@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCreative, Autoplay } from "swiper/modules";
 import Img from "../../_global/Img";
@@ -47,13 +46,13 @@ export default function HeroSlider() {
                   alt="Hero Image"
                 />
                 <div className="content absolute left-14 top-1/2 -translate-y-1/2 max-md:left-2 max-md:top-[60%]">
-                  <p className="firstLine w-fit h-fit rounded-full bg-yellow-400 p-1 font-normal text-[14px]">
+                  <p className="firstLine text-gray-800 mb-2 w-fit h-fit rounded-full bg-primary p-1 px-2 font-normal text-[14px]">
                     WEEKEND DISCOUNT
                   </p>
-                  <p className="firstTitle font-medium py-1 text-5xl max-md:text-3xl">
+                  <p className="firstTitle font-medium py-1 text-5xl max-md:text-3xl text-gray-700">
                     {slide.title}
                   </p>
-                  <p className=" font-bold py-1 text-7xl max-md:text-4xl">
+                  <p className=" font-bold py-1 text-7xl max-md:text-4xl text-gray-800">
                     {slide.bold_title}
                   </p>
                   <p className=" py-4 text-[20px]">
@@ -65,7 +64,7 @@ export default function HeroSlider() {
                   </p>
                   <Link
                     href={"/shop"}
-                    className="btn-shop block w-fit py-4 px-8 bg-primary-blue rounded-full text-white hover:bg-cyan-500 duration-300"
+                    className="btn-shop block w-fit py-4 px-8 bg-primary rounded-full text-white hover:bg-cyan-700 duration-300"
                   >
                     Shop now
                   </Link>

@@ -2,18 +2,17 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { useSignUp } from "@clerk/nextjs";
 import { VscLoading } from "react-icons/vsc";
 import { useRouter } from "next/navigation";
 import { FaTimes } from "react-icons/fa";
 import { PiWarningOctagon } from "react-icons/pi";
+import { instance } from "../_global/AxiosTool";
 
 interface props {
   onClose: () => void;
 }
 
 export default function VerifyCode({ onClose }: props) {
-  const { signUp, isLoaded } = useSignUp();
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
@@ -25,7 +24,7 @@ export default function VerifyCode({ onClose }: props) {
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     const val = e.target.value;
     if (!/^\d*$/.test(val)) return;
@@ -42,7 +41,7 @@ export default function VerifyCode({ onClose }: props) {
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     if (e.key === "Backspace" && values[index] === "" && index > 0) {
       inputsRef.current[index - 1]?.focus();
@@ -68,19 +67,14 @@ export default function VerifyCode({ onClose }: props) {
     inputsRef.current[lastIndex]?.focus();
   };
 
-  if (!signUp) return;
-
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
 
     try {
       setLoading(true);
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
-      });
 
-      if (completeSignUp.status === "complete") {
+      const response = await instance.post("/");
+      if (response.status === 200) {
         toast.success("User signed up and verified!");
         setValues(Array(6).fill(""));
         router.push("/signin");

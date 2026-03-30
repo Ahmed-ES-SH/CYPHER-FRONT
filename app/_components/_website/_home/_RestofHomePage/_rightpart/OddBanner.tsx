@@ -48,18 +48,18 @@ export default function OddBanner({ imgsrc }: props) {
           ref={imgRef} // Assign ref to your Img component if it forwards it, or directly to img if it's a native img
         />
         <div className="content absolute left-14 top-1/2 -translate-y-1/2 max-md:left-2 max-md:top-[60%]">
-          <p className="firstLine w-fit h-fit text-sky-500 p-1 font-normal text-[14px]">
+          <p className="firstLine text-white w-fit h-fit p-1 font-normal text-[14px]">
             WEEKEND DISCOUND
           </p>
-          <p className="font-medium py-1 text-[22px] max-md:text-[17px]">
+          <p className="font-medium text-white py-1 text-[22px] max-md:text-[17px]">
             Momentum 3 Headphone
           </p>
-          <p className="font-bold py-1 text-[12px] max-md:text-[12px]">
+          <p className="font-bold text-white py-1 text-[12px] max-md:text-[12px]">
             Dont't miss the last opportunity
           </p>
           <Link
             href={"/shop"}
-            className="btn-shop block w-fit py-2 px-4 bg-primary-blue hover:bg-sky-500 duration-300 rounded-full text-white"
+            className="btn-shop mt-4 block w-fit py-2 px-4 bg-primary-blue hover:bg-sky-500 duration-300 rounded-full text-white"
           >
             Shop now
           </Link>

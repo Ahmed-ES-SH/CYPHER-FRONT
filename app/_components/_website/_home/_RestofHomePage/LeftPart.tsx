@@ -10,7 +10,7 @@ export default function LeftPart() {
       <div className="xl:flex-1 flex flex-col gap-4 w-full">
         <Features />
         <PhoneCard />
-        <CardTimer imgsrc={"/images/category-2.jpg"} />
+        <CardTimer imgsrc={"/images/apple-air.webp"} />
         <FixedPart />
       </div>
     </>

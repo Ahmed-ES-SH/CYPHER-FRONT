@@ -7,11 +7,11 @@ import React, { Suspense } from "react";
 export async function generateMetadata({ searchParams }: any) {
   const { articleId } = await searchParams;
   const article = articles.find(
-    (article) => article.id.toString() === articleId
+    (article) => article.id.toString() === articleId,
   );
   return {
-    title: `Machic - Blog – ${article?.title ?? "Article"}`,
-    description: `Machic - Blog – ${
+    title: `CYPHER - Blog – ${article?.title ?? "Article"}`,
+    description: `CYPHER - Blog – ${
       article?.description ?? "Read our latest articles and insights."
     }`,
   };

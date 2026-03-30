@@ -3,7 +3,7 @@ import { useListToggle } from "@/app/store/ListToggle";
 import { menuData } from "@/constants/constantsDetails";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { MdChevronRight } from "react-icons/md";
 
 export default function HeroList() {
@@ -21,7 +21,7 @@ export default function HeroList() {
           animate={{ opacity: 1, height: "61vh" }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="origin-top shrink-0 w-[280px] h-[61vh] bg-white rounded-lg shadow-lg overflow-hidden max-xl:hidden"
+          className="origin-top bg-primary/10 backdrop-blur-lg mt-1 shrink-0 w-[280px] h-[61vh] rounded-lg shadow-lg overflow-hidden max-xl:hidden"
         >
           <div className="divide-y divide-gray-100">
             {menuData.map((item, index) => (

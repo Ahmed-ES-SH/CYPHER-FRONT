@@ -1,4 +1,4 @@
-# 🛒 Machic E-Commerce Store
+# 🛒 CYPHER E-Commerce Store
 
 # 🛒 Modern E-Commerce Store built with Next.js 15 & Clerk Authentication
 
@@ -118,7 +118,7 @@ This allows rapid development and UI testing before backend integration.
    https://github.com/Ahmed-ES-SH/machie-store.git
 
    # 2. Navigate to the project directory
-   cd machic-store
+   cd CYPHER-store
    ```
 
 # 3. Install dependencies

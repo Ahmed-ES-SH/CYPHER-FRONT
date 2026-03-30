@@ -143,7 +143,7 @@ export default function MobailSideBar() {
                     </li>
                     <li>
                       <p className="text-xs text-gray-500 leading-relaxed p-2 pt-6 border-t border-gray-300">
-                        Copyright byearl © Machic WordPress Theme. All right
+                        Copyright byearl © CYPHER WordPress Theme. All right
                         reserved. Develop by{" "}
                         <span className="font-medium text-gray-600">
                           Ahmed Ismail

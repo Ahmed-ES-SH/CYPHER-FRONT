@@ -11,7 +11,7 @@ export default function RightPart() {
     <div className="xl:flex-1/2 w-full">
       <DualBanner />
       <FourProducts />
-      <OddBanner imgsrc="/images/banner-4.jpg" />
+      <OddBanner imgsrc="/images/banner-4.png" />
       <LatestDeals />
       <DiscountBanner />
       <PhonesSection />

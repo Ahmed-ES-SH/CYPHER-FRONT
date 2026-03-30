@@ -1,375 +1,54 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react/no-unescaped-entities */
 "use client";
-import React, { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { FaFacebook } from "react-icons/fa";
-import { OAuthStrategy } from "@clerk/types";
-import {
-  FiArrowRight,
-  FiEye,
-  FiEyeOff,
-  FiLoader,
-  FiLock,
-  FiMail,
-  FiX,
-} from "react-icons/fi";
-import Link from "next/link";
-import Img from "@/app/_components/_global/Img";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { useSignIn, useUser } from "@clerk/nextjs";
-
-type FormFields = "email" | "password";
-
-interface FormData {
-  email: string;
-  password: string;
-}
-
-interface FormErrors {
-  email: string;
-  password: string;
-}
+import { motion } from "framer-motion";
+import SignInHeader from "./_signinPage/SignInHeader";
+import SocialLogin from "./_signinPage/SocialLogin";
+import SignInForm from "./_signinPage/SignInForm";
+import SignInFooter from "./_signinPage/SignInFooter";
+import SignInBackground, {
+  SignInSideImage,
+} from "./_signinPage/SignInBackground";
 
 export default function SignInComponent() {
-  const router = useRouter();
-  const { user } = useUser();
-  const { signIn, setActive } = useSignIn();
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({
-    email: "",
-    password: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-
-  // This not Necessary because middleware File but Just in case
-  useEffect(() => {
-    if (user) {
-      router.push(`/`);
-    }
-  }, [user, router]);
-
-  const validateForm = () => {
-    const newErrors = {
-      email: "",
-      password: "",
-    };
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-
-    // تحقق إن كان هناك أي خطأ
-    return !Object.values(newErrors).some((msg) => msg !== "");
+  const signInWithGoogle = () => {
+    // Implement Google Sign In logic here
+    console.log("Google Sign In clicked");
   };
-
-  if (!signIn) return null;
-
-  const handleSignIn = async (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const isValid = validateForm();
-    if (!isValid) return;
-
-    try {
-      setIsLoading(true);
-      const result = await signIn.create({
-        identifier: formData.email,
-        password: formData.password,
-      });
-
-      await setActive({ session: result.createdSessionId });
-      router.push(`/`);
-    } catch (err: any) {
-      const errorMessage = err.errors?.[0]?.message || "Something went wrong";
-      // ✅ Show error toast
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signInWith = (strategy: OAuthStrategy) => {
-    return signIn
-      .authenticateWithRedirect({
-        strategy,
-        redirectUrl: `/`,
-        redirectUrlComplete: "/",
-      })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err: any) => {
-        console.log(err.errors);
-        console.error(err, null, 2);
-      });
-  };
-
-  const handleInputChange = (field: FormFields, value: string): void => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-  };
-
-  if (user) return null;
 
   return (
-    <div className="min-h-screen c-container mt-2  flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Animation */}
-      <div className="absolute inset-0">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute top-1/4 left-1/4 w-full bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [360, 180, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl"
-        />
-      </div>
+    <div className=" c-container  flex min-h-[86vh] items-center justify-center  relative overflow-hidden">
+      <SignInBackground />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-[97%] lg:w-[80%] xl:w-1/2 relative z-10 border border-white/20"
-      >
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-center mb-8"
-        >
-          <Img src="/logo.png" className="w-60 my-3  mx-auto object-contain" />
-        </motion.div>
-        <div className="text-center my-3">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome Back
-          </h1>
-          <p className="text-gray-600">Sign in to your account</p>
-        </div>
-        {/* Social Login Buttons */}
+      <div className="flex max-lg:max-w-xl mt-10 items-start h-[70vh] border border-gray-200 rounded-lg shadow-lg w-full ">
+        {/* form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="space-y-3 mb-6"
+          transition={{ duration: 0.8 }}
+          className="p-6 max-lg:bg-white flex-1 xl:w-1/2 relative z-10 max-lg:border max-lg:border-gray-200 max-lg:rounded-lg max-lg:shadow-lg"
         >
-          <button
-            onClick={() => signInWith("oauth_google")}
-            className=" hover:scale-[103%] w-full bg-white border-2 border-gray-200 text-gray-700 py-3 px-4 rounded-xl font-medium flex items-center justify-center space-x-3 hover:border-gray-300 hover:shadow-lg transition-all duration-300"
-          >
-            <div className="flex items-center justify-center gap-3  ">
-              <Img src="/google.png" className="w-5 h-5 object-contain" />
-              <span className="w-[180px]">Continue with Google</span>
+          <SignInHeader />
+
+          <SocialLogin onGoogleSignIn={signInWithGoogle} />
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
             </div>
-          </button>
-          <button
-            onClick={() => signInWith("oauth_facebook")}
-            className=" hover:scale-[103%] w-full bg-[#1877F2] text-white py-3 px-4 rounded-xl font-medium flex items-center justify-center space-x-3 hover:bg-[#166FE5] transition-all duration-300 shadow-lg"
-          >
-            <div className="flex items-center justify-center gap-3">
-              <FaFacebook className="w-5 h-5 text-white" />
-              <span className="w-[180px]">Continue with Facebook</span>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">
+                or continue with email
+              </span>
             </div>
-          </button>
+          </div>
+
+          <SignInForm />
+
+          <SignInFooter />
         </motion.div>
 
-        {/* Divider */}
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500">
-              or continue with email
-            </span>
-          </div>
-        </div>
-
-        {/* Login Form */}
-        <motion.form
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          onSubmit={handleSignIn}
-          className="space-y-6"
-        >
-          {/* Email Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <div className="relative">
-              <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                  errors.email ? "border-red-500" : "border-gray-200"
-                }`}
-                placeholder="Enter your email"
-              />
-              {errors.email && (
-                <motion.div
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                >
-                  <FiX className="w-5 h-5 text-red-500" />
-                </motion.div>
-              )}
-            </div>
-            <AnimatePresence>
-              {errors.email && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-1 text-sm text-red-500"
-                >
-                  {errors.email}
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Password Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                  errors.password ? "border-red-500" : "border-gray-200"
-                }`}
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? (
-                  <FiEyeOff className="w-5 h-5" />
-                ) : (
-                  <FiEye className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-            <AnimatePresence>
-              {errors.password && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-1 text-sm text-red-500"
-                >
-                  {errors.password}
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
-            </label>
-            <Link
-              href={"/forgetpassword"}
-              type="button"
-              className="text-sm block text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
-          {/* Submit Button */}
-          <motion.button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-primary-blue text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600  hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <>
-                <FiLoader className="w-5 h-5 animate-spin" />
-                <span>Signing in...</span>
-              </>
-            ) : (
-              <>
-                <span>Sign in</span>
-                <FiArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </motion.button>
-        </motion.form>
-
-        {/* Sign Up Link */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="text-center mt-6"
-        >
-          <p className="text-gray-600">
-            Don't have an account?{" "}
-            <Link
-              href={"/signup"}
-              className="text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Sign up
-            </Link>
-          </p>
-        </motion.div>
-      </motion.div>
+        <SignInSideImage />
+      </div>
     </div>
   );
 }

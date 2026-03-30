@@ -10,7 +10,7 @@ interface props {
 
 export default function LinkAnimate({ title }: props) {
   return (
-    <Link className="text-primary-blue flex items-center gap-2" href={"/"}>
+    <Link className="text-primary-blue flex items-center gap-2" href={"/shop"}>
       <p>{title}</p>
       <motion.div
         initial={{ x: 0 }}

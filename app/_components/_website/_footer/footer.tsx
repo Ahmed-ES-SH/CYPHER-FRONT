@@ -28,9 +28,9 @@ export function Footer() {
             {/* Copyright and payment */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                Copyright {currentYear} © Machic. All rights reserved. Powered
+                Copyright {currentYear} © CYPHER. All rights reserved. Powered
                 by
-                <span className="text-primary-blue px-2">Ahmed Ismail</span>.
+                <span className="text-primary-blue px-2">Ahmed</span>.
               </p>
               <Img src="/images/payment.webp" className="w-[250px]" />
             </div>

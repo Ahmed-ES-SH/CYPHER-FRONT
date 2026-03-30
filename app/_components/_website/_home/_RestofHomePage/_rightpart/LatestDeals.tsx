@@ -3,6 +3,8 @@ import Stars from "@/app/_components/_global/Stars";
 import { LatestDealsContent } from "@/constants/constantsDetails";
 import React from "react";
 import MainHead from "./MainHead";
+import Link from "next/link";
+import { formatTitle } from "@/app/helpers/helpers";
 
 export default function LatestDeals() {
   return (
@@ -12,17 +14,18 @@ export default function LatestDeals() {
           <MainHead title={"Latest Deals"} />
           <div className="latest flex max-lg:flex-col items-center gap-2 w-full justify-between ">
             {LatestDealsContent.map((deal, index) => (
-              <div
+              <Link
                 key={index}
-                className="w-[49%] max-lg:w-full borer shadow-lg rounded-md p-2 flex items-center gap-2 justify-between"
+                href={`/products/${formatTitle(deal.title)}?productId=${deal.id}`}
+                className="flex-1 group cursor-pointer max-lg:w-full borer shadow-lg rounded-md p-2 flex items-center gap-2 justify-between"
               >
                 <Img
-                  className="w-[150px] rounded-md"
+                  className={`rounded-md ${index === 0 ? "w-[120px]" : "w-[150px]"}`}
                   src={deal.img || "/public"}
                   alt="image-Latest"
                 />
                 <div className="content w-full">
-                  <h1 className="w-1/2 max-md:w-full text-[14px] py-2 ">
+                  <h1 className="w-1/2 group-hover:text-primary-blue transition-all duration-300 max-md:w-full text-[14px] py-2 ">
                     {deal.title}
                   </h1>
                   <Stars
@@ -49,7 +52,7 @@ export default function LatestDeals() {
                     </h1>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

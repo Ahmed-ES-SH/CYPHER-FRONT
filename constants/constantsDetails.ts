@@ -52,12 +52,12 @@ export const leftCornerFirst = [
 
 export const dualBannerDetails = [
   {
-    img: "/images/banner-box.jpg",
+    img: "/images/banner-box.png",
     title: "Home Speakers",
     desc: "Dont't miss the last opportunity",
   },
   {
-    img: "/images/banner-2.jpg",
+    img: "/images/phone-banner.png",
     title: "New Smart Phones",
     desc: "Dont't miss the last opportunity",
   },
@@ -238,9 +238,9 @@ export const NewProductscontent = [
 
 export const LatestDealsContent = [
   {
-    id: (Math.random() * 100)?.toFixed(0),
-    img: "/images/product-15-400x400.jpg",
-    title: "Apple 10.9-inch iPad Air Wi-Fi Cellular 64GB",
+    id: 159,
+    img: "/images/thumbnail.webp",
+    title: "iPad Mini 2021 Starlight",
     stars: 5,
     price: 699.99,
     priceAfterDiscount: 699.99,
@@ -250,9 +250,9 @@ export const LatestDealsContent = [
     discount: "11%",
   },
   {
-    id: (Math.random() * 100)?.toFixed(0),
-    img: "/images/product-2-400x400.jpg",
-    title: "Apple iPhone 11 64GB Yellow Fully Unlocked - 3",
+    id: 123,
+    img: "/images/iphone-13.webp",
+    title: "Apple iPhone 13 64GB",
     stars: 4,
     price: 478.67,
     priceAfterDiscount: 438.67,
@@ -521,19 +521,25 @@ export const SliderContent: {
   disocunt_percent: string;
 }[] = [
   {
-    img_src: "/images/slider-banner-3.jpg",
+    img_src: "/slider/slide-1.webp",
     title: "Enhance Your",
     bold_title: "Entertaimment",
     disocunt_percent: "20%",
   },
   {
-    img_src: "/images/slider-banner-3.jpg",
+    img_src: "/slider/slide-2.webp",
     title: "Great Stores",
     bold_title: "Great Choices",
     disocunt_percent: "30%",
   },
   {
-    img_src: "/images/slider-banner-3.jpg",
+    img_src: "/slider/slide-3.webp",
+    title: "The World's largest",
+    bold_title: "Online Store",
+    disocunt_percent: "40%",
+  },
+  {
+    img_src: "/slider/slide-4.webp",
     title: "The World's largest",
     bold_title: "Online Store",
     disocunt_percent: "40%",

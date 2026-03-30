@@ -3,9 +3,9 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Machic – Electronics Store ECommerce - Cart Page",
+  title: "CYPHER – Electronics Store ECommerce - Cart Page",
   description:
-    "Review and manage the items in your cart. Securely proceed to checkout and enjoy the best deals on the latest electronics at Machic.",
+    "Review and manage the items in your cart. Securely proceed to checkout and enjoy the best deals on the latest electronics at CYPHER.",
 };
 
 export default function CartPage() {

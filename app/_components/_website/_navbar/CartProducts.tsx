@@ -1,7 +1,7 @@
 "use client";
 
 import { useCartStore } from "@/app/store/CartStore";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { BsMinecart } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,7 @@ export default function CartProducts() {
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setShowMiniCart(false);
-    }, 100);
+    }, 250);
   };
 
   const totalPrice = cartItems.reduce((acc, item) => {
@@ -46,7 +46,7 @@ export default function CartProducts() {
         <div className="relative">
           <BsMinecart className="lg:size-7 size-6 text-icon-color" />
           {cartItems.length > 0 && (
-            <div className="w-4 h-4 absolute -top-1 -right-2 bg-primary-yellow flex items-center justify-center text-gray-950 text-[10px] font-bold rounded-full">
+            <div className="w-4 h-4 absolute -top-1 -right-2 bg-primary animate-bounce text-white flex items-center justify-center text-[10px] font-bold rounded-full">
               {cartItems.length}
             </div>
           )}
@@ -65,7 +65,7 @@ export default function CartProducts() {
             animate={{ opacity: 1, y: 0, scale: 1.02 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="absolute right-0  mt-4 w-[340px] bg-white shadow-2xl rounded-xl p-4 space-y-3 z-[99999]"
+            className="absolute right-0  mt-4 w-[340px] bg-white shadow-2xl rounded-xl p-4 space-y-3 z-99999"
           >
             <h4 className="text-lg font-semibold text-gray-800">Cart Items</h4>
 
@@ -125,7 +125,7 @@ export default function CartProducts() {
                 </button>
                 <button
                   onClick={() => handleCheckout(cartItems)}
-                  className="flex-1 w-full py-2 text-sm font-medium bg-primary-yellow hover:bg-yellow-300 text-white rounded-lg transition"
+                  className="flex-1 w-full py-2 text-sm font-medium bg-primary hover:bg-primary/70 text-white rounded-lg transition"
                 >
                   Checkout
                 </button>

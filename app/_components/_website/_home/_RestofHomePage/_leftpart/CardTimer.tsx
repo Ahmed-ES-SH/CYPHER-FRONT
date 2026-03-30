@@ -15,15 +15,24 @@ export default function CardTimer({ imgsrc }: props) {
       </h1>
       <div>
         <div className="cursor-pointer z-[99999] h-full relative bg-white  w-full   rounded-md shadow-md overflow-hidden hover:shadow-lg duration-300 group">
-          <div className="">
-            <Img className="w-[420px] mx-auto" src={imgsrc} alt="img-banner" />
+          <div className="relative">
+            <Img
+              src="/images/glow-white.png"
+              className="absolute top-0 left-0 w-full h-full object-cover -z-1"
+            />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-48 bg-primary opacity-50 rounded-full blur-3xl z-1"></div>
+            <Img
+              className="w-[420px] mx-auto z-10"
+              src={imgsrc}
+              alt="img-banner"
+            />
           </div>
           <div className="flex items-center justify-center flex-col px-4">
             <div className="text-[18px] text-sky-400  p-2 h-[90px] text-center group">
-              <p className="group-hover:border-b-2 border-sky-400 ">
-                Bose Noise Cancelling
+              <p className="group-hover:underline duration-300">
+                Apple AirPods Max Silver
               </p>
-              <p className="group-hover:border-b-2 border-sky-400 ">
+              <p className="group-hover:underline duration-300">
                 Wireless Bluetooth
               </p>
             </div>

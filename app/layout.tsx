@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import ClientLayout from "./_components/_global/ClientLayout";
-import "./globals.css";
 import Navbar from "./_components/_global/Navbar";
 import MobailSideBar from "./_components/_website/_navbar/MobileSidebar";
 import { Toaster } from "sonner";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Footer } from "./_components/_website/_footer/footer";
+
+import "./globals.css";
+import AnimateBackground from "./_components/_global/AnimateBackground";
 
 const RobotoFont = Roboto({
   variable: "--font-roboto",
@@ -14,9 +15,9 @@ const RobotoFont = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Machic – Electronics Store ECommerce",
+  title: "CYPHER – Electronics Store ECommerce",
   description:
-    "Shop the latest smartphones, laptops, and electronic accessories at Machic. Premium quality, exclusive deals, and fast, secure shipping.",
+    "Shop the latest smartphones, laptops, and electronic accessories at CYPHER. Premium quality, exclusive deals, and fast, secure shipping.",
 };
 export default function RootLayout({
   children,
@@ -25,16 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${RobotoFont.variable} antialiased`}>
-        <ClerkProvider>
-          <ClientLayout>
-            <Navbar />
-            <MobailSideBar />
-            <Toaster richColors position="top-center" />
-            <div className="min-h-screen">{children}</div>
-            <Footer />
-          </ClientLayout>
-        </ClerkProvider>
+      <body className={`${RobotoFont.variable}  antialiased`}>
+        <ClientLayout>
+          <Navbar />
+          <MobailSideBar />
+          <Toaster richColors position="top-center" />
+          {children}
+          <Footer />
+        </ClientLayout>
       </body>
     </html>
   );

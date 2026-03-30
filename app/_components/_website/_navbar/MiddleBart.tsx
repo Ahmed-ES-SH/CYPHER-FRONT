@@ -2,7 +2,7 @@ import React from "react";
 import Img from "../../_global/Img";
 import Link from "next/link";
 import Barsbtn from "./Barsbtn";
-import InputSearch from "./InputSearch";
+import InputSearch from "./_searchInput/InputSearch";
 import CartProducts from "./CartProducts";
 import WishListProducts from "./WishListProducts";
 import SignInBtn from "./Signinbtn";
@@ -17,7 +17,7 @@ export default async function MiddleBart() {
         <Link className="block" href={"/"} id="logo">
           <Img
             src="/logo.png"
-            className="lg:w-40 w-32"
+            className="xl:w-72 lg:w-48 w-32"
             alt="logo"
             loading="eager"
           />

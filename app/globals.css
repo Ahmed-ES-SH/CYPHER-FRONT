@@ -3,12 +3,14 @@
 :root {
   --primary-blue: #0070dc;
   --primary-yellow: #facc15;
+  --primary: #00b8db;
   --dark-btn: #041e42;
   --icon-color: #99a1af;
 }
 
 @theme inline {
   --color-primary-blue: var(--primary-blue);
+  --color-primary: var(--primary);
   --color-primary-yellow: var(--primary-yellow);
   --color-dark-btn: var(--dark-btn);
   --color-icon-color: var(--icon-color);
@@ -17,7 +19,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --primary-blue: #0070dc;
-    --primary-yellow: #facc15;
+    --primary-yellow: #080806;
     --dark-btn: #041e42;
   }
 }

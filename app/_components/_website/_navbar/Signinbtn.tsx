@@ -1,29 +1,18 @@
 "use client";
-import { UserButton, useUser } from "@clerk/nextjs";
+
 import Link from "next/link";
-import React from "react";
 import { AiOutlineUser } from "react-icons/ai";
 
+function UserButton() {
+  return <div></div>;
+}
+
 export default function SignInBtn() {
-  const { user } = useUser();
+  const user = false;
   return (
     <>
       {user ? (
-        <UserButton
-          appearance={{
-            elements: {
-              userButtonAvatarBox: {
-                width: "32px",
-                height: "32px",
-              },
-              userButtonPopoverCard: {
-                zIndex: "999999",
-                marginTop: "15px",
-                marginLeft: "auto",
-              },
-            },
-          }}
-        />
+        <UserButton />
       ) : (
         <Link
           href={"/signin"}

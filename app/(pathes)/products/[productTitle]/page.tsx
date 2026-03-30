@@ -9,8 +9,8 @@ export async function generateMetadata({ searchParams }: any) {
   const product = await FetchData(`/products/${productId}`, false);
 
   return {
-    title: `Machic - products – ${product?.title ?? "Product"}`,
-    description: `Machic - products – ${
+    title: `CYPHER - products – ${product?.title ?? "Product"}`,
+    description: `CYPHER - products – ${
       product?.description ?? "Check our Popular Products."
     }`,
   };
