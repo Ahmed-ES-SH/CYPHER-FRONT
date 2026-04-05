@@ -1,17 +1,16 @@
 "use client";
 
+import { useAuthStore } from "@/app/store/useAuthStore";
 import Link from "next/link";
 import { AiOutlineUser } from "react-icons/ai";
-
-function UserButton() {
-  return <div></div>;
-}
+import { UserButton } from "./UserButton";
 
 export default function SignInBtn() {
-  const user = false;
+  const { isAuthenticated } = useAuthStore((state) => state);
+
   return (
     <>
-      {user ? (
+      {isAuthenticated ? (
         <UserButton />
       ) : (
         <Link

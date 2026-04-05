@@ -18,17 +18,29 @@ export default function CartProducts() {
   const router = useRouter();
 
   const handleMouseEnter = () => {
+    // Clear any existing closing or opening timeouts
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
     }
-    setShowMiniCart(true);
+
+    // Set a timeout to open the cart after 500ms
+    timeoutRef.current = setTimeout(() => {
+      setShowMiniCart(true);
+      timeoutRef.current = null;
+    }, 500);
   };
 
   const handleMouseLeave = () => {
+    // Clear the opening timeout if user leaves before 500ms
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Set a timeout to close the cart after 250ms
     timeoutRef.current = setTimeout(() => {
       setShowMiniCart(false);
-    }, 250);
+      timeoutRef.current = null;
+    }, 150);
   };
 
   const totalPrice = cartItems.reduce((acc, item) => {
@@ -40,11 +52,12 @@ export default function CartProducts() {
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={() => setShowMiniCart(!showMiniCart)}
     >
       {/* Cart Icon and Summary */}
-      <div className="flex items-center gap-4 cursor-pointer max-md:mr-2">
+      <div className="flex items-center group gap-4 cursor-pointer max-md:mr-2">
         <div className="relative">
-          <BsMinecart className="lg:size-7 size-6 text-icon-color" />
+          <BsMinecart className="lg:size-7 size-6 text-icon-color group-hover:text-primary duration-300" />
           {cartItems.length > 0 && (
             <div className="w-4 h-4 absolute -top-1 -right-2 bg-primary animate-bounce text-white flex items-center justify-center text-[10px] font-bold rounded-full">
               {cartItems.length}
@@ -53,7 +66,12 @@ export default function CartProducts() {
         </div>
         <div className="flex flex-col items-start max-md:hidden">
           <p className="text-[11px] text-icon-color">Total</p>
-          <p className="text-[15px] font-semibold">${totalPrice.toFixed(2)}</p>
+          <p className="text-[15px] font-semibold">
+            $
+            {totalPrice > 10000
+              ? totalPrice.toString().slice(0, 5) + "..."
+              : totalPrice.toFixed(2)}
+          </p>
         </div>
       </div>
 

@@ -11,6 +11,13 @@ import {
   FiX,
 } from "react-icons/fi";
 import Link from "next/link";
+import { validateForm } from "./validateForm";
+import { toast } from "sonner";
+import { API_ENDPOINTS } from "@/constants/endpoints";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { encryptToken } from "@/app/helpers/encryptToken";
+import { apiInstance } from "@/app/helpers/axios";
 
 type FormFields = "email" | "password";
 
@@ -25,6 +32,8 @@ interface FormErrors {
 }
 
 export default function SignInForm() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -38,29 +47,6 @@ export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const validateForm = () => {
-    const newErrors = {
-      email: "",
-      password: "",
-    };
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    setErrors(newErrors);
-
-    return !Object.values(newErrors).some((msg) => msg !== "");
-  };
-
   const handleInputChange = (field: FormFields, value: string): void => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
@@ -69,14 +55,52 @@ export default function SignInForm() {
     }
   };
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
+
+    // 1. Validation check
+    const isValidate = validateForm(formData, setErrors);
+    if (!isValidate) return;
+
+    try {
       setIsLoading(true);
-      // Logic for sign in would go here
-      console.log("Signing in with:", formData);
-      // Simulate API call
-      setTimeout(() => setIsLoading(false), 2000);
+
+      // 2. Use the instance directly (don't hardcode the full URL)
+      const response = await apiInstance.post(API_ENDPOINTS.AUTH.LOGIN, {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // 3. Destructure data for cleaner access
+      const { access_token, user } = response.data;
+      const tokenName =
+        process.env.NEXT_PUBLIC_TOKEN_NAME || "cypher_auth_token";
+
+      if (access_token) {
+        // 4. Secure cookie storage
+        Cookies.set(tokenName, encryptToken(access_token), {
+          expires: 5, // Token valid for 5 days
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        });
+
+        toast.success("Welcome back to CYPHER!");
+
+        // 5. Immediate routing is better than setTimeout in most cases
+        // but if you want to show the toast, 500ms is fine.
+        setTimeout(() => {
+          router.push("/");
+          router.refresh(); // Refresh to update server-side session
+        }, 800);
+      }
+    } catch (error: any) {
+      console.log(error);
+      // 6. Detailed error handling
+      const message =
+        error.response?.data?.message || "Invalid Email or Password";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,9 +162,7 @@ export default function SignInForm() {
           <input
             type={showPassword ? "text" : "password"}
             value={formData.password}
-            onChange={(e) =>
-              handleInputChange("password", e.target.value)
-            }
+            onChange={(e) => handleInputChange("password", e.target.value)}
             className={`w-full pl-12 pr-12 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
               errors.password ? "border-red-500" : "border-gray-200"
             }`}
@@ -184,7 +206,7 @@ export default function SignInForm() {
           <span className="ml-2 text-sm text-gray-600">Remember me</span>
         </label>
         <Link
-          href={"/forgetpassword"}
+          href={"/forget-password"}
           className="text-sm block text-blue-600 hover:text-blue-700 font-medium"
         >
           Forgot password?
@@ -195,7 +217,7 @@ export default function SignInForm() {
       <motion.button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-primary-blue text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600  hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-primary hover:bg-primary/80 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg   hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
           <>

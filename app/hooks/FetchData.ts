@@ -1,4 +1,7 @@
-export default async function FetchData(api: string, paginationState: boolean) {
+export default async function FetchDummyData(
+  api: string,
+  paginationState: boolean,
+) {
   try {
     const options = {
       method: "GET",

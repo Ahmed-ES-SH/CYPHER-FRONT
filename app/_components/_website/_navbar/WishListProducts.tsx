@@ -1,7 +1,7 @@
 "use client";
 import { useWishlistStore } from "@/app/store/WishlistStoreStore";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState } from "react";
+import { useState } from "react";
 import { AiOutlineHeart } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
 import Img from "../../_global/Img";
@@ -13,23 +13,8 @@ export default function WishListProducts() {
   const { wishlistItems, removeFromWishlist, clearWishlist } =
     useWishlistStore();
   const { addToCart } = useCartStore();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [showWishList, setShowWishList] = useState(false);
-
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    setShowWishList(true);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setShowWishList(false);
-    }, 250);
-  };
 
   const WrapperAddToCart = (product: ProductType) => {
     const isInWishList = wishlistItems.some((item) => item.id === product.id);
@@ -41,12 +26,13 @@ export default function WishListProducts() {
   return (
     <>
       <div
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         id="favoriteList"
         className="relative cursor-pointer "
+        onClick={() => setShowWishList(!showWishList)}
       >
-        <AiOutlineHeart className="size-7  text-icon-color" />
+        <AiOutlineHeart
+          className={`${showWishList ? "text-red-500" : "text-icon-color"} size-7 hover:text-red-500 duration-300`}
+        />
         {wishlistItems.length > 0 && (
           <div className="min-w-fit w-4 h-4 absolute -top-1 -right-2 animate-bounce bg-red-400 text-white flex items-center justify-center text-[10px] font-bold rounded-full p-1">
             {wishlistItems.length}

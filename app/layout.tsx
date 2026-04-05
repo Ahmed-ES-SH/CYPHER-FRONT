@@ -7,7 +7,6 @@ import { Toaster } from "sonner";
 import { Footer } from "./_components/_website/_footer/footer";
 
 import "./globals.css";
-import AnimateBackground from "./_components/_global/AnimateBackground";
 
 const RobotoFont = Roboto({
   variable: "--font-roboto",
@@ -25,12 +24,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${RobotoFont.variable}  antialiased`}>
         <ClientLayout>
           <Navbar />
           <MobailSideBar />
-          <Toaster richColors position="top-center" />
+          <Toaster closeButton richColors position="top-center" />
           {children}
           <Footer />
         </ClientLayout>

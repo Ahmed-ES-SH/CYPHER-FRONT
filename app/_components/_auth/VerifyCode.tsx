@@ -6,7 +6,7 @@ import { VscLoading } from "react-icons/vsc";
 import { useRouter } from "next/navigation";
 import { FaTimes } from "react-icons/fa";
 import { PiWarningOctagon } from "react-icons/pi";
-import { instance } from "../_global/AxiosTool";
+import { apiInstance } from "@/app/helpers/axios";
 
 interface props {
   onClose: () => void;
@@ -73,7 +73,7 @@ export default function VerifyCode({ onClose }: props) {
     try {
       setLoading(true);
 
-      const response = await instance.post("/");
+      const response = await apiInstance.post("/");
       if (response.status === 200) {
         toast.success("User signed up and verified!");
         setValues(Array(6).fill(""));
@@ -101,7 +101,7 @@ export default function VerifyCode({ onClose }: props) {
           initial={{ opacity: 0, y: -300 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -300 }}
-          className="w-full h-screen fixed top-0 left-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-md"
+          className="w-full h-screen fixed top-0 left-0 z-9999 flex items-center justify-center bg-black/50 backdrop-blur-md"
         >
           <div className="bg-white shadow-xl p-6 rounded-3xl space-y-8 border border-gray-200 relative w-[95%] lg:w-[80%] xl:w-1/2">
             <FaTimes
@@ -148,7 +148,7 @@ export default function VerifyCode({ onClose }: props) {
                 type="submit"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-8 py-3 w-full rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg"
+                className="bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-8 py-3 w-full rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg"
               >
                 {loading ? (
                   <motion.div
@@ -171,7 +171,7 @@ export default function VerifyCode({ onClose }: props) {
           initial={{ opacity: 0, y: -300 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -300 }}
-          className="w-full h-screen fixed top-0 left-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-md"
+          className="w-full h-screen fixed top-0 left-0 z-9999 flex items-center justify-center bg-black/50 backdrop-blur-md"
         >
           <div className="lg:w-1/2 w-[80%] bg-white flex flex-col gap-4 items-center py-6 px-2 rounded-md">
             <PiWarningOctagon className="size-12 text-red-400" />

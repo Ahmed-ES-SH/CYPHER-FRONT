@@ -52,6 +52,10 @@ body {
   font-family: var(--font-roboto), Helvetica, sans-serif;
 }
 
+input {
+  outline: none;
+}
+
 @layer components {
   .c-container {
     @apply xl:w-[85%] lg:w-[90%] w-full px-[15px] max-md:px-[10px] mx-auto;
@@ -77,4 +81,8 @@ body {
 a,
 button {
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }

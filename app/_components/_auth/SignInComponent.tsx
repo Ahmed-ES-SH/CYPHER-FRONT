@@ -28,7 +28,7 @@ export default function SignInComponent() {
         >
           <SignInHeader />
 
-          <SocialLogin onGoogleSignIn={signInWithGoogle} />
+          <SocialLogin />
 
           {/* Divider */}
           <div className="relative mb-6">

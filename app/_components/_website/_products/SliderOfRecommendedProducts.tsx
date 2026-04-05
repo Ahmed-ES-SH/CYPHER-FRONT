@@ -12,7 +12,7 @@ export default function SliderOfRecommendedProducts() {
   const { products } = useData();
 
   return (
-    <div className="w-full mt-12 pt-2 border-t border-gray-300 px-4">
+    <div className="w-full min-h-screen mt-12 pt-2 border-t border-gray-300 px-4">
       <div className="text-start mb-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-2">
           Recommended for You
@@ -27,6 +27,7 @@ export default function SliderOfRecommendedProducts() {
         autoplay={{
           delay: 1500,
           disableOnInteraction: false,
+          pauseOnMouseEnter: true,
         }}
         modules={[Autoplay]}
         slidesPerView={5}
@@ -48,7 +49,7 @@ export default function SliderOfRecommendedProducts() {
             slidesPerView: 5,
           },
         }}
-        className="w-full"
+        className="w-full "
       >
         {products.map((product) => (
           <SwiperSlide key={product?.id}>

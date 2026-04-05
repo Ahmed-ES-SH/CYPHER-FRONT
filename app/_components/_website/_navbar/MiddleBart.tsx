@@ -5,7 +5,7 @@ import Barsbtn from "./Barsbtn";
 import InputSearch from "./_searchInput/InputSearch";
 import CartProducts from "./CartProducts";
 import WishListProducts from "./WishListProducts";
-import SignInBtn from "./Signinbtn";
+import SignInBtn from "./_auth/Signinbtn";
 
 export default async function MiddleBart() {
   return (
