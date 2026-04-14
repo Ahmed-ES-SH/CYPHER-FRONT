@@ -23,7 +23,7 @@ export default function HeroSlider() {
           effect={"creative"}
           loopAdditionalSlides={3}
           autoplay={{
-            delay: 2500,
+            delay: 4500,
             disableOnInteraction: false,
           }}
           creativeEffect={{
@@ -45,28 +45,29 @@ export default function HeroSlider() {
                   className="w-full h-full object-cover object-center absolute inset-0 -z-10"
                   alt="Hero Image"
                 />
-                <div className="content absolute left-14 top-1/2 -translate-y-1/2 max-md:left-2 max-md:top-[60%]">
-                  <p className="firstLine text-gray-800 mb-2 w-fit h-fit rounded-full bg-primary p-1 px-2 font-normal text-[14px]">
-                    WEEKEND DISCOUNT
+                <div className="absolute inset-0 bg-gradient-to-r from-dark-btn/80 via-dark-btn/40 to-transparent" />
+                <div className="content absolute left-14 top-1/2 -translate-y-1/2 max-md:left-4 max-md:top-[55%] z-10">
+                  <p className="firstLine text-white mb-3 w-fit h-fit rounded-sm bg-primary-blue/90 px-3 py-1 text-[13px] font-medium tracking-wider uppercase">
+                    Weekend Discount
                   </p>
-                  <p className="firstTitle font-medium py-1 text-5xl max-md:text-3xl text-gray-700">
+                  <p className="firstTitle font-medium py-1 text-5xl max-md:text-3xl text-white drop-shadow-lg">
                     {slide.title}
                   </p>
-                  <p className=" font-bold py-1 text-7xl max-md:text-4xl text-gray-800">
+                  <p className="font-bold py-1 text-7xl max-md:text-4xl text-white drop-shadow-lg" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                     {slide.bold_title}
                   </p>
-                  <p className=" py-4 text-[20px]">
-                    Last cell for up to{" "}
-                    <span className="font-bold text-red-500 text-3xl">
+                  <p className="py-4 text-[20px] text-white/90">
+                    Last call for up to{" "}
+                    <span className="font-bold text-primary-yellow text-3xl">
                       {slide.disocunt_percent}
                     </span>
-                    off !
+                    off!
                   </p>
                   <Link
                     href={"/shop"}
-                    className="btn-shop block w-fit py-4 px-8 bg-primary rounded-full text-white hover:bg-cyan-700 duration-300"
+                    className="btn-shop inline-block mt-2 bg-primary-yellow text-dark-btn hover:bg-white duration-200 font-semibold rounded-md px-8 py-3"
                   >
-                    Shop now
+                    Shop Now
                   </Link>
                 </div>
               </div>

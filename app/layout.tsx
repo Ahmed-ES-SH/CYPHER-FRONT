@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import ClientLayout from "./_components/_global/ClientLayout";
 import Navbar from "./_components/_global/Navbar";
 import MobailSideBar from "./_components/_website/_navbar/MobileSidebar";
@@ -8,9 +8,16 @@ import { Footer } from "./_components/_website/_footer/footer";
 
 import "./globals.css";
 
-const RobotoFont = Roboto({
-  variable: "--font-roboto",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${RobotoFont.variable}  antialiased`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
         <ClientLayout>
           <Navbar />
           <MobailSideBar />

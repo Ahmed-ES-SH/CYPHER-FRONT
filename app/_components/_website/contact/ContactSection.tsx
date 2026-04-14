@@ -23,28 +23,28 @@ export default function ContactSection() {
 
   const offices = [
     {
-      country: "United States",
-      title: "United States Office",
+      country: "North America",
+      title: "New York Experience Center",
       address: "205 Middle Road, 2nd Floor, New York",
       phone: "+1 1234 567 88",
-      email: "info@example.com",
-      color: "blue",
+      email: "ny.support@cypher.tech",
+      color: "var(--primary-blue)",
     },
     {
-      country: "United Kingdom",
-      title: "United Kingdom Office",
+      country: "Europe",
+      title: "London Tech Hub",
       address: "79 Manor Way, 2nd Floor, Great Fransham",
-      phone: "+49 1234 567 88",
-      email: "contact@example.com",
-      color: "green",
+      phone: "+44 1234 567 88",
+      email: "uk.support@cypher.tech",
+      color: "var(--primary)",
     },
     {
-      country: "Germany",
-      title: "Germany Office",
+      country: "Priority Support",
+      title: "Global Enterprise Desk",
       address: "Holstenwall 86, Sachsen-Anhalt, Zschornewitz",
-      phone: "+44 1234 567 88",
-      email: "info@example.com",
-      color: "purple",
+      phone: "+49 1234 567 88",
+      email: "vip.desk@cypher.tech",
+      color: "var(--primary-yellow)",
     },
   ];
 
@@ -98,25 +98,24 @@ export default function ContactSection() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 py-16 px-4 mt-3 md:mt-8 xl:mt-12">
+    <div className="py-12 bg-white">
       <div className="max-w-7xl mx-auto">
         <motion.div
-          className="grid lg:grid-cols-2 gap-16 items-start"
+          className="grid lg:grid-cols-2 gap-12 items-start"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {/* Left Column - Offices and Description */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Offices Grid */}
-            <motion.div className="grid gap-6" variants={itemVariants}>
+            <motion.div className="grid gap-4" variants={itemVariants}>
               {offices.map((office, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl border border-gray-100 transition-all duration-300"
+                  className="bg-white rounded-md p-6 shadow-md hover:shadow-lg border border-gray-100 transition-all duration-300"
                   whileHover={{
-                    scale: 1.02,
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+                    scale: 1.01,
                   }}
                   variants={itemVariants}
                 >
@@ -124,60 +123,57 @@ export default function ContactSection() {
                     {/* Country Header */}
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-3 h-3 rounded-full ${
-                          office.color === "blue"
-                            ? "bg-blue-500"
-                            : office.color === "green"
-                            ? "bg-green-500"
-                            : "bg-purple-500"
-                        }`}
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: office.color }}
                       ></div>
-                      <h3 className="text-lg font-bold text-gray-800">
+                      <span className="text-xs font-bold uppercase tracking-widest text-icon-color">
                         {office.country}
-                      </h3>
+                      </span>
                     </div>
 
                     {/* Office Title */}
-                    <h4 className="text-xl font-semibold text-gray-900 mb-3">
+                    <h4 className="text-lg font-bold text-dark-btn mb-1">
                       {office.title}
                     </h4>
 
                     {/* Contact Info */}
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-start gap-3">
                         <FiMapPin
-                          className="text-gray-500 mt-1 flex-shrink-0"
-                          size={16}
+                          className="text-primary-blue mt-1 flex-shrink-0"
+                          size={14}
                         />
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <p className="text-icon-color text-sm leading-relaxed">
                           {office.address}
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <FiPhone
-                          className="text-gray-500 flex-shrink-0"
-                          size={16}
-                        />
-                        <a
-                          href={`tel:${office.phone}`}
-                          className="text-gray-900 font-medium hover:text-blue-600 transition-colors duration-200"
-                        >
-                          {office.phone}
-                        </a>
-                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                          <FiPhone
+                            className="text-primary-blue flex-shrink-0"
+                            size={14}
+                          />
+                          <a
+                            href={`tel:${office.phone}`}
+                            className="text-dark-btn font-medium hover:text-primary-blue transition-colors text-sm"
+                          >
+                            {office.phone}
+                          </a>
+                        </div>
 
-                      <div className="flex items-center gap-3">
-                        <FiMail
-                          className="text-gray-500 flex-shrink-0"
-                          size={16}
-                        />
-                        <a
-                          href={`mailto:${office.email}`}
-                          className="text-blue-600 hover:text-blue-700 transition-colors duration-200 font-medium"
-                        >
-                          {office.email}
-                        </a>
+                        <div className="flex items-center gap-3">
+                          <FiMail
+                            className="text-primary-blue flex-shrink-0"
+                            size={14}
+                          />
+                          <a
+                            href={`mailto:${office.email}`}
+                            className="text-primary hover:text-primary-blue transition-colors font-medium text-sm"
+                          >
+                            {office.email}
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -187,59 +183,56 @@ export default function ContactSection() {
 
             {/* Description Text */}
             <motion.div
-              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100"
+              className="bg-gray-50 rounded-md p-8 border border-gray-100"
               variants={itemVariants}
             >
-              <div className="space-y-4 text-gray-700 leading-relaxed">
+              <div className="space-y-4 text-dark-btn/80 leading-relaxed italic font-light">
                 <p className="text-lg">
-                  Nam maximus nunc a augue pulvinar, non euismod mauris tempus.
-                  Cras non elit vel magna molestie pellentesque in eu dui. Donec
-                  laoreet quis erat vitae finibus.
+                  "Our mission is to bridge the gap between innovation and the end-user. Whether it's a software glitch or a hardware inquiry, our engineers are here to provide the clarity you deserve."
                 </p>
-                <p>
-                  Vestibulum enim eros, porta eget quam et, euismod dictum elit.
+                <p className="text-sm font-bold text-primary-blue uppercase tracking-widest not-italic">
+                  — The CYPHER Technical Team
                 </p>
               </div>
             </motion.div>
 
             {/* Image Section */}
             <motion.div
-              className="rounded-2xl overflow-hidden shadow-2xl"
+              className="rounded-md overflow-hidden shadow-lg aspect-video"
               variants={itemVariants}
-              whileHover={{ scale: 1.02 }}
             >
               <Img
                 src="/images/contact-img.webp"
-                alt="Modern workspace with laptop, coffee, and plant"
-                className="w-full h-80 object-cover"
+                alt="CYPHER Flagship Tech Lab"
+                className="w-full h-full object-cover"
               />
             </motion.div>
           </div>
 
           {/* Right Column - Contact Form */}
           <motion.div
-            className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100 sticky top-8"
+            className="bg-white rounded-md p-10 shadow-lg border border-gray-100 lg:sticky lg:top-8"
             variants={itemVariants}
           >
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Header */}
-              <div className="text-center space-y-3">
+              <div className="space-y-3">
                 <motion.h2
-                  className="text-3xl font-bold text-gray-900"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  className="text-3xl font-bold text-dark-btn"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  Get in Touch
+                  Message Support
                 </motion.h2>
+                <div className="h-1 w-12 bg-primary-yellow rounded-full"></div>
                 <motion.p
-                  className="text-gray-600 leading-relaxed"
+                  className="text-icon-color leading-relaxed"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  Quisque mattis tortor eu tristique sodales. Aenean sit amet
-                  justo nec sem vestibulum.
+                  Expect a response from our technical specialists within 24 business hours.
                 </motion.p>
               </div>
 
@@ -251,16 +244,15 @@ export default function ContactSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                {/* Name and Email Row */}
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      Your name *
+                    <label className="text-xs font-bold uppercase tracking-widest text-dark-btn">
+                      Full Name
                     </label>
                     <div className="relative">
                       <FiUser
-                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                        size={18}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-blue"
+                        size={16}
                       />
                       <input
                         type="text"
@@ -268,20 +260,20 @@ export default function ContactSection() {
                         value={formData.name}
                         onChange={handleInputChange}
                         required
-                        className="w-full outline-none pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                        placeholder="Enter your name"
+                        className="w-full outline-none pl-10 pr-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm"
+                        placeholder="e.g. Alan Turing"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-semibold text-gray-700">
-                      Your email *
+                    <label className="text-xs font-bold uppercase tracking-widest text-dark-btn">
+                      Email Address
                     </label>
                     <div className="relative">
                       <FiMail
-                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                        size={18}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-blue"
+                        size={16}
                       />
                       <input
                         type="email"
@@ -289,17 +281,16 @@ export default function ContactSection() {
                         value={formData.email}
                         onChange={handleInputChange}
                         required
-                        className="w-full outline-none  pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                        placeholder="Enter your email"
+                        className="w-full outline-none pl-10 pr-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm"
+                        placeholder="name@email.com"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Subject */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Subject *
+                  <label className="text-xs font-bold uppercase tracking-widest text-dark-btn">
+                    Subject
                   </label>
                   <input
                     type="text"
@@ -307,37 +298,35 @@ export default function ContactSection() {
                     value={formData.subject}
                     onChange={handleInputChange}
                     required
-                    className="w-full outline-none px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                    placeholder="Enter subject"
+                    className="w-full outline-none px-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm"
+                    placeholder="What can we help you with?"
                   />
                 </div>
 
-                {/* Message */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Your message
+                  <label className="text-xs font-bold uppercase tracking-widest text-dark-btn">
+                    Description
                   </label>
                   <div className="relative">
                     <FiMessageSquare
-                      className="absolute left-3 top-4 text-gray-400"
-                      size={18}
+                      className="absolute left-3 top-4 text-primary-blue"
+                      size={16}
                     />
                     <textarea
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
                       rows={5}
-                      className="w-full outline-none pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white resize-none"
-                      placeholder="Type your message here..."
+                      className="w-full outline-none pl-10 pr-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm resize-none"
+                      placeholder="Please provide as much detail as possible..."
                     />
                   </div>
                 </div>
 
-                {/* Submit Button */}
                 <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full bg-dark-btn hover:bg-primary-blue text-white font-bold py-5 px-8 rounded-full shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-70"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -353,8 +342,8 @@ export default function ContactSection() {
                     />
                   ) : (
                     <>
-                      <FiSend size={18} />
-                      Send Message
+                      <span className="uppercase tracking-widest text-sm">Deploy Inquiry</span>
+                      <FiSend size={18} className="text-primary-yellow" />
                     </>
                   )}
                 </motion.button>

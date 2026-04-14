@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FaTruck } from "react-icons/fa";
+import { FaTruck, FaShoppingCart, FaShieldAlt } from "react-icons/fa";
 import { ProductType } from "@/app/types/productType";
 import ProductRenderStars from "./ProductRenderStars";
 import Quantity_Actions from "./Quantity&Actions";
@@ -26,65 +26,64 @@ export default function ProductDetails({
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.8 }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      {/* Product Title & Model */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      {/* Product Title & Brand */}
+      <div className="space-y-1">
+        <span className="text-primary-blue text-sm font-bold uppercase tracking-widest">
+          {product.brand || "Premium Brand"}
+        </span>
+        <h1 className="text-4xl font-bold text-dark-btn leading-tight">
           {product.title}
         </h1>
-        <p className="text-gray-600">
-          Model: <span className="font-medium">MYFL2LLA</span> | SKU:{" "}
-          <span className="font-medium">{product?.sku}</span>
+        <p className="text-icon-color text-sm">
+          SKU: <span className="font-medium">{product?.sku || "CY-7892-X"}</span> | 
+          Model: <span className="font-medium">2024 Gen-3</span>
         </p>
       </div>
 
-      {/* Rating */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-center space-x-2"
-      >
-        <ProductRenderStars
-          rating={product.rating}
-          reviews={product.reviews?.length ?? 0}
-        />
-
-        <h5 className="text-gray-600">
-          {product.reviews.length} <span className="font-light">Review</span>
-        </h5>
-      </motion.div>
-
-      {/* Stock Status */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="flex items-center space-x-2"
-      >
-        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        <span className="text-green-600 font-medium">
-          {product.availabilityStatus} ({product?.stock})
-        </span>
-      </motion.div>
-
-      {/* Price */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="space-y-2"
-      >
-        <div className="flex items-baseline space-x-3">
-          <span className="text-4xl font-bold text-red-600">
-            ${product.price}
-          </span>
-          <span className="text-xl text-gray-400 line-through">
-            ${discountedPrice?.toFixed(2)}
+      {/* Rating & Stock */}
+      <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2">
+          <ProductRenderStars
+            rating={product.rating}
+            reviews={product.reviews?.length ?? 0}
+          />
+          <span className="text-icon-color text-sm">
+            ({product.reviews.length} Reviews)
           </span>
         </div>
-      </motion.div>
+        
+        <div className="flex items-center space-x-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-green-600 text-sm font-bold uppercase tracking-wide">
+            {product.availabilityStatus} ({product?.stock})
+          </span>
+        </div>
+      </div>
+
+      {/* Price Section */}
+      <div className="py-6 border-y border-gray-100 flex items-center justify-between">
+        <div className="space-y-1">
+          <p className="text-xs font-bold uppercase text-icon-color tracking-widest">
+            Best Offer
+          </p>
+          <div className="flex items-baseline space-x-3">
+            <span className="text-4xl font-bold text-dark-btn">
+              ${product.price}
+            </span>
+            <span className="text-lg text-icon-color/50 line-through">
+              ${discountedPrice?.toFixed(2)}
+            </span>
+          </div>
+        </div>
+        
+        <div className="bg-primary-yellow/10 border border-primary-yellow/20 px-4 py-2 rounded-full">
+          <span className="text-primary-yellow font-bold text-sm">
+            SAVE {(product.discountPercentage).toFixed(0)}% TODAY
+          </span>
+        </div>
+      </div>
 
       {/* Quantity & Actions */}
       <Quantity_Actions
@@ -93,41 +92,34 @@ export default function ProductDetails({
         isWishlisted={isWishlisted}
       />
 
-      {/* Delivery Info */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="bg-blue-50 border border-blue-200 rounded-lg p-4"
-      >
-        <div className="flex items-center space-x-3">
-          <FaTruck className="text-blue-600 text-xl" />
+      {/* Premium Highlights (Consolidated Alerts) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-md border border-gray-100">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+            <FaTruck className="text-primary-blue" />
+          </div>
           <div>
-            <p className="font-semibold text-blue-800">2-day Delivery</p>
-            <p className="text-sm text-blue-600">
-              Speedy and reliable parcel delivery!
-            </p>
+            <p className="text-sm font-bold text-dark-btn">Standard Shipping</p>
+            <p className="text-xs text-icon-color">Arrives within 3-5 days</p>
           </div>
         </div>
-      </motion.div>
 
-      {/* Popular Alert */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
-      >
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs">!</span>
+        <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-md border border-gray-100">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+            <FaShieldAlt className="text-primary-blue" />
           </div>
-          <p className="text-yellow-800">
-            <span className="font-semibold">Other people want this.</span> 5
-            people have this in their carts right now.
-          </p>
+          <div>
+            <p className="text-sm font-bold text-dark-btn">Warranty Included</p>
+            <p className="text-xs text-icon-color">{product.warrantyInformation || "2-Year Manufacturer Protection"}</p>
+          </div>
         </div>
-      </motion.div>
+      </div>
+
+      {/* High-Urgency Subtle Notification */}
+      <p className="text-sm text-icon-color flex items-center gap-2">
+        <FaShoppingCart className="text-primary-yellow opacity-70" />
+        <span className="italic">5 people currently have this item in their cart.</span>
+      </p>
 
       {/* Categories & Social */}
       <CategoriesSocial tags={product.tags ?? []} />

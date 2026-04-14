@@ -1,17 +1,24 @@
 import { ProductType } from "@/app/types/productType";
 
 export const keyFeatures = [
-  "Slim body with metal cover",
-  "Latest Intel Core i5-1135G7 processor (4 cores / 8 threads)",
-  "8GB DDR4 RAM and fast 512GB PCIe SSD",
-  "NVIDIA GeForce MX350 2GB GDDR5 graphics card",
-  "Backlit keyboard, touchpad with gesture support",
+  "High-performance design and premium materials",
+  "Optimized for efficiency and long-term durability",
+  "Includes comprehensive manufacturer warranty",
+  "Rigorously tested for quality and performance",
+  "Ships in secure, eco-friendly packaging",
 ];
 
 export function returnSpecs(product: ProductType) {
   return [
-    { label: "Screen Size", value: "10.9 in" },
-    { label: "Operating System", value: "Apple iOS" },
-    { label: "Brand", value: `${product?.brand}` },
+    { label: "Brand", value: `${product?.brand || "Premium Brand"}` },
+    { label: "Model SKU", value: `${product?.sku || "CY-7892-X"}` },
+    { label: "Category", value: `${product?.category || "Electronics"}` },
+    { label: "Weight", value: `${product?.weight || "0.5"} kg` },
+    { 
+      label: "Dimensions", 
+      value: product?.dimensions 
+        ? `${product.dimensions.width} x ${product.dimensions.height} x ${product.dimensions.depth} cm` 
+        : "Standard Dimensions" 
+    },
   ];
 }

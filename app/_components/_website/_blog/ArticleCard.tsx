@@ -32,10 +32,10 @@ export default function ArticleCard({ Article }: Props) {
   ];
 
   return (
-    <div className="not-last:border-b block border-gray-200 pb-4 group">
+    <div className="not-last:border-b block border-gray-200 pb-12 group">
       <h1
         id="title"
-        className="xl:text-3xl md:text-2xl text-xl font-light pb-3 border-b border-gray-200 group-hover:text-primary-blue duration-300"
+        className="xl:text-3xl md:text-2xl text-xl font-light pb-6 group-hover:text-primary-blue duration-300"
       >
         {Article.title}
       </h1>
@@ -72,7 +72,7 @@ export default function ArticleCard({ Article }: Props) {
 
       <Link
         href={`/blog/${formatTitle(Article.title)}?articleId=${Article?.id}`}
-        className="flex w-fit mt-4 items-center justify-center text-white rounded-md bg-primary-blue px-6 py-2 hover:bg-white hover:text-black hover:border-primary-blue hover:scale-110 border border-transparent duration-300"
+        className="flex w-fit mt-4 items-center justify-center text-white rounded-md bg-primary-blue px-6 py-2 hover:bg-white hover:text-black hover:border-primary-blue hover:scale-105 border border-transparent duration-300"
       >
         Read More
       </Link>

@@ -21,7 +21,7 @@ function SocialLink({ href, icon, label }: SocialLinkProps) {
     <Link
       href={href}
       aria-label={label}
-      className="w-8 h-8 flex items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors duration-200 "
+      className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--border-subtle)] text-[var(--icon-color)] hover:bg-primary hover:text-white transition-colors duration-200"
     >
       {icon}
     </Link>
@@ -30,46 +30,37 @@ function SocialLink({ href, icon, label }: SocialLinkProps) {
 
 export function FooterSocial() {
   return (
-    <div className="flex space-x-2">
-      {[
-        {
-          href: "https://facebook.com",
-          icon: <FaFacebookF size={16} />,
-          label: "Facebook",
-        },
-        {
-          href: "https://twitter.com",
-          icon: <FaTwitter size={16} />,
-          label: "Twitter",
-        },
-        {
-          href: "https://linkedin.com",
-          icon: <FaLinkedinIn size={16} />,
-          label: "LinkedIn",
-        },
-        {
-          href: "https://youtube.com",
-          icon: <FaYoutube size={16} />,
-          label: "YouTube",
-        },
-        {
-          href: "https://instagram.com",
-          icon: <FaInstagram size={16} />,
-          label: "Instagram",
-        },
-        {
-          href: "https://twitch.tv",
-          icon: <FaTwitch size={16} />,
-          label: "Twitch",
-        },
-      ].map((social, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-center bg-gray-200 rounded-full h-12 w-12 hover:-translate-y-3 duration-300 cursor-pointer"
-        >
-          <SocialLink {...social} />
-        </div>
-      ))}
-    </div>
+    <nav aria-label="Social media links" className="flex gap-3">
+      <SocialLink
+        href="https://facebook.com"
+        icon={<FaFacebookF size={16} />}
+        label="Facebook"
+      />
+      <SocialLink
+        href="https://twitter.com"
+        icon={<FaTwitter size={16} />}
+        label="Twitter"
+      />
+      <SocialLink
+        href="https://linkedin.com"
+        icon={<FaLinkedinIn size={16} />}
+        label="LinkedIn"
+      />
+      <SocialLink
+        href="https://youtube.com"
+        icon={<FaYoutube size={16} />}
+        label="YouTube"
+      />
+      <SocialLink
+        href="https://instagram.com"
+        icon={<FaInstagram size={16} />}
+        label="Instagram"
+      />
+      <SocialLink
+        href="https://twitch.tv"
+        icon={<FaTwitch size={16} />}
+        label="Twitch"
+      />
+    </nav>
   );
 }

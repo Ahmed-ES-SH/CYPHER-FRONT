@@ -11,29 +11,35 @@ export function Footer() {
   return (
     <>
       <SubscribeSection />
-      <footer className=" pb-8 bg-background">
+      <footer className="bg-background">
         <div className="container mx-auto px-4">
-          {/* Bottom footer section */}
-          <div className="pt-8 pb-4">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-6">
-              <FooterLogo />
-              <FooterSocial />
-            </div>
+          {/* Top section: Logo + Social */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-8 gap-4">
+            <FooterLogo />
+            <FooterSocial />
+          </div>
 
-            {/* Brand links */}
-            <div className="mb-8">
-              <BrandLinks />
-            </div>
+          {/* Divider */}
+          <div className="border-t border-[var(--border-subtle)]" />
 
-            {/* Copyright and payment */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <p className="text-sm text-muted-foreground">
-                Copyright {currentYear} © CYPHER. All rights reserved. Powered
-                by
-                <span className="text-primary-blue px-2">Ahmed</span>.
-              </p>
-              <Img src="/images/payment.webp" className="w-[250px]" />
-            </div>
+          {/* Brand links — categorized columns */}
+          <div className="py-8">
+            <BrandLinks />
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[var(--border-subtle)]" />
+
+          {/* Bottom section: Copyright + Payment */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 gap-3">
+            <p className="text-sm text-text-muted">
+              Copyright {currentYear} &copy; CYPHER. All rights reserved.
+            </p>
+            <Img
+              src="/images/payment.webp"
+              alt="Accepted payment methods"
+              className="w-[200px]"
+            />
           </div>
         </div>
       </footer>

@@ -1,64 +1,91 @@
 "use client";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-interface BrandLinkProps {
+interface BrandLinkItemProps {
   href: string;
   children: React.ReactNode;
-  className?: string;
 }
 
-function BrandLink({ href, children, className }: BrandLinkProps) {
+function BrandLinkItem({ href, children }: BrandLinkItemProps) {
   return (
     <Link
       href={href}
-      className={cn(
-        "text-xs text-muted-foreground hover:text-foreground transition-colors duration-200",
-        className
-      )}
+      className="text-sm text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors duration-200"
     >
       {children}
     </Link>
   );
 }
 
+interface BrandCategoryProps {
+  title: string;
+  links: { name: string; href: string }[];
+}
+
+function BrandCategory({ title, links }: BrandCategoryProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <h4 className="text-sm font-semibold text-[var(--text-primary)]">{title}</h4>
+      <ul className="flex flex-col gap-1.5">
+        {links.map((link) => (
+          <li key={link.name}>
+            <BrandLinkItem href={link.href}>{link.name}</BrandLinkItem>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function BrandLinks() {
-  const links = [
-    { name: "Apple", href: "/apple" },
-    { name: "Apple Watch", href: "/apple-watch" },
-    { name: "Beats", href: "/beats" },
-    { name: "Camera", href: "/camera" },
-    { name: "Game Controller", href: "/game-controller" },
-    { name: "HD", href: "/hd" },
-    { name: "HTC", href: "/htc" },
-    { name: "HTC One", href: "/htc-one" },
-    { name: "iMac", href: "/imac" },
-    { name: "iPad", href: "/ipad" },
-    { name: "iPad 4 16Gb", href: "/ipad-4-16gb" },
-    { name: "iPad Mini", href: "/ipad-mini" },
-    { name: "Keyboard", href: "/keyboard" },
-    { name: "Lenovo", href: "/lenovo" },
-    { name: "M8", href: "/m8" },
-    { name: "Mackbook Pro M1", href: "/macbook-pro-m1" },
-    { name: "Mouse", href: "/mouse" },
-    { name: "Samsung", href: "/samsung" },
-    { name: "Samsung Galaxy M11", href: "/samsung-galaxy-m11" },
-    { name: "Samsung Galaxy M31", href: "/samsung-galaxy-m31" },
-    { name: "Samsung Galaxy S5 - 64gb", href: "/samsung-galaxy-s5" },
-    { name: "Samsung Galaxy Tab 4", href: "/samsung-galaxy-tab-4" },
-    { name: "Wireless Speaker", href: "/wireless-speaker" },
+  const categories = [
+    {
+      title: "Apple",
+      links: [
+        { name: "MacBook Pro M1", href: "/macbook-pro-m1" },
+        { name: "iMac", href: "/imac" },
+        { name: "iPad", href: "/ipad" },
+        { name: "iPad Mini", href: "/ipad-mini" },
+        { name: "iPad 4 16GB", href: "/ipad-4-16gb" },
+        { name: "Apple Watch", href: "/apple-watch" },
+        { name: "Beats", href: "/beats" },
+      ],
+    },
+    {
+      title: "Samsung",
+      links: [
+        { name: "Samsung Galaxy S5 64GB", href: "/samsung-galaxy-s5" },
+        { name: "Samsung Galaxy M31", href: "/samsung-galaxy-m31" },
+        { name: "Samsung Galaxy M11", href: "/samsung-galaxy-m11" },
+        { name: "Samsung Galaxy Tab 4", href: "/samsung-galaxy-tab-4" },
+      ],
+    },
+    {
+      title: "Accessories",
+      links: [
+        { name: "Wireless Speaker", href: "/wireless-speaker" },
+        { name: "Camera", href: "/camera" },
+        { name: "Keyboard", href: "/keyboard" },
+        { name: "Mouse", href: "/mouse" },
+        { name: "Game Controller", href: "/game-controller" },
+        { name: "HD Monitors", href: "/hd" },
+      ],
+    },
+    {
+      title: "Other Brands",
+      links: [
+        { name: "Lenovo", href: "/lenovo" },
+        { name: "HTC One", href: "/htc-one" },
+        { name: "HTC M8", href: "/m8" },
+      ],
+    },
   ];
 
   return (
-    <div className="flex flex-wrap gap-x-3 gap-y-2">
-      {links.map((link, index) => (
-        <div key={link.name} className="flex items-center">
-          <BrandLink href={"#"}>{link.name}</BrandLink>
-          {index < links.length - 1 && (
-            <span className="text-muted-foreground ml-3">|</span>
-          )}
-        </div>
+    <nav aria-label="Browse by brand" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-6">
+      {categories.map((category) => (
+        <BrandCategory key={category.title} title={category.title} links={category.links} />
       ))}
-    </div>
+    </nav>
   );
 }

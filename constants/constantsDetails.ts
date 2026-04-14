@@ -54,12 +54,12 @@ export const dualBannerDetails = [
   {
     img: "/images/banner-box.png",
     title: "Home Speakers",
-    desc: "Dont't miss the last opportunity",
+    desc: "Don't miss the last opportunity",
   },
   {
     img: "/images/phone-banner.png",
     title: "New Smart Phones",
-    desc: "Dont't miss the last opportunity",
+    desc: "Don't miss the last opportunity",
   },
 ];
 export const BestSellerscontent_2 = [
@@ -523,7 +523,7 @@ export const SliderContent: {
   {
     img_src: "/slider/slide-1.webp",
     title: "Enhance Your",
-    bold_title: "Entertaimment",
+    bold_title: "Entertainment",
     disocunt_percent: "20%",
   },
   {

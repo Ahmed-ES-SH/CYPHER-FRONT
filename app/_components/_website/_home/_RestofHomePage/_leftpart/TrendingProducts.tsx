@@ -11,23 +11,22 @@ export default function TrendingProducts() {
   return (
     <div className="xl:sticky top-4 left-0">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pb-4 border-b border-gray-100">
+      <div className="flex items-center gap-3 px-4 pb-4 border-b border-border-subtle">
         <div className="relative">
-          <span className="text-xl font-extrabold text-gray-900 tracking-tight">
+          <span className="text-xl font-bold text-text-primary tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             Trending
           </span>
-          {/* Animated accent line */}
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="absolute -bottom-1 left-0 right-0 h-[3px] bg-linear-to-r from-primary to-cyan-300 rounded-full origin-left"
+            className="absolute -bottom-1 left-0 right-0 h-[2px] bg-primary-blue rounded-full origin-left"
           />
         </div>
-        <span className="text-xl font-light text-gray-400 tracking-tight">
+        <span className="text-xl font-light text-text-muted tracking-tight">
           Products
         </span>
-        <span className="ml-auto text-[11px] font-semibold text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full">
+        <span className="ml-auto text-[11px] font-semibold text-primary-blue uppercase tracking-widest bg-primary-blue/10 px-2 py-0.5 rounded-sm">
           Hot
         </span>
       </div>
@@ -43,33 +42,33 @@ export default function TrendingProducts() {
           >
             <Link
               href={`/products/${formatTitle(item.title)}?productId=${item.id}`}
-              className="flex items-center gap-4 p-3 rounded-xl group cursor-pointer hover:bg-gray-50 transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-sm"
+              className="flex items-center gap-4 p-3 rounded-md group cursor-pointer hover:bg-surface transition-all duration-200 border border-transparent hover:border-border-subtle"
             >
               {/* Rank Badge */}
               <span
-                className={`shrink-0 w-6 h-6 flex items-center justify-center rounded-full text-[11px] font-black ${
+                className={`shrink-0 w-6 h-6 flex items-center justify-center rounded-sm text-[11px] font-bold ${
                   index === 0
-                    ? "bg-yellow-400 text-yellow-900"
+                    ? "bg-primary-yellow text-dark-btn"
                     : index === 1
-                    ? "bg-gray-300 text-gray-700"
+                    ? "bg-text-muted/30 text-text-secondary"
                     : index === 2
-                    ? "bg-orange-300 text-orange-900"
-                    : "bg-gray-100 text-gray-500"
+                    ? "bg-primary-blue/20 text-primary-blue"
+                    : "bg-surface text-text-muted"
                 }`}
               >
                 {index + 1}
               </span>
 
               {/* Product Image */}
-              <div className="relative shrink-0 w-[70px] h-[70px] bg-gray-50 rounded-lg overflow-hidden">
+              <div className="relative shrink-0 w-[70px] h-[70px] bg-surface rounded-md overflow-hidden">
                 <Img
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   src={item.images[0] || ""}
                   alt={item.title}
                 />
                 {/* Discount badge */}
                 {item.discountPercentage > 0 && (
-                  <div className="absolute top-1 left-1 bg-red-500 text-white text-[9px] font-bold px-1 py-0.5 rounded">
+                  <div className="absolute top-1 left-1 bg-primary-yellow text-dark-btn text-[9px] font-bold px-1 py-0.5 rounded-sm">
                     -{Math.round(item.discountPercentage)}%
                   </div>
                 )}
@@ -77,15 +76,15 @@ export default function TrendingProducts() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-medium text-gray-800 leading-snug line-clamp-2 group-hover:text-primary transition-colors duration-200">
+                <p className="text-[13px] font-medium text-text-primary leading-snug line-clamp-2 group-hover:text-primary-blue transition-colors duration-200">
                   {item.title}
                 </p>
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[15px] font-bold text-gray-900">
+                  <span className="text-[15px] font-bold text-text-primary">
                     ${item.price.toFixed(2)}
                   </span>
                   {item.discountPercentage > 0 && (
-                    <del className="text-[12px] text-gray-400">
+                    <del className="text-[12px] text-text-muted">
                       ${(item.price / (1 - item.discountPercentage / 100)).toFixed(2)}
                     </del>
                   )}
@@ -98,12 +97,12 @@ export default function TrendingProducts() {
                       key={i}
                       className={`w-1.5 h-1.5 rounded-full ${
                         i < Math.round(item.rating)
-                          ? "bg-yellow-400"
-                          : "bg-gray-200"
+                          ? "bg-primary-yellow"
+                          : "bg-border-subtle"
                       }`}
                     />
                   ))}
-                  <span className="text-[10px] text-gray-400 ml-1">
+                  <span className="text-[10px] text-text-muted ml-1">
                     ({item.reviews?.length || 0})
                   </span>
                 </div>
@@ -113,7 +112,7 @@ export default function TrendingProducts() {
               <motion.div
                 initial={{ opacity: 0, x: -4 }}
                 whileHover={{ opacity: 1, x: 0 }}
-                className="shrink-0 text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                className="shrink-0 text-primary-blue opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M12 5l7 7-7 7"/>

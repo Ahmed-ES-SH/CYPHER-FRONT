@@ -1,91 +1,194 @@
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMinus, FiPlus, FiX, FiCheck } from "react-icons/fi";
+import { FiCheck, FiTruck, FiMapPin } from "react-icons/fi";
 import { useCartStore } from "@/app/store/CartStore";
 import Img from "../../_global/Img";
-import { handleCheckout } from "@/app/helpers/handleCheckout";
+import { toast } from "sonner";
 import CartItems from "./CartItems";
+
+type ShippingMethod = "free_shipping" | "local_pickup";
 
 export default function CartComponent() {
   const { cartItems } = useCartStore();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [shippingMethod, setShippingMethod] = useState<ShippingMethod>("free_shipping");
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
-  const total = subtotal;
+  const shippingCost = shippingMethod === "free_shipping" ? 0 : 0;
+  const total = subtotal + shippingCost;
+
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    setIsCheckingOut(true);
+
+    try {
+      const lineItems = cartItems.map((item) => ({
+        name: item.title,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lineItems,
+          shippingMethod,
+          currency: "usd",
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create checkout session");
+      }
+
+      const data = await res.json();
+
+      if (!data.sessionId) {
+        throw new Error("No checkout session returned");
+      }
+
+      const { loadStripe } = await import("@stripe/stripe-js");
+      const stripe = await loadStripe(
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+      );
+
+      await stripe?.redirectToCheckout({ sessionId: data.sessionId });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Checkout failed. Please try again."
+      );
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   return (
-    <div className="c-container  xl:p-4 p-2  min-h-screen">
-      <div className="flex w-full relative gap-8">
+    <div className="c-container xl:p-4 p-2 min-h-screen">
+      <div className="flex w-full flex-col gap-8 lg:flex-row">
         {/* Cart Items */}
         <CartItems />
 
         {/* Cart Totals */}
-        <div className="flex-1 sticky top-12 left-0">
+        <div className="lg:w-80">
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-xl p-6 sticky top-6"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.3 }}
+            className="rounded-md border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-6 lg:sticky lg:top-6"
           >
-            <h2 className="text-xl font-bold text-gray-900 mb-6">
-              CART TOTALS
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+              Order Summary
             </h2>
 
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold text-gray-900">
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-[var(--text-muted)]">
+                  Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})
+                </span>
+                <span className="font-medium text-[var(--text-primary)]">
                   ${subtotal.toFixed(2)}
                 </span>
               </div>
 
-              <div className="border-t border-gray-200 pt-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center text-gray-700">
-                      <input
-                        type="radio"
-                        name="shipping"
-                        className="mr-2 text-blue-600"
-                        defaultChecked
-                      />
+              {/* Shipping Selection */}
+              <div className="space-y-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)] p-3">
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="free_shipping"
+                    checked={shippingMethod === "free_shipping"}
+                    onChange={() => setShippingMethod("free_shipping")}
+                    className="h-4 w-4 accent-[var(--primary-blue)]"
+                  />
+                  <FiTruck className="text-[var(--primary-blue)]" />
+                  <div className="flex-1">
+                    <span className="text-sm font-medium text-[var(--text-primary)]">
                       Free shipping
-                    </label>
+                    </span>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      5–7 business days
+                    </p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center text-gray-700">
-                      <input
-                        type="radio"
-                        name="shipping"
-                        className="mr-2 text-blue-600"
-                      />
+                  <span className="text-sm font-semibold text-[var(--primary-blue)]">
+                    Free
+                  </span>
+                </label>
+
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="local_pickup"
+                    checked={shippingMethod === "local_pickup"}
+                    onChange={() => setShippingMethod("local_pickup")}
+                    className="h-4 w-4 accent-[var(--primary-blue)]"
+                  />
+                  <FiMapPin className="text-[var(--text-muted)]" />
+                  <div className="flex-1">
+                    <span className="text-sm font-medium text-[var(--text-primary)]">
                       Local pickup
-                    </label>
+                    </span>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Ready in 24 hours
+                    </p>
                   </div>
-                </div>
-                <div className="mt-3 text-sm text-gray-600">
-                  Shipping to <span className="font-medium">NY</span>
-                </div>
+                  <span className="text-sm font-semibold text-[var(--text-muted)]">
+                    Free
+                  </span>
+                </label>
               </div>
 
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex justify-between items-center text-lg font-bold">
-                  <span>Total</span>
-                  <span className="text-2xl text-primary font-bold underline">
+              <div className="border-t border-[var(--border-subtle)] pt-3">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-sm font-medium text-[var(--text-primary)]">
+                    Total
+                  </span>
+                  <span className="text-xl font-bold text-[var(--text-primary)]">
                     ${total.toFixed(2)}
                   </span>
                 </div>
               </div>
 
               <button
-                onClick={() => handleCheckout(cartItems)}
-                className="w-full bg-primary text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl hover:scale-110 hover:bg-blue-700 transition-all duration-300"
+                onClick={handleCheckout}
+                disabled={isCheckingOut || cartItems.length === 0}
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-[var(--primary-blue)] py-3.5 text-base font-semibold text-white transition-colors hover:bg-[var(--dark-btn)] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Proceed to checkout
+                {isCheckingOut ? (
+                  <>
+                    <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <FiCheck className="h-4 w-4" />
+                    Proceed to Checkout
+                  </>
+                )}
               </button>
+
+              <div className="flex items-center justify-center gap-1.5 text-xs text-[var(--text-muted)]">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0110 0v4" />
+                </svg>
+                Secure checkout · Encrypted payment
+              </div>
             </div>
           </motion.div>
         </div>

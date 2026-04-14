@@ -39,15 +39,15 @@ export default function ProductCard({ product }: props) {
       return { text: "Out of Stock", color: "text-red-600" };
     if (product.stock <= 5)
       return {
-        text: `Only ${product.stock} left in stock`,
+        text: `Only ${product.stock} left`,
         color: "text-red-500",
       };
     if (product.stock <= 10)
       return {
-        text: `${product.stock} left in stock`,
-        color: "text-orange-500",
+        text: `${product.stock} left`,
+        color: "text-amber-600",
       };
-    return { text: "In Stock", color: "text-green-500" };
+    return { text: "In Stock", color: "text-green-600" };
   };
 
   const stockStatus = getStockStatus();
@@ -61,55 +61,58 @@ export default function ProductCard({ product }: props) {
 
   return (
     <div
-      className="relative bg-white rounded-lg cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-xl group w-full hover:scale-110 h-fit  z-20"
+      className="relative bg-surface-elevated rounded-md cursor-pointer overflow-hidden transition-all duration-200 hover:shadow-lg group w-full h-fit border border-border-subtle"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
     >
       {/* TOP PRODUCT badge */}
       {isTopProduct && (
-        <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
-          TOP PRODUCT
+        <div className="absolute top-3 left-3 bg-primary-blue text-white text-[11px] font-semibold px-2.5 py-1 rounded-sm z-10 tracking-wide">
+          TOP RATED
         </div>
       )}
 
       {/* Discount badge */}
       {product.discountPercentage > 0 && (
         <div
-          className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10"
-          style={{ top: isTopProduct ? "2.5rem" : "0.75rem" }}
+          className="absolute top-3 left-3 bg-primary-yellow text-dark-btn text-[11px] font-semibold px-2.5 py-1 rounded-sm z-10 tracking-wide"
+          style={{ top: isTopProduct ? "2.25rem" : "0.75rem" }}
         >
           -{Math.round(product.discountPercentage)}%
         </div>
       )}
 
       {/* Product image */}
-      <div className="relative overflow-hidden bg-gray-100">
+      <div className="relative overflow-hidden bg-surface aspect-square">
         <Img
           src={
             product.images?.[0] ||
             "https://via.placeholder.com/300x200?text=No+Image"
           }
           alt={product.title}
-          className={`w-full h-1/2 object-cover transition-transform duration-300 ${
+          className={`w-full h-full object-contain p-4 transition-transform duration-300 ${
             isHovered ? "scale-105" : "scale-100"
           }`}
         />
 
-        {/* Side icons on hover */}
+        {/* Side icons - always visible on mobile, hover-reveal on desktop */}
         <div
-          className={`absolute right-3 top-16 transform -translate-y-1/2 flex flex-col items-center gap-2 transition-all duration-300 `}
+          className="absolute right-3 top-16 transform -translate-y-1/2 flex flex-col items-center gap-2"
         >
           {/* Heart icon */}
           <button
-            onClick={
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               isInWishList
-                ? () => removeFromWishlist(product.id)
-                : () => addToWishlist(product)
-            }
-            className={`z-10 p-2  rounded-full shadow-md  transition-colors duration-200 ${
+                ? removeFromWishlist(product.id)
+                : addToWishlist(product);
+            }}
+            aria-label={isInWishList ? "Remove from wishlist" : "Add to wishlist"}
+            className={`z-10 p-2 rounded-full shadow-md transition-colors duration-200 xl:opacity-0 xl:translate-x-8 xl:group-hover:opacity-100 xl:group-hover:translate-x-0 opacity-100 translate-x-0 ${
               isInWishList
-                ? "bg-red-300 hover:bg-red-400 text-white"
-                : "hover:bg-gray-100 bg-white text-gray-400"
+                ? "bg-primary-yellow hover:bg-yellow-400 text-dark-btn"
+                : "hover:bg-surface bg-surface-elevated text-text-muted"
             }`}
           >
             {isInWishList ? (
@@ -122,13 +125,10 @@ export default function ProductCard({ product }: props) {
             href={`/products/${formatTitle(product.title)}?productId=${
               product.id
             }`}
-            className={`p-2 block bg-white rounded-full shadow-md hover:bg-gray-100 transition-all duration-300 ${
-              isHovered
-                ? "opacity-100 translate-x-0"
-                : "opacity-0 translate-x-8"
-            }`}
+            aria-label="Quick view product"
+            className={`p-2 block bg-surface-elevated rounded-full shadow-md hover:bg-surface transition-all duration-300 xl:opacity-0 xl:translate-x-8 xl:group-hover:opacity-100 xl:group-hover:translate-x-0 opacity-100 translate-x-0`}
           >
-            <BsEye size={16} className="text-gray-600" />
+            <BsEye size={16} className="text-text-secondary" />
           </Link>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function ProductCard({ product }: props) {
       <div className="p-4">
         {/* Brand */}
         {product.brand && (
-          <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+          <div className="text-[11px] text-text-muted uppercase tracking-wider mb-1 font-medium">
             {product.brand}
           </div>
         )}
@@ -147,7 +147,7 @@ export default function ProductCard({ product }: props) {
           href={`/products/${formatTitle(product.title)}?productId=${
             product.id
           }`}
-          className="text-blue-600 font-medium hover:underline text-sm mb-2 line-clamp-2 hover:text-blue-800 transition-colors duration-200 min-h-[50px]"
+          className="text-text-primary font-medium text-[14px] mb-2 line-clamp-2 hover:text-primary-blue transition-colors duration-200 min-h-[40px] block leading-tight"
         >
           {product.title}
         </Link>
@@ -155,19 +155,16 @@ export default function ProductCard({ product }: props) {
         {/* Rating */}
         <div className="mb-2">
           <RenderStars product={product} />
-          <div className="text-xs text-gray-500 mt-1">
-            {product.rating.toFixed(1)} out of 5
-          </div>
         </div>
 
         {/* Prices */}
         <div className="flex items-center gap-2 mb-3">
           {product.discountPercentage > 0 && (
-            <span className="text-gray-400 text-sm line-through">
+            <span className="text-text-muted text-sm line-through">
               ${product.price.toFixed(2)}
             </span>
           )}
-          <span className="text-red-500 font-bold text-lg">
+          <span className="text-primary-blue font-bold text-lg">
             $
             {product.discountPercentage > 0
               ? discountedPrice.toFixed(2)
@@ -175,31 +172,9 @@ export default function ProductCard({ product }: props) {
           </span>
         </div>
 
-        {/* Shipping information */}
-        <div className="text-gray-500 text-xs mb-2">
-          {product.shippingInformation || "Shipping info not available"}
-        </div>
-
         {/* Stock status */}
         <div className={`text-xs mb-3 ${stockStatus.color}`}>
           {stockStatus.text}
-        </div>
-
-        {/* Category and tags */}
-        <div className="mb-3 min-h-[40px]">
-          <div className="flex flex-wrap gap-1">
-            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-              {product.category}
-            </span>
-            {product.tags?.slice(0, 2).map((tag, index) => (
-              <span
-                key={index}
-                className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
         </div>
 
         {/* Additional info on hover */}

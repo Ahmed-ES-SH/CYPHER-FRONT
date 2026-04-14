@@ -3,19 +3,19 @@ import Img from "../../_global/Img";
 import { companysimages } from "@/constants/constantsDetails";
 
 export default function Partners() {
+  const companyNames = ["Brand 1", "Brand 2", "Brand 3", "Brand 4", "Brand 5", "Brand 6"];
+
   return (
-    <>
-      <div className="grid container px-4 grid-cols-[repeat(auto-fit,minmax(150px,1fr))]  justify-items-center  mx-auto justify-between py-6 gap-[32px]  border-b">
-        {companysimages.map((img, index) => (
-          <div key={index} className="p-8 max-sm:p-1">
-            <Img
-              className="opacity-50 object-contain  hover:opacity-100 duration-300 cursor-pointer w-[150px]"
-              src={img}
-              alt="image-company"
-            />
-          </div>
-        ))}
-      </div>
-    </>
+    <div className="grid container px-4 grid-cols-[repeat(auto-fit,minmax(120px,1fr))] justify-items-center mx-auto py-8 gap-8">
+      {companysimages.map((img, index) => (
+        <div key={index} className="p-4 opacity-40 hover:opacity-70 transition-opacity duration-300">
+          <Img
+            className="object-contain w-[100px] h-[40px]"
+            src={img}
+            alt={companyNames[index] || "Partner brand"}
+          />
+        </div>
+      ))}
+    </div>
   );
 }

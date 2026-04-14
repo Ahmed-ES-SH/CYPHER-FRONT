@@ -58,34 +58,34 @@ export default function BlogSidebar() {
             initial={{ x: -500, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -500, opacity: 0 }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
             className="xl:flex-1 xl:sticky fixed top-0  left-0 xl:top-4 xl:right-0 bg-white max-xl:px-4 max-xl:py-12 overflow-y-auto max-md:w-[80%] custom-scrollbar max-xl:h-screen max-xl:w-[420px]"
           >
             <FaTimes
               onClick={ToggleFilter}
-              className=" absolute top-3 right-4 text-red-400 hover:text-red-500 hover:scale-110 cursor-pointer duration-300"
+              className=" absolute top-3 right-4 text-dark-btn hover:opacity-70 cursor-pointer duration-300"
             />
             <InputSearchArticles />
 
             {/* Categories Section */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-dark-btn mb-4 pb-2 border-b border-gray-200">
                 Categories
               </h3>
               <div className="space-y-3">
                 {categories.map((category, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between py-1"
+                    className="flex items-center justify-between py-1 group/cat"
                   >
                     <Link
                       href={`/blog/categories/${formatTitle(category.name)}`}
-                      className="text-gray-700 hover:text-gray-900 transition-colors text-sm"
+                      className="text-gray-600 group-hover/cat:text-primary-blue transition-colors text-sm font-medium"
                     >
                       {category.name}
                     </Link>
-                    <span className="text-gray-500 text-sm">
-                      ({category.count})
+                    <span className="text-icon-color text-xs bg-gray-100 px-2 py-0.5 rounded-full">
+                      {category.count}
                     </span>
                   </div>
                 ))}
@@ -94,7 +94,7 @@ export default function BlogSidebar() {
 
             {/* Tags Section */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-dark-btn mb-4 pb-2 border-b border-gray-200">
                 Tags
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -102,7 +102,7 @@ export default function BlogSidebar() {
                   <Link
                     key={index}
                     href={`/blog/tags/${formatTitle(tag)}`}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition-colors border border-gray-200"
+                    className="px-4 py-1.5 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-primary-blue hover:text-white transition-all duration-300 border border-transparent"
                   >
                     {tag}
                   </Link>

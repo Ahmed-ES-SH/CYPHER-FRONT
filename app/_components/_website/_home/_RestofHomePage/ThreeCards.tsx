@@ -4,51 +4,49 @@ import Link from "next/link";
 import React from "react";
 import { BsArrowRight } from "react-icons/bs";
 
+const categoryLinks = ["/cellphones", "/headphones", "/smartwatches"];
+
 export default function ThreeCards() {
   return (
-    <>
-      <div className="grid justify-items-center grid-cols-3 max-xl:grid-cols-2 max-md:grid-cols-1 gap-4 px-3  pt-11  c-container">
-        {threeElement.map((ele, index) => (
-          <div
-            key={index}
-            className="w-full min-h-[30vh] flex items-center  gap-4 p-2  rounded-md shadow-lg border border-gray-200"
-          >
-            <div className=" flex gap-4 items-center justify-between max-md:justify-around max-sm:justify-between w-full px-2">
-              <div className="image w-[45%] max-md:w-[90%]">
-                <Img
-                  src={ele.img}
-                  alt={ele.title}
-                  width={1024}
-                  height={1280}
-                  className=" w-[150px] h-[20vh] object-cover rounded-md"
-                />
-              </div>
-              <div className="content w-[60%] max-md:w-[90%]">
-                <h1 className="text-[18px] dark:text-white">{ele.title}</h1>
-                <ul>
-                  {ele.nots.map((not, i) => (
-                    <li
-                      className="py-2 text-gray-500 text-[14px]  whitespace-nowrap"
-                      key={i}
-                    >
-                      {not}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  className="whitespace-nowrap text-[14px] mt-8"
-                  href={`/cellphones`}
-                >
-                  <div className="text-primary-blue hover:text-cyan-500 duration-300 cursor-pointer flex items-center gap-2">
-                    <p>{ele.link}</p>
-                    <BsArrowRight width={18} />
-                  </div>
-                </Link>
-              </div>
-            </div>
+    <div className="grid grid-cols-3 max-xl:grid-cols-2 max-md:grid-cols-1 gap-5 px-3 pt-12 pb-4 c-container">
+      {threeElement.map((ele, index) => (
+        <div
+          key={index}
+          className="w-full flex items-center gap-5 p-5 rounded-md bg-surface-elevated border border-border-subtle hover:shadow-lg transition-shadow duration-300"
+        >
+          <div className="image shrink-0">
+            <Img
+              src={ele.img}
+              alt={ele.title}
+              width={120}
+              height={120}
+              className="w-[100px] h-[100px] object-cover rounded-md"
+            />
           </div>
-        ))}
-      </div>
-    </>
+          <div className="content">
+            <h1 className="text-[17px] font-semibold text-text-primary" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+              {ele.title}
+            </h1>
+            <ul>
+              {ele.nots.map((not, i) => (
+                <li
+                  className="py-1.5 text-text-secondary text-[13px]"
+                  key={i}
+                >
+                  {not.trim()}
+                </li>
+              ))}
+            </ul>
+            <Link
+              className="inline-flex items-center gap-1.5 text-[13px] mt-3 text-primary-blue hover:text-dark-btn font-medium transition-colors duration-200"
+              href={categoryLinks[index] || "/shop"}
+            >
+              <span>{ele.link}</span>
+              <BsArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

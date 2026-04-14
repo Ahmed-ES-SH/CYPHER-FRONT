@@ -104,18 +104,18 @@ export default function ProductDetailsTabs({
               transition={{ duration: 0.2 }}
               className="grid md:grid-cols-2 gap-8"
             >
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="font-semibold text-lg mb-4 text-gray-800">
-                General
+            <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+              <h3 className="font-bold text-lg mb-6 text-dark-btn uppercase tracking-wider border-b pb-2">
+                General details
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {specs.map((spec, index) => (
                   <div
                     key={index}
-                    className="flex justify-between py-2 border-b border-gray-100 last:border-b-0"
+                    className="flex justify-between py-2 border-b border-gray-50 last:border-b-0"
                   >
-                    <span className="text-gray-600">{spec.label}</span>
-                    <span className="font-medium text-gray-800">
+                    <span className="text-icon-color text-sm">{spec.label}</span>
+                    <span className="font-bold text-dark-btn text-sm">
                       {spec.value}
                     </span>
                   </div>
@@ -123,23 +123,27 @@ export default function ProductDetailsTabs({
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="font-semibold text-lg mb-4 text-gray-800">
-                Technical Specs
+            <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+              <h3 className="font-bold text-lg mb-6 text-dark-btn uppercase tracking-wider border-b pb-2">
+                Logistics & Support
               </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Processor</span>
-                  <span className="font-medium text-gray-800">A14 Bionic</span>
+              <div className="space-y-4">
+                <div className="flex justify-between py-2 border-b border-gray-50">
+                  <span className="text-icon-color text-sm">Warranty</span>
+                  <span className="font-bold text-dark-btn text-sm text-right max-w-[200px]">
+                    {product.warrantyInformation || "2-Year Standard"}
+                  </span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Storage</span>
-                  <span className="font-medium text-gray-800">64GB</span>
+                <div className="flex justify-between py-2 border-b border-gray-50">
+                  <span className="text-icon-color text-sm">Return Policy</span>
+                  <span className="font-bold text-dark-btn text-sm text-right max-w-[200px]">
+                    {product.returnPolicy || "30-Day Money Back"}
+                  </span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Connectivity</span>
-                  <span className="font-medium text-gray-800">
-                    Wi-Fi + Cellular
+                <div className="flex justify-between py-2 border-b border-gray-50 last:border-b-0">
+                  <span className="text-icon-color text-sm">Shipping</span>
+                  <span className="font-bold text-dark-btn text-sm text-right max-w-[200px]">
+                    {product.shippingInformation || "Free Express Shipping"}
                   </span>
                 </div>
               </div>

@@ -1,45 +1,37 @@
+/**
+ * @deprecated Use inline checkout logic in CartComponent.tsx instead.
+ * This file is kept for interface export only.
+ */
 import { loadStripe } from "@stripe/stripe-js";
-import { formatTitle } from "./helpers";
 
-export interface CartItem {
-  title: string;
+export interface CheckoutLineItem {
+  name: string;
   price: number;
   quantity: number;
 }
 
-export async function handleCheckout(cartItems: CartItem[]) {
-  if (!cartItems || cartItems.length === 0) {
+export interface CheckoutPayload {
+  lineItems: CheckoutLineItem[];
+  shippingMethod: string;
+  currency: string;
+}
+
+export async function handleCheckout(payload: CheckoutPayload) {
+  if (!payload.lineItems || payload.lineItems.length === 0) {
     throw new Error("Cart is empty");
   }
-
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  const formatFirstTwoCharFromEveryProduct = () => {
-    const courseShortTitles = cartItems.map((course) =>
-      course.title.slice(0, 2).toUpperCase()
-    );
-    return courseShortTitles.join(" ");
-  };
-
-  const ProductsText = formatFirstTwoCharFromEveryProduct();
-
-  const productDetails = {
-    productName: formatTitle(ProductsText),
-    amount: subtotal,
-    currency: "usd",
-    quantity: cartItems.length,
-  };
 
   const res = await fetch("/api/checkout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(productDetails),
+    body: JSON.stringify(payload),
   });
+
+  if (!res.ok) {
+    throw new Error("Failed to create checkout session");
+  }
 
   const data = await res.json();
 

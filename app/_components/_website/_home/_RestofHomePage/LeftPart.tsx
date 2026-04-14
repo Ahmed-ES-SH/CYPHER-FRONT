@@ -6,13 +6,11 @@ import FixedPart from "./_leftpart/FixedPart";
 
 export default function LeftPart() {
   return (
-    <>
-      <div className="xl:flex-1 flex flex-col gap-4 w-full">
-        <Features />
-        <PhoneCard />
-        <CardTimer imgsrc={"/images/apple-air.webp"} />
-        <FixedPart />
-      </div>
-    </>
+    <div className="xl:flex-1 flex flex-col gap-4 w-full">
+      <Features />
+      <PhoneCard />
+      <CardTimer imgsrc="/images/apple-air.webp" />
+      <FixedPart />
+    </div>
   );
 }

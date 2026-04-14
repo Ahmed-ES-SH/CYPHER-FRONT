@@ -17,23 +17,23 @@ export default function ProductAction({ product, isHovered }: props) {
     <button
       onClick={() => addToCart(product)}
       disabled={product.stock === 0}
-      className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-all duration-300 my-3
+      className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-all duration-200 my-3 text-[13px]
     ${
       product.stock === 0
-        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        ? "bg-surface text-text-muted cursor-not-allowed"
         : isInCart
-          ? "bg-green-100 text-green-700 border border-green-500"
+          ? "bg-primary-blue/10 text-primary-blue border border-primary-blue/20"
           : isHovered
-            ? "bg-primary text-white hover:bg-primary/80"
-            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            ? "bg-primary-blue text-white hover:bg-dark-btn"
+            : "bg-surface text-text-secondary hover:bg-border-subtle"
     }
   `}
     >
-      <CgShoppingCart size={16} />
+      <CgShoppingCart size={15} />
       {product.stock === 0
         ? "Out of Stock"
         : isInCart
-          ? "✓ In Cart"
+          ? "In Cart"
           : "Add to Cart"}
     </button>
   );

@@ -5,7 +5,13 @@
   --primary-yellow: #facc15;
   --primary: #00b8db;
   --dark-btn: #041e42;
-  --icon-color: #99a1af;
+  --icon-color: #64748b;
+  --surface: #f8fafc;
+  --surface-elevated: #ffffff;
+  --border-subtle: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 }
 
 @theme inline {
@@ -14,19 +20,17 @@
   --color-primary-yellow: var(--primary-yellow);
   --color-dark-btn: var(--dark-btn);
   --color-icon-color: var(--icon-color);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary-blue: #0070dc;
-    --primary-yellow: #080806;
-    --dark-btn: #041e42;
-  }
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-border-subtle: var(--border-subtle);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -41,19 +45,27 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--primary-yellow);
+  background-color: var(--primary-blue);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: var(--icon-color);
+  background-color: var(--border-subtle);
 }
 
 body {
-  font-family: var(--font-roboto), Helvetica, sans-serif;
+  font-family: var(--font-inter), var(--font-space-grotesk), system-ui, sans-serif;
+  background-color: var(--surface);
+  color: var(--text-primary);
 }
 
 input {
   outline: none;
+}
+
+input:focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
 }
 
 @layer components {
@@ -70,11 +82,11 @@ input {
   }
 
   .btn-shop {
-    @apply py-2 px-3 bg-sky-400 rounded-full max-lg:rounded-md text-white whitespace-nowrap;
+    @apply py-2.5 px-6 bg-primary-blue rounded-md text-white whitespace-nowrap font-medium tracking-wide transition-all duration-200 hover:bg-dark-btn hover:shadow-lg;
   }
 
   .bg-same {
-    @apply w-full h-[230px]  bg-cover bg-center object-contain relative rounded-md overflow-hidden;
+    @apply w-full h-[230px] bg-cover bg-center object-contain relative rounded-md overflow-hidden;
   }
 }
 
