@@ -13,35 +13,26 @@ import {
 } from "react-icons/fi";
 
 import Img from "@/app/_components/_global/Img";
-import { useAuthStore } from "@/app/store/useAuthStore";
+import { useAuth, useLogout, AUTH_ROUTES } from "@/src/modules/auth";
 import { useClickOutside } from "@/app/hooks/useClickOutside";
-import axios from "axios";
 
 export function UserButton() {
-  const { user, logout } = useAuthStore((state) => state);
+  const { user } = useAuth();
+  const { logout, isLoading: isLoggingOut } = useLogout();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Close dropdown when clicking outside
   useClickOutside(dropdownRef, () => setIsOpen(false));
 
   const handleLogout = async () => {
     try {
-      setIsLoggingOut(true);
-
-      await axios.post("/api/auth/logout");
-
-      logout();
-
-      router.replace("/signin");
+      await logout();
+      router.push(AUTH_ROUTES.LOGIN);
     } catch (error) {
       console.error("Logout failed:", error);
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 

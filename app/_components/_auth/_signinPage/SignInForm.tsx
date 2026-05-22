@@ -13,11 +13,9 @@ import {
 import Link from "next/link";
 import { validateForm } from "./validateForm";
 import { toast } from "sonner";
-import { API_ENDPOINTS } from "@/constants/endpoints";
+import { AUTH_ROUTES } from "@/src/modules/auth";
+import { useLogin } from "@/src/modules/auth";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { encryptToken } from "@/app/helpers/encryptToken";
-import { apiInstance } from "@/app/helpers/axios";
 
 type FormFields = "email" | "password";
 
@@ -33,6 +31,7 @@ interface FormErrors {
 
 export default function SignInForm() {
   const router = useRouter();
+  const { login, isLoading, error } = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -44,7 +43,6 @@ export default function SignInForm() {
     email: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleInputChange = (field: FormFields, value: string): void => {
@@ -58,49 +56,19 @@ export default function SignInForm() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Validation check
     const isValidate = validateForm(formData, setErrors);
     if (!isValidate) return;
 
     try {
-      setIsLoading(true);
-
-      // 2. Use the instance directly (don't hardcode the full URL)
-      const response = await apiInstance.post(API_ENDPOINTS.AUTH.LOGIN, {
+      const response = await login({
         email: formData.email,
         password: formData.password,
       });
-
-      // 3. Destructure data for cleaner access
-      const { access_token, user } = response.data;
-      const tokenName =
-        process.env.NEXT_PUBLIC_TOKEN_NAME || "cypher_auth_token";
-
-      if (access_token) {
-        // 4. Secure cookie storage
-        Cookies.set(tokenName, encryptToken(access_token), {
-          expires: 5, // Token valid for 5 days
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        });
-
-        toast.success("Welcome back to CYPHER!");
-
-        // 5. Immediate routing is better than setTimeout in most cases
-        // but if you want to show the toast, 500ms is fine.
-        setTimeout(() => {
-          router.push("/");
-          router.refresh(); // Refresh to update server-side session
-        }, 800);
-      }
-    } catch (error: any) {
-      console.log(error);
-      // 6. Detailed error handling
-      const message =
-        error.response?.data?.message || "Invalid Email or Password";
+      console.log(response);
+      // router.push(AUTH_ROUTES.HOME);
+    } catch (err: any) {
+      const message = err?.message || "Invalid Email or Password";
       toast.error(message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -206,7 +174,7 @@ export default function SignInForm() {
           <span className="ml-2 text-sm text-gray-600">Remember me</span>
         </label>
         <Link
-          href={"/forget-password"}
+          href={AUTH_ROUTES.FORGOT_PASSWORD}
           className="text-sm block text-blue-600 hover:text-blue-700 font-medium"
         >
           Forgot password?

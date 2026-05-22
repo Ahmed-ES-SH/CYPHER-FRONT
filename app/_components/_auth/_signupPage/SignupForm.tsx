@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   FiArrowRight,
@@ -12,6 +12,7 @@ import {
   FiUser,
 } from "react-icons/fi";
 import VerifyCode from "../VerifyCode";
+import { globalRequest } from "@/app/helpers/globalRequest";
 
 type FormFields = "email" | "password" | "name";
 
@@ -79,17 +80,25 @@ export default function SignupForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (validateForm()) {
+    try {
+      // const isValid = validateForm();
+      // if (!isValid) return;
+
       setIsLoading(true);
-      // Logic for sign up would go here
-      console.log("Signing up with:", formData);
-      // Simulate API call
-      setTimeout(() => {
-        setIsLoading(false);
-        setPendingVerification(true);
-      }, 1500);
+
+      const response = await globalRequest({
+        endpoint: "/api/user",
+        method: "POST",
+        body: formData,
+      });
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -110,7 +119,7 @@ export default function SignupForm() {
       className="space-y-4"
     >
       <div className="hidden" id="clerk-captcha" />
-      
+
       {/* Name Field */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">

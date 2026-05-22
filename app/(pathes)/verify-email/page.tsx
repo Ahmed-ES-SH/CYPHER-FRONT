@@ -1,5 +1,4 @@
 "use client";
-import { instance } from "@/app/_components/_global/AxiosTool";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";

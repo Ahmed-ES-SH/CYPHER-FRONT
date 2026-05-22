@@ -9,11 +9,6 @@ import SignupBackground, {
 } from "./_signupPage/SignupBackground";
 
 export default function SignUpComponent() {
-  const signInWithGoogle = () => {
-    // Implement Google Sign Up logic here
-    console.log("Google Sign Up clicked");
-  };
-
   return (
     <div className=" c-container  flex min-h-[86vh] items-center justify-center  relative overflow-hidden">
       <SignupBackground />
@@ -28,7 +23,7 @@ export default function SignUpComponent() {
         >
           <SignupHeader />
 
-          <SocialSignup onGoogleSignUp={signInWithGoogle} />
+          <SocialSignup />
 
           {/* Divider */}
           <div className="relative mb-6">

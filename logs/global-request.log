@@ -1,0 +1,246 @@
+[2026-05-22T12:48:32.374Z] ENTRY {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "method": "POST",
+  "endpoint": "/api/user",
+  "hasBody": true
+}
+[2026-05-22T12:48:32.375Z] URL {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "url": "http://localhost:5000/api/user"
+}
+[2026-05-22T12:48:32.379Z] AUTH_COOKIE {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "hasCookie": false
+}
+[2026-05-22T12:48:32.379Z] FETCH_REQ {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "method": "POST",
+  "url": "http://localhost:5000/api/user",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "name": "Ahmed",
+    "email": "ahmedismaildev66@gmail.com",
+    "password": "asdASD0123@0123"
+  }
+}
+[2026-05-22T12:48:32.385Z] FETCH_RES {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "status": 404,
+  "statusText": "Not Found",
+  "ok": false
+}
+[2026-05-22T12:48:32.385Z] CONTENT_TYPE {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "contentType": "application/json; charset=utf-8"
+}
+[2026-05-22T12:48:32.386Z] PARSE_JSON {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "result": {
+    "statusCode": 404,
+    "message": "Cannot POST /api/user",
+    "timestamp": "2026-05-22T12:48:32.384Z",
+    "path": "/api/user"
+  }
+}
+[2026-05-22T12:48:32.386Z] ERROR_RESPONSE {
+  "requestId": "7b9ae43b-4947-4e5d-ac34-7195c01dcbea",
+  "status": 404,
+  "result": {
+    "statusCode": 404,
+    "message": "Cannot POST /api/user",
+    "timestamp": "2026-05-22T12:48:32.384Z",
+    "path": "/api/user"
+  }
+}
+[2026-05-22T12:50:14.952Z] ENTRY {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "method": "POST",
+  "endpoint": "/api/user",
+  "hasBody": true
+}
+[2026-05-22T12:50:14.953Z] URL {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "url": "http://localhost:5000/api/user"
+}
+[2026-05-22T12:50:14.957Z] AUTH_COOKIE {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "hasCookie": false
+}
+[2026-05-22T12:50:14.957Z] FETCH_REQ {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "method": "POST",
+  "url": "http://localhost:5000/api/user",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "name": "Ahmed",
+    "email": "ahmedismaildev66@gmail.com",
+    "password": "asdASD0123@0123"
+  }
+}
+[2026-05-22T12:50:15.129Z] FETCH_RES {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "status": 500,
+  "statusText": "Internal Server Error",
+  "ok": false
+}
+[2026-05-22T12:50:15.130Z] CONTENT_TYPE {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "contentType": "application/json; charset=utf-8"
+}
+[2026-05-22T12:50:15.132Z] PARSE_JSON {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "result": {
+    "statusCode": 500,
+    "message": "Internal server error",
+    "timestamp": "2026-05-22T12:50:15.109Z",
+    "path": "/api/user"
+  }
+}
+[2026-05-22T12:50:15.133Z] ERROR_RESPONSE {
+  "requestId": "fb03b431-b02a-4f9f-a4a2-22cdfd86a378",
+  "status": 500,
+  "result": {
+    "statusCode": 500,
+    "message": "Internal server error",
+    "timestamp": "2026-05-22T12:50:15.109Z",
+    "path": "/api/user"
+  }
+}
+[2026-05-22T14:25:41.376Z] ENTRY {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "method": "POST",
+  "endpoint": "/api/user",
+  "hasBody": true
+}
+[2026-05-22T14:25:41.377Z] URL {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "url": "http://localhost:5000/api/user"
+}
+[2026-05-22T14:25:41.381Z] AUTH_COOKIE {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "hasCookie": false
+}
+[2026-05-22T14:25:41.382Z] FETCH_REQ {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "method": "POST",
+  "url": "http://localhost:5000/api/user",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "body": {
+    "name": "Ahmed",
+    "email": "ahmedismaildev66@gmail.com",
+    "password": "asdASD0123@0123"
+  }
+}
+[2026-05-22T14:25:42.099Z] FETCH_RES {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "status": 201,
+  "statusText": "Created",
+  "ok": true
+}
+[2026-05-22T14:25:42.099Z] CONTENT_TYPE {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "contentType": "application/json; charset=utf-8"
+}
+[2026-05-22T14:25:42.103Z] PARSE_JSON {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "result": {
+    "data": {
+      "id": 1,
+      "email": "ahmedismaildev66@gmail.com",
+      "name": "Ahmed",
+      "avatar": null,
+      "role": "user",
+      "status": "active",
+      "googleId": null,
+      "updatedAt": "2026-05-22T11:25:41.931Z",
+      "createdAt": "2026-05-22T11:25:41.931Z",
+      "isEmailVerified": false,
+      "emailVerificationToken": null,
+      "emailVerificationTokenExpiry": null,
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "stripeCustomerId": null,
+      "isPremium": false
+    }
+  }
+}
+[2026-05-22T14:25:42.104Z] SUCCESS {
+  "requestId": "009abb06-b958-416d-82e6-5e8a97017e3d",
+  "finalData": {
+    "data": {
+      "id": 1,
+      "email": "ahmedismaildev66@gmail.com",
+      "name": "Ahmed",
+      "avatar": null,
+      "role": "user",
+      "status": "active",
+      "googleId": null,
+      "updatedAt": "2026-05-22T11:25:41.931Z",
+      "createdAt": "2026-05-22T11:25:41.931Z",
+      "isEmailVerified": false,
+      "emailVerificationToken": null,
+      "emailVerificationTokenExpiry": null,
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "stripeCustomerId": null,
+      "isPremium": false
+    }
+  }
+}
+[2026-05-22T16:57:34.257Z] ENTRY {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "method": "GET",
+  "endpoint": "/api/auth/current-user",
+  "hasBody": false
+}
+[2026-05-22T16:57:34.297Z] URL {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "url": "http://localhost:5000/api/auth/current-user"
+}
+[2026-05-22T16:57:34.326Z] AUTH_COOKIE {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "hasCookie": false
+}
+[2026-05-22T16:57:34.329Z] FETCH_REQ {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "method": "GET",
+  "url": "http://localhost:5000/api/auth/current-user",
+  "headers": {
+    "content-type": "application/json"
+  }
+}
+[2026-05-22T16:57:35.067Z] FETCH_RES {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "status": 401,
+  "statusText": "Unauthorized",
+  "ok": false
+}
+[2026-05-22T16:57:35.071Z] CONTENT_TYPE {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "contentType": "application/json; charset=utf-8"
+}
+[2026-05-22T16:57:35.100Z] PARSE_JSON {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "result": {
+    "statusCode": 401,
+    "message": "Authentication cookie not found",
+    "timestamp": "2026-05-22T16:57:34.451Z",
+    "path": "/api/auth/current-user"
+  }
+}
+[2026-05-22T16:57:35.101Z] ERROR_RESPONSE {
+  "requestId": "c3698d46-81f8-448c-9de9-4be9e7dbc211",
+  "status": 401,
+  "result": {
+    "statusCode": 401,
+    "message": "Authentication cookie not found",
+    "timestamp": "2026-05-22T16:57:34.451Z",
+    "path": "/api/auth/current-user"
+  }
+}

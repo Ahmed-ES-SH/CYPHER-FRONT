@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiMail, FiArrowRight, FiX, FiLoader } from "react-icons/fi";
 import Img from "@/app/_components/_global/Img";
 import Link from "next/link";
-import { API_ENDPOINTS } from "@/constants/endpoints";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useResetPassword } from "@/src/modules/auth";
 
 export default function ForgetPasswordPage() {
   const router = useRouter();
+  const { send } = useResetPassword();
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,20 +32,7 @@ export default function ForgetPasswordPage() {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}${API_ENDPOINTS.AUTH.resetPasswordSend}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        },
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to send reset email");
-      }
+      await send.mutateAsync({ email });
 
       setSuccess(true);
       toast.success("Reset email sent successfully , check your inbox");

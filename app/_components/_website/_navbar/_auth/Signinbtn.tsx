@@ -1,12 +1,12 @@
 "use client";
 
-import { useAuthStore } from "@/app/store/useAuthStore";
+import { useAuth } from "@/src/modules/auth";
 import Link from "next/link";
 import { AiOutlineUser } from "react-icons/ai";
 import { UserButton } from "./UserButton";
 
 export default function SignInBtn() {
-  const { isAuthenticated } = useAuthStore((state) => state);
+  const { isAuthenticated } = useAuth();
 
   return (
     <>

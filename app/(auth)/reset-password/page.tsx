@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { apiInstance } from "@/app/helpers/axios";
-import { API_ENDPOINTS } from "@/constants/endpoints";
+import { useResetPassword } from "@/src/modules/auth";
 
 // Child components
 import VerifyingState from "@/app/_components/_auth/_restPasswordPage/VerifyingState";
@@ -15,6 +14,7 @@ export default function RestPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("e");
+  const { verify } = useResetPassword();
 
   // State management
   const [isVerifying, setIsVerifying] = useState(true);
@@ -33,23 +33,9 @@ export default function RestPasswordPage() {
       }
 
       try {
-        const response = await apiInstance.post(
-          API_ENDPOINTS.AUTH.resetPasswordVerify,
-          {
-            token,
-            email,
-          },
-        );
-
-        if (response.status === 200 || response.status === 201) {
-          setTokenValid(true);
-          setVerifyError(null);
-        } else {
-          setTokenValid(false);
-          setVerifyError(
-            "Invalid or expired reset token. Please request a new password reset.",
-          );
-        }
+        await verify.mutateAsync({ token, email: email ?? undefined });
+        setTokenValid(true);
+        setVerifyError(null);
       } catch (error) {
         console.error("Verification error:", error);
         setTokenValid(false);
@@ -62,7 +48,7 @@ export default function RestPasswordPage() {
     };
 
     verifyToken();
-  }, [token, email]);
+  }, [token, email, verify]);
 
   // Orchestrate rendering based on state
   if (isVerifying) {

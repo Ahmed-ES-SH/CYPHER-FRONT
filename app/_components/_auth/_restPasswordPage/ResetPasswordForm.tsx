@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import ResetPasswordWrapper from "./ResetPasswordWrapper";
-import { API_ENDPOINTS } from "@/constants/endpoints";
+import { useResetPassword } from "@/src/modules/auth";
 
 interface ResetPasswordFormProps {
   token: string | null;
@@ -15,9 +15,9 @@ export default function ResetPasswordForm({ token, email, onSuccess }: ResetPass
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [isResetting, setIsResetting] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
   const router = useRouter();
+  const { reset } = useResetPassword();
 
   const validatePassword = () => {
     if (newPassword.length < 6) {
@@ -36,41 +36,22 @@ export default function ResetPasswordForm({ token, email, onSuccess }: ResetPass
     e.preventDefault();
     if (!validatePassword()) return;
 
-    setIsResetting(true);
     setResetError(null);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}${API_ENDPOINTS.AUTH.resetPassword}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token,
-            password: newPassword,
-            email,
-          }),
-        },
+      await reset.mutateAsync({
+        token: token ?? "",
+        password: newPassword,
+        passwordConfirmation: confirmPassword,
+      });
+      onSuccess();
+      setTimeout(() => {
+        router.push("/signin");
+      }, 1000);
+    } catch (error: any) {
+      setResetError(
+        error?.message || "Failed to reset password. Please try again.",
       );
-
-      if (response.ok) {
-        onSuccess();
-        setTimeout(() => {
-          router.push("/signin");
-        }, 1000);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        setResetError(
-          errorData.message || "Failed to reset password. Please try again.",
-        );
-      }
-    } catch (error) {
-      console.error("Reset error:", error);
-      setResetError("Network error. Please check your connection.");
-    } finally {
-      setIsResetting(false);
     }
   };
 
@@ -146,10 +127,10 @@ export default function ResetPasswordForm({ token, email, onSuccess }: ResetPass
 
           <button
             type="submit"
-            disabled={isResetting}
+            disabled={reset.isPending}
             className="w-full flex justify-center items-center py-3 px-4 rounded-xl text-white bg-[#00b8db] hover:bg-[#009fbf] transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {isResetting ? (
+            {reset.isPending ? (
               <>
                 <svg
                   className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"

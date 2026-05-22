@@ -9,11 +9,6 @@ import SignInBackground, {
 } from "./_signinPage/SignInBackground";
 
 export default function SignInComponent() {
-  const signInWithGoogle = () => {
-    // Implement Google Sign In logic here
-    console.log("Google Sign In clicked");
-  };
-
   return (
     <div className=" c-container  flex min-h-[86vh] items-center justify-center  relative overflow-hidden">
       <SignInBackground />

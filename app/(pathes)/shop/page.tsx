@@ -1,6 +1,5 @@
 import ShopProducts from "@/app/_components/_website/_shop/ShopProducts";
 import { Metadata } from "next";
-import React from "react";
 
 export const metadata: Metadata = {
   title: "CYPHER – Electronics Store ECommerce - Shop",

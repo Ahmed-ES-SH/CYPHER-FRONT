@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-20T18:54:26+03:00",
+  "title": "Design System: CYPHER",
+  "extensions": {
+    "colorMeta": {
+      "primary-blue": { "role": "primary", "displayName": "Primary Blue", "canonical": "oklch(52.7% 0.211 254.4)" },
+      "primary-cyan": { "role": "accent", "displayName": "Primary Cyan", "canonical": "oklch(73.5% 0.165 212.8)" },
+      "primary-yellow": { "role": "highlight", "displayName": "Primary Yellow", "canonical": "oklch(82.6% 0.187 91.5)" },
+      "dark-btn": { "role": "heading", "displayName": "Dark Navy", "canonical": "oklch(18.2% 0.082 258.8)" },
+      "surface": { "role": "neutral", "displayName": "Surface Neutral", "canonical": "oklch(97.3% 0.013 252.0)" },
+      "surface-elevated": { "role": "neutral", "displayName": "Surface Elevated", "canonical": "oklch(100% 0.000 0)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display Space Grotesk", "purpose": "Hero headers and marketing text." },
+      "body": { "displayName": "Body Inter", "purpose": "Default paragraphs, specs, and details." },
+      "label": { "displayName": "Label Inter", "purpose": "Badges, buttons, metadata." }
+    },
+    "shadows": [
+      { "name": "elevated-hover", "value": "0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05)", "purpose": "Gently lift cards and interactive buttons on hover." },
+      { "name": "nav-shadow", "value": "0 4px 6px -1px rgba(0, 0, 0, 0.02)", "purpose": "Subtle elevation for header separation." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Smooth micro-animations for hovers." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Shop Button",
+      "kind": "button",
+      "refersTo": "button-shop",
+      "description": "Premium brand primary call to action button.",
+      "html": "<button class=\"ds-btn-shop\">SHOP NOW</button>",
+      "css": ".ds-btn-shop { background: #0070dc; color: #ffffff; padding: 10px 24px; font-weight: 500; font-family: Inter, sans-serif; font-size: 14px; border: none; border-radius: 6px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.02em; } .ds-btn-shop:hover { background: #041e42; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }"
+    },
+    {
+      "name": "Product Action Button",
+      "kind": "button",
+      "refersTo": "product-action",
+      "description": "Context-aware shopping cart button.",
+      "html": "<div style=\"display:flex; flex-direction:column; gap:12px; max-width:200px;\">\n  <button class=\"ds-btn-action ds-action-active\">Add to Cart</button>\n  <button class=\"ds-btn-action ds-action-incart\">In Cart</button>\n  <button class=\"ds-btn-action ds-action-disabled\" disabled>Out of Stock</button>\n</div>",
+      "css": ".ds-btn-action { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; py: 8px; padding: 10px 16px; border-radius: 6px; font-weight: 500; font-family: Inter, sans-serif; font-size: 13px; border: 1px solid transparent; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }\n.ds-action-active { background: #f8fafc; color: #475569; }\n.ds-action-active:hover { background: #0070dc; color: #ffffff; }\n.ds-action-incart { background: rgba(0, 112, 220, 0.1); color: #0070dc; border-color: rgba(0, 112, 220, 0.2); }\n.ds-action-disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "product-card",
+      "description": "Storefront product catalog card with layout frames, badges, ratings, and action controls.",
+      "html": "<div class=\"ds-product-card\">\n  <div class=\"ds-card-badge-top\">TOP RATED</div>\n  <div class=\"ds-card-badge-discount\">-15%</div>\n  <div class=\"ds-card-image-wrapper\">\n    <svg class=\"ds-card-image-placeholder\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#0070dc\" stroke-width=\"1.5\">\n      <rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"2\" />\n      <circle cx=\"12\" cy=\"18\" r=\"1\" />\n    </svg>\n  </div>\n  <div class=\"ds-card-content\">\n    <div class=\"ds-card-brand\">CYPHER ELECTRONICS</div>\n    <div class=\"ds-card-title\">Premium Ultra-Slim Laptop 14\" M3</div>\n    <div class=\"ds-card-rating\">\n      <span class=\"ds-stars\">★★★★★</span>\n      <span class=\"ds-rating-val\">(4.8)</span>\n    </div>\n    <div class=\"ds-card-price-row\">\n      <span class=\"ds-price-old\">$1,299.00</span>\n      <span class=\"ds-price-current\">$1,104.15</span>\n    </div>\n    <div class=\"ds-card-stock\">In Stock</div>\n    <button class=\"ds-card-btn-cart\">Add to Cart</button>\n  </div>\n</div>",
+      "css": ".ds-product-card { position: relative; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; width: 280px; overflow: hidden; font-family: Inter, sans-serif; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }\n.ds-product-card:hover { border-color: #0070dc; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05); }\n.ds-card-badge-top { position: absolute; top: 12px; left: 12px; bg-color: #0070dc; background: #0070dc; color: #ffffff; font-size: 10px; font-weight: 700; px: 8px; padding: 4px 8px; border-radius: 2px; z-index: 2; letter-spacing: 0.05em; }\n.ds-card-badge-discount { position: absolute; top: 38px; left: 12px; background: #facc15; color: #041e42; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 2px; z-index: 2; letter-spacing: 0.05em; }\n.ds-card-image-wrapper { background: #f8fafc; height: 180px; width: 100%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; overflow: hidden; }\n.ds-product-card:hover .ds-card-image-placeholder { transform: scale(1.08); }\n.ds-card-image-placeholder { width: 64px; height: 64px; transition: transform 0.3s ease; }\n.ds-card-content { padding: 16px; }\n.ds-card-brand { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px; }\n.ds-card-title { font-size: 14px; font-weight: 500; color: #0f172a; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px; }\n.ds-card-rating { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }\n.ds-stars { color: #facc15; font-size: 14px; }\n.ds-rating-val { font-size: 11px; color: #64748b; }\n.ds-card-price-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }\n.ds-price-old { text-decoration: line-through; color: #94a3b8; font-size: 13px; }\n.ds-price-current { color: #0070dc; font-weight: 700; font-size: 16px; }\n.ds-card-stock { font-size: 11px; color: #16a34a; font-weight: 500; margin-bottom: 12px; }\n.ds-card-btn-cart { width: 100%; display: flex; align-items: center; justify-content: center; background: #f8fafc; color: #475569; padding: 10px 16px; border-radius: 6px; border: none; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }\n.ds-product-card:hover .ds-card-btn-cart { background: #0070dc; color: #ffffff; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Innovation Frame",
+    "overview": "CYPHER's design system, The Innovation Frame, exists to showcase next-generation tech products with modern restraint and high-fidelity polish. It treats the user interface as a silent, premium gallery frame—meticulously structured, highly responsive, and completely content-first. The products provide the color, excitement, and texture, while the UI establishes the layout structure, confident typographic specs, and clear interactive feedback.",
+    "keyCharacteristics": [
+      "Product-first focal point using neutral canvases",
+      "Technical readability with prominent spec layouts",
+      "Flat-by-default structure elevating only on interaction",
+      "Generous spacing and clean geometric lines"
+    ],
+    "rules": [
+      { "name": "The 90-10 Brand Rule", "body": "90% of the screen consists of clean, neutral surfaces, spacing, and typography. The primary blue and cyan accent colors are reserved for the remaining 10% of critical action elements, ensuring high impact.", "section": "colors" },
+      { "name": "The Technical Scannability Rule", "body": "Large specifications (e.g. 8GB RAM, 1TB SSD) must be displayed using bold weights or clear label sizes, immediately adjacent to their respective metric labels to allow high-speed scanning by tech buyers.", "section": "typography" },
+      { "name": "The Flat-Rest Rule", "body": "All cards, containers, and buttons must remain completely flat at rest with border lines. Tonal shift or shadow-elevation triggers ONLY as a response to active user interaction.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use strict neutral layouts to let product imagery carry the color and texture.",
+      "Do showcase clear specs and prices with prominent typographic weight.",
+      "Do utilize smooth, quick transitions (200-300ms) for interactive elements."
+    ],
+    "donts": [
+      "Don't use colored left/right side-stripes on product cards, warnings, or badges.",
+      "Don't use gradient text under any circumstances; maintain solid, legible colors.",
+      "Don't apply neon backgrounds or flashing accents."
+    ]
+  }
+}

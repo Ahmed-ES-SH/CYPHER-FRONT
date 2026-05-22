@@ -1,16 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
 import Img from "@/app/_components/_global/Img";
-import { useRouter } from "next/navigation";
-import { API_ENDPOINTS } from "@/constants/endpoints";
+import { getAuthConfig, AUTH_ENDPOINTS } from "@/src/modules/auth";
 
 export default function SocialLogin() {
-  const router = useRouter();
+  const { apiUrl } = getAuthConfig();
 
   const handleGoogleSignIn = () => {
-    router.push(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}${API_ENDPOINTS.AUTH.GOOGLE}`,
-    );
+    window.location.href = `${apiUrl}${AUTH_ENDPOINTS.GOOGLE}`;
   };
 
   return (

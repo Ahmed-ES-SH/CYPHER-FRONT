@@ -1,14 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
-import ProductCard from "../_products/ProductCard";
 import { ProductType } from "@/app/types/productType";
-import DummyPagination from "../../_global/DummyPagination";
 import { AiOutlineLoading } from "react-icons/ai";
 import { motion } from "framer-motion";
 import { useVariables } from "@/app/context/VariablesContext";
 import { useData } from "@/app/context/DataContext";
+import ProductCard from "../_products/ProductCard";
+import DummyPagination from "../../_global/DummyPagination";
 import SelectedCategories from "./SelectedCategories";
-import { useAuthStore } from "@/app/store/useAuthStore";
 
 export default function ShopProducts() {
   const { categories } = useVariables();
