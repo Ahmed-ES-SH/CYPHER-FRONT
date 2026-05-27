@@ -6,13 +6,15 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
 import Img from "../../_global/Img";
 import { LuHeartCrack } from "react-icons/lu";
-import { useCartStore } from "@/app/store/CartStore";
+import { useGuestCart } from "@/src/modules/cart";
+import { productToGuestCartItem } from "@/src/modules/cart/adapters/cart-helpers";
 import { ProductType } from "@/app/types/productType";
+import { toast } from "sonner";
 
 export default function WishListProducts() {
   const { wishlistItems, removeFromWishlist, clearWishlist } =
     useWishlistStore();
-  const { addToCart } = useCartStore();
+  const { addItem } = useGuestCart();
 
   const [showWishList, setShowWishList] = useState(false);
 
@@ -20,7 +22,8 @@ export default function WishListProducts() {
     const isInWishList = wishlistItems.some((item) => item.id === product.id);
     if (isInWishList) {
       removeFromWishlist(product.id);
-      addToCart(product);
+      addItem(productToGuestCartItem(product));
+      toast.success("Added to cart!");
     }
   };
   return (

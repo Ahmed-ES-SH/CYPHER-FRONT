@@ -21,6 +21,9 @@ This file helps AI agents (and humans) quickly understand the project's stack, f
 - Utilities: clsx, js-cookie, crypto-js, swiper, sonner
 - icons : react-icons
 
+
+## make sure use @globalRequest.ts for every request in the application (high-level)
+
 ## Important folders (high-level)
 
 - `app/` — Next.js App Router pages and components. Primary working area for routes and UI.

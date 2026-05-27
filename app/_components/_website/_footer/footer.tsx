@@ -4,10 +4,15 @@ import { FooterSocial } from "./footer-social";
 import { BrandLinks } from "./brand-links";
 import Img from "../../_global/Img";
 import SubscribeSection from "../_home/SubscribeSection";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
+  
+  if (pathname.includes("/admin")) return null;
+  
   return (
     <>
       <SubscribeSection />

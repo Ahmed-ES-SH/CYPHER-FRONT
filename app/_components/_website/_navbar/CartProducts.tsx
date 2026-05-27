@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartStore } from "@/app/store/CartStore";
+import { useGuestCart } from "@/src/modules/cart";
 import { useRef, useState } from "react";
 import { BsMinecart } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,10 +8,11 @@ import { useRouter } from "next/navigation";
 import Img from "../../_global/Img";
 import { FaTimes } from "react-icons/fa";
 import { TbShoppingCartX } from "react-icons/tb";
-import { handleCheckout } from "@/app/helpers/handleCheckout";
+import { handleCheckout, type CheckoutPayload } from "@/app/helpers/handleCheckout";
+import { toast } from "sonner";
 
 export default function CartProducts() {
-  const { cartItems, removeFromCart } = useCartStore();
+  const { items, removeItem } = useGuestCart();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [showMiniCart, setShowMiniCart] = useState(false);
@@ -43,8 +44,8 @@ export default function CartProducts() {
     }, 150);
   };
 
-  const totalPrice = cartItems.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
+  const totalPrice = items.reduce((acc, item) => {
+    return acc + item.unitPrice.amount * item.quantity;
   }, 0);
 
   return (
@@ -58,9 +59,9 @@ export default function CartProducts() {
       <div className="flex items-center group gap-4 cursor-pointer max-md:mr-2">
         <div className="relative">
           <BsMinecart className="lg:size-7 size-6 text-icon-color group-hover:text-primary duration-300" />
-          {cartItems.length > 0 && (
+          {items.length > 0 && (
             <div className="w-4 h-4 absolute -top-1 -right-2 bg-primary animate-bounce text-white flex items-center justify-center text-[10px] font-bold rounded-full">
-              {cartItems.length}
+              {items.length}
             </div>
           )}
         </div>
@@ -87,7 +88,7 @@ export default function CartProducts() {
           >
             <h4 className="text-lg font-semibold text-gray-800">Cart Items</h4>
 
-            {cartItems.length === 0 ? (
+            {items.length === 0 ? (
               <div className="h-60 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2">
                   <TbShoppingCartX className="size-12 text-icon-color" />
@@ -96,30 +97,33 @@ export default function CartProducts() {
               </div>
             ) : (
               <div className="max-h-72 overflow-y-auto hidden-scrollbar space-y-3  pr-1">
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <div
-                    key={item.id}
+                    key={item.productId}
                     className="flex items-center gap-3 relative not-last:border-b border-gray-200 pb-2"
                   >
                     <div
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => {
+                        removeItem(item.productId);
+                        toast.info("Removed from cart");
+                      }}
                       className="group w-4 h-4 cursor-pointer absolute top-0 right-0 rounded-full  bg-gray-200 hover:bg-gray-400 hover:scale-110 duration-300 flex items-center justify-center"
                     >
                       <FaTimes className="size-3 text-icon-color group-hover:text-white duration-300" />
                     </div>
                     <Img
-                      src={item.images[0]}
-                      alt={item.title}
+                      src={item.productImage}
+                      alt={item.productName}
                       className="w-14 h-14 object-cover rounded-md"
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-medium ">{item.title}</p>
+                      <p className="text-sm font-medium ">{item.productName}</p>
                       <p className="text-xs text-gray-500">
-                        {item.quantity} × ${item.price}
+                        {item.quantity} × ${item.unitPrice.amount}
                       </p>
                     </div>
                     <p className="text-sm mt-2 font-semibold text-gray-800">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${(item.unitPrice.amount * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 ))}
@@ -142,7 +146,15 @@ export default function CartProducts() {
                   View Cart
                 </button>
                 <button
-                  onClick={() => handleCheckout(cartItems)}
+                  onClick={() => handleCheckout({
+    lineItems: items.map(item => ({
+      name: item.productName,
+      price: item.unitPrice.amount,
+      quantity: item.quantity,
+    })),
+    shippingMethod: "free_shipping",
+    currency: "usd",
+  } as CheckoutPayload)}
                   className="flex-1 w-full py-2 text-sm font-medium bg-primary hover:bg-primary/70 text-white rounded-lg transition"
                 >
                   Checkout

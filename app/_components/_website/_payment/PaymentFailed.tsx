@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import { handleCheckout } from "@/app/helpers/handleCheckout";
-import { useCartStore } from "@/app/store/CartStore";
+import { handleCheckout, type CheckoutPayload } from "@/app/helpers/handleCheckout";
+import { useGuestCart } from "@/src/modules/cart";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 
 export default function PaymentFailed() {
-  const { cartItems } = useCartStore();
+  const { items } = useGuestCart();
   const searchParams = useSearchParams();
   const amount = searchParams.get("amount");
   const router = useRouter();
@@ -183,7 +183,15 @@ export default function PaymentFailed() {
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => handleCheckout(cartItems)}
+              onClick={() => handleCheckout({
+    lineItems: items.map(item => ({
+      name: item.productName,
+      price: item.unitPrice.amount,
+      quantity: item.quantity,
+    })),
+    shippingMethod: "free_shipping",
+    currency: "usd",
+  } as CheckoutPayload)}
               className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <FiRefreshCw className="w-5 h-5" />

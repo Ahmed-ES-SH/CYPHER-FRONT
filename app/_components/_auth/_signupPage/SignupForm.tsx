@@ -11,8 +11,8 @@ import {
   FiX,
   FiUser,
 } from "react-icons/fi";
+import { useRegister } from "@/src/modules/user";
 import VerifyCode from "../VerifyCode";
-import { globalRequest } from "@/app/helpers/globalRequest";
 
 type FormFields = "email" | "password" | "name";
 
@@ -41,7 +41,7 @@ export default function SignupForm() {
     email: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutateAsync: registerUser, isPending: isRegistering } = useRegister();
   const [pendingVerification, setPendingVerification] = useState(false);
 
   const validateForm = (): boolean => {
@@ -82,23 +82,20 @@ export default function SignupForm() {
 
   const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const isValid = validateForm();
+    if (!isValid) return;
+
     try {
-      // const isValid = validateForm();
-      // if (!isValid) return;
-
-      setIsLoading(true);
-
-      const response = await globalRequest({
-        endpoint: "/api/user",
-        method: "POST",
-        body: formData,
+      await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
       });
 
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
+      setPendingVerification(true);
+    } catch (error: any) {
+      console.error("Registration error:", error);
     }
   };
 
@@ -237,10 +234,10 @@ export default function SignupForm() {
       {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={isLoading}
+        disabled={isRegistering}
         className="w-full bg-primary-blue text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600  hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
       >
-        {isLoading ? (
+        {isRegistering ? (
           <>
             <FiLoader className="w-5 h-5 animate-spin" />
             <span>Signing up...</span>

@@ -54,8 +54,8 @@ export const authKeys = {
 
 export function getAuthConfig() {
   return {
-    apiUrl: process.env.NEXT_PUBLIC_BACK_END_URL ?? "http://localhost:3000",
-    cookieName: process.env.NEXT_PUBLIC_AUTH_COOKIE ?? "sanad_auth_token",
+    apiUrl: process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:3000",
+    cookieName: process.env.NEXT_PUBLIC_AUTH_COOKIE ?? AUTH_COOKIE_NAME,
   };
 }
 

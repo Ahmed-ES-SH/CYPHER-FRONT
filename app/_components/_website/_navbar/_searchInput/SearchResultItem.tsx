@@ -1,6 +1,7 @@
 "use client";
 
-import { useCartStore } from "@/app/store/CartStore";
+import { useGuestCart } from "@/src/modules/cart";
+import { productToGuestCartItem, isProductInCart } from "@/src/modules/cart/adapters/cart-helpers";
 import { ProductType } from "@/app/types/productType";
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
@@ -8,16 +9,16 @@ import { IoCheckmarkOutline } from "react-icons/io5";
 import { MdShoppingCart } from "react-icons/md";
 import Img from "../../../_global/Img";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function SearchResultItem({
   product,
 }: {
   product: ProductType;
 }) {
-  const { addToCart, cartItems } = useCartStore();
+  const { items, addItem } = useGuestCart();
 
-  const isInCart =
-    cartItems && cartItems.some((item) => item.id === product.id);
+  const inCart = isProductInCart(items, product);
 
   return (
     <Link
@@ -61,16 +62,19 @@ export default function SearchResultItem({
             </div>
 
             <motion.button
-              onClick={() => addToCart(product)}
+              onClick={() => {
+                addItem(productToGuestCartItem(product));
+                toast.success("Added to cart!");
+              }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className={`p-2 ${
-                isInCart
+                inCart
                   ? "bg-green-100 hover:bg-green-200"
                   : "bg-blue-100 hover:bg-blue-200"
               } rounded-full transition-colors duration-200`}
             >
-              {isInCart ? (
+              {inCart ? (
                 <IoCheckmarkOutline className="w-4 h-4 text-green-600" />
               ) : (
                 <MdShoppingCart className="w-4 h-4 text-blue-600" />

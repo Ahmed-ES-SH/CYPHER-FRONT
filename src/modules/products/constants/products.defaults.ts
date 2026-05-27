@@ -1,0 +1,16 @@
+export const PRODUCTS_DEFAULTS = {
+  PAGE: 1,
+  LIMIT: 10,
+  MAX_LIMIT: 100,
+  MIN_STOCK_FOR_LOW: 5,
+  SORT_BY: "createdAt" as const,
+  SORT_ORDER: "desc" as const,
+  TIMEOUT: 10000,
+  MIN_QUANTITY: 1,
+  DISCOUNT_MIN: 0,
+  DISCOUNT_MAX: 100,
+  PRICE_DECIMALS: 2,
+  STALE_TIME: 5 * 60 * 1000,
+  GC_TIME: 30 * 60 * 1000,
+  RETRY: 1,
+};

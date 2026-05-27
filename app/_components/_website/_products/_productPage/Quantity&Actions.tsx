@@ -9,8 +9,10 @@ import {
 } from "react-icons/fa";
 import { MdCompare } from "react-icons/md";
 import { ProductType } from "@/app/types/productType";
-import { useCartStore } from "@/app/store/CartStore";
+import { useGuestCart } from "@/src/modules/cart";
+import { productToGuestCartItem, findCartItem } from "@/src/modules/cart/adapters/cart-helpers";
 import { useWishlistStore } from "@/app/store/WishlistStoreStore";
+import { toast } from "sonner";
 import { useCallback, useMemo } from "react";
 
 interface Quantity_ActionsProps {
@@ -24,8 +26,7 @@ export default function Quantity_Actions({
   setIsWishlisted,
   isWishlisted,
 }: Quantity_ActionsProps) {
-  const { addToCart, increaseQuantity, decreaseQuantity, cartItems } =
-    useCartStore();
+  const { items, addItem, updateQuantity } = useGuestCart();
   const { addToWishlist, wishlistItems } = useWishlistStore();
 
   const handleAddToWishList = (product: ProductType) => {
@@ -36,24 +37,25 @@ export default function Quantity_Actions({
     }
   };
 
-  const productQuantity = useMemo(() => {
-    return cartItems.find((item) => item.id === product?.id)?.quantity || 1;
-  }, [cartItems, product?.id]);
+  const cartItem = useMemo(() => {
+    return findCartItem(items, product);
+  }, [items, product]);
+
+  const productQuantity = cartItem?.quantity ?? 1;
 
   const handleQuantityChange = useCallback(
-    (action: string, product: ProductType) => {
+    (action: string) => {
+      if (!cartItem) return;
       if (action === "increase") {
-        increaseQuantity(product);
+        updateQuantity(cartItem.productId, cartItem.quantity + 1);
       } else if (action === "decrease" && productQuantity > 1) {
-        decreaseQuantity(product?.id);
+        updateQuantity(cartItem.productId, cartItem.quantity - 1);
       }
     },
-    [increaseQuantity, decreaseQuantity, productQuantity],
+    [cartItem, updateQuantity, productQuantity],
   );
 
-  const isInCart = useMemo(() => {
-    return cartItems.find((item) => item.id === product?.id);
-  }, [cartItems, product?.id]);
+  const isInCart = !!cartItem;
 
   return (
     <motion.div
@@ -68,7 +70,7 @@ export default function Quantity_Actions({
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => handleQuantityChange("decrease", product)}
+            onClick={() => handleQuantityChange("decrease")}
             className="p-3 hover:bg-gray-100 transition-colors"
           >
             <FaMinus className="text-gray-600" />
@@ -79,7 +81,7 @@ export default function Quantity_Actions({
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => handleQuantityChange("increase", product)}
+            onClick={() => handleQuantityChange("increase")}
             className="p-3 hover:bg-gray-100 transition-colors"
           >
             <FaPlus className="text-gray-600" />
@@ -88,8 +90,11 @@ export default function Quantity_Actions({
 
         {/* Add to Cart Button */}
         <motion.button
-          disabled={isInCart ? true : false}
-          onClick={() => addToCart(product)}
+          disabled={isInCart}
+          onClick={() => {
+            addItem(productToGuestCartItem(product));
+            toast.success("Added to cart!");
+          }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           style={{ cursor: isInCart ? "not-allowed" : "pointer" }}

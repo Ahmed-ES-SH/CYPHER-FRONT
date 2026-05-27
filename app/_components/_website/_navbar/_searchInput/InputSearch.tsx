@@ -4,12 +4,13 @@ import { ChangeEvent, useEffect, useState, useRef } from "react";
 import Categories from "../Categories";
 import { CiSearch } from "react-icons/ci";
 import { useData } from "@/app/context/DataContext";
-import axios from "axios";
 import { ProductType } from "@/app/types/productType";
 import { AnimatePresence, motion } from "framer-motion";
 import { MdClose } from "react-icons/md";
 
 import SearchResultsDropdown from "./SearchResultsDropdown";
+import { getProductsApi } from "@/src/modules/products";
+import { productToLegacy } from "@/src/modules/products";
 
 export default function InputSearch() {
   const { categories } = useData();
@@ -25,23 +26,21 @@ export default function InputSearch() {
   };
 
   useEffect(() => {
-    const FetchSearchData = async () => {
+    const fetchSearchData = async () => {
       if (!query.trim()) return;
       try {
-        const res = await axios.get(
-          `https://dummyjson.com/products/search?q=${query}`,
-        );
-        setSearchData(res.data.products);
+        const result = await getProductsApi({ search: query, limit: 10 });
+        setSearchData(result.data.map(productToLegacy));
         setShowResults(true);
       } catch (error) {
-        console.log(error);
+        console.error("Search error:", error);
       } finally {
         setLoading(false);
       }
     };
 
     const timeout = setTimeout(() => {
-      FetchSearchData();
+      fetchSearchData();
     }, 500);
 
     if (query.length === 0) {

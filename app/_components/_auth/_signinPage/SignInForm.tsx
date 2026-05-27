@@ -60,12 +60,11 @@ export default function SignInForm() {
     if (!isValidate) return;
 
     try {
-      const response = await login({
+      await login({
         email: formData.email,
         password: formData.password,
       });
-      console.log(response);
-      // router.push(AUTH_ROUTES.HOME);
+      router.push(AUTH_ROUTES.HOME);
     } catch (err: any) {
       const message = err?.message || "Invalid Email or Password";
       toast.error(message);

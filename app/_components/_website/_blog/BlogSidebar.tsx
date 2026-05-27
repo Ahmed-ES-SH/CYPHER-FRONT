@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Img from "../../_global/Img";
 import { FaTimes } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,7 +8,8 @@ import { useVariables } from "@/app/context/VariablesContext";
 import InputSearchArticles from "./InputSearchArticles";
 import Link from "next/link";
 import { formatTitle } from "@/app/helpers/helpers";
-import { articles } from "@/constants/Articles";
+import { useBlogPosts } from "@/src/modules/blog";
+import { blogToLegacyArticleSummary } from "@/src/modules/blog";
 
 export default function BlogSidebar() {
   const { width } = useVariables();
@@ -49,6 +50,18 @@ export default function BlogSidebar() {
       setShowSidebar(true);
     }
   }, [width]);
+
+  // Fetch popular posts via the blog module
+  const { data: popularResult } = useBlogPosts({
+    limit: 3,
+    sortBy: "publishedAt",
+    sortOrder: "DESC",
+  });
+
+  const popularPosts = useMemo(
+    () => (popularResult?.data ?? []).map(blogToLegacyArticleSummary),
+    [popularResult],
+  );
 
   return (
     <>
@@ -116,31 +129,41 @@ export default function BlogSidebar() {
                 Popular Posts
               </h3>
               <div className="space-y-4">
-                {articles.slice(0, 3).map((post) => (
-                  <Link
-                    href={`/blog/${formatTitle(post.title)}?articleId=${
-                      post.id
-                    }`}
-                    key={post.tags[0]}
-                    className="flex gap-3"
-                  >
-                    <div className="w-16 h-12 flex-shrink-0 overflow-hidden">
-                      <Img
-                        src={post.image}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-blue-600 mb-1 uppercase tracking-wide">
-                        {post.category}
+                {popularPosts.length > 0
+                  ? popularPosts.map((post) => (
+                      <Link
+                        href={`/blog/${formatTitle(post.title)}?articleId=${
+                          post.id
+                        }`}
+                        key={post.id}
+                        className="flex gap-3"
+                      >
+                        <div className="w-16 h-12 flex-shrink-0 overflow-hidden">
+                          <Img
+                            src={post.image}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium text-blue-600 mb-1 uppercase tracking-wide">
+                            {post.category}
+                          </div>
+                          <h4 className="text-sm text-gray-900 leading-tight hover:text-gray-700 cursor-pointer">
+                            {post.title}
+                          </h4>
+                        </div>
+                      </Link>
+                    ))
+                  : Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="flex gap-3 animate-pulse">
+                        <div className="w-16 h-12 bg-gray-200 rounded flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-3 bg-gray-200 rounded w-1/3" />
+                          <div className="h-4 bg-gray-200 rounded w-full" />
+                        </div>
                       </div>
-                      <h4 className="text-sm text-gray-900 leading-tight hover:text-gray-700 cursor-pointer">
-                        {post.title}
-                      </h4>
-                    </div>
-                  </Link>
-                ))}
+                    ))}
               </div>
             </div>
 

@@ -6,16 +6,19 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
-import { useFetchData } from "../hooks/useFetchData";
-import { ProductType } from "../types/productType";
+import type { ProductType } from "../types/productType";
 import { useVariables } from "./VariablesContext";
-import axios from "axios";
+import { useProducts } from "@/src/modules/products";
+import { productToLegacy } from "@/src/modules/products";
+import { useCategories } from "@/src/modules/categories";
+import { getProductsByCategoryApi } from "@/src/modules/products";
 
 export type categoryType = {
   name: string;
-  url: string;
   slug: string;
+  url: string;
 };
 
 interface DataContextType {
@@ -35,62 +38,92 @@ interface ChildrenType {
 }
 
 export default function DataProvider({ children }: ChildrenType) {
-  const { categories: selectedCategories } = useVariables();
-  const [products, setProducts] = useState<ProductType[]>([]);
-  const [phones, setPhones] = useState<ProductType[]>([]);
+  const { categories: selectedCategorySlugs } = useVariables();
 
-  const [randomProducts, setRandomProducts] = useState<ProductType[]>([]);
+  // Fetch products via the products module
+  const {
+    data: productsResult,
+    isLoading: productsLoading,
+  } = useProducts({ limit: 50 });
 
-  const [categoryData, setCategoryData] = useState<ProductType[]>([]);
-  const { data } = useFetchData("/products");
-  const { data: PhonesData } = useFetchData("/products/category/smartphones");
-  const { data: categories, loading } = useFetchData<categoryType[]>(
-    "/products/categories"
+  // Fetch smartphones via the products module (category filter)
+  const { data: phonesResult } = useProducts({
+    categorySlug: "smartphones",
+    limit: 20,
+  });
+
+  // Fetch categories via the categories module
+  const { data: appCategories, isLoading: categoriesLoading } = useCategories();
+
+  // Map to legacy types for backward compatibility
+  const products = useMemo<ProductType[]>(
+    () => (productsResult?.data ?? []).map(productToLegacy),
+    [productsResult],
   );
 
-  useEffect(() => {
-    if (data) setProducts(data.products);
-    if (PhonesData) setPhones(PhonesData.products);
-  }, [PhonesData, data]);
+  const phones = useMemo<ProductType[]>(
+    () => (phonesResult?.data ?? []).map(productToLegacy),
+    [phonesResult],
+  );
 
+  const [randomProducts, setRandomProducts] = useState<ProductType[]>([]);
+  const [categoryData, setCategoryData] = useState<ProductType[]>([]);
+
+  // Map categories from the categories module to the legacy format
+  const categories = useMemo<categoryType[] | null>(
+    () =>
+      appCategories?.map((cat) => ({
+        name: cat.name,
+        slug: cat.slug,
+        url: `/category/${cat.slug}`,
+      })) ?? null,
+    [appCategories],
+  );
+
+  // Pick random 6 phones
   useEffect(() => {
-    const fetchData = async () => {
-      if (selectedCategories.length === 0) {
+    if (phones.length > 0) {
+      const shuffled = [...phones].sort(() => 0.5 - Math.random());
+      setRandomProducts(shuffled.slice(0, 6));
+    }
+  }, [phones]);
+
+  // Fetch products by selected categories
+  useEffect(() => {
+    const fetchCategoryData = async () => {
+      if (selectedCategorySlugs.length === 0) {
         setCategoryData([]);
         return;
       }
 
       const uniqueCategories = Array.from(
-        new Map(selectedCategories.map((cat) => [cat.slug, cat])).values()
+        new Map(
+          selectedCategorySlugs.map((cat) => [cat.slug, cat]),
+        ).values(),
       );
 
       try {
-        const allProductsArrays = await Promise.all(
+        const results = await Promise.all(
           uniqueCategories.map((cat) =>
-            axios
-              .get(`https://dummyjson.com/products/category/${cat.slug}`)
-              .then((res) => res.data.products)
-          )
+            getProductsByCategoryApi(cat.slug, { limit: 50 }),
+          ),
         );
 
-        const mergedProducts = allProductsArrays.flat();
-
+        const allProducts = results.flatMap(
+          (result) => result?.data ?? [],
+        );
+        const mergedProducts = allProducts.map(productToLegacy);
         setCategoryData(mergedProducts);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching category products:", error);
+        setCategoryData([]);
       }
     };
 
-    fetchData();
-  }, [selectedCategories]);
+    fetchCategoryData();
+  }, [selectedCategorySlugs]);
 
-  useEffect(() => {
-    const randomSixProducts = phones
-      ?.slice()
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 6);
-    setRandomProducts(randomSixProducts);
-  }, [phones]);
+  const loading = productsLoading || categoriesLoading;
 
   return (
     <DataContext.Provider

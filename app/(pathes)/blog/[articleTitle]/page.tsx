@@ -1,32 +1,32 @@
 import type { Metadata } from "next";
 import Loading from "@/app/_components/_global/Loading";
 import ArticleComponent from "@/app/_components/_website/_blog/ArticleComponent";
-import { articles } from "@/constants/Articles";
 import React, { Suspense } from "react";
+import { getBlogPostApi } from "@/src/modules/blog";
 
 interface ArticlePageProps {
-  searchParams: Promise<{ articleId?: string }>;
+  params: Promise<{ articleTitle: string }>;
 }
 
 export async function generateMetadata({
-  searchParams,
+  params,
 }: ArticlePageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const article = articles.find(
-    (article) => article.id.toString() === params.articleId,
-  );
+  const { articleTitle } = await params;
 
-  if (!article) {
+  try {
+    const article = await getBlogPostApi(articleTitle);
+
+    return {
+      title: `${article.title} — CYPHER Blog`,
+      description: article.excerpt || article.title,
+    };
+  } catch {
     return {
       title: "Article Not Found — CYPHER Blog",
-      description: "The article you're looking for doesn't exist or has been removed.",
+      description:
+        "The article you're looking for doesn't exist or has been removed.",
     };
   }
-
-  return {
-    title: `${article.title} — CYPHER Blog`,
-    description: article.description,
-  };
 }
 
 export default function ArticlePage() {

@@ -178,7 +178,7 @@ export default function ProductCard({ product }: props) {
         </div>
 
         {/* Additional info on hover */}
-        <AdditionalInfo product={product} isHovered={isHovered} />
+        <AdditionalInfo isHovered={isHovered} />
 
         {/* Add to cart button */}
         <ProductAction product={product} isHovered={isHovered} />

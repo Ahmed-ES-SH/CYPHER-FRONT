@@ -19,9 +19,9 @@ import {
 } from "react-icons/fa";
 import { MdSmartDisplay } from "react-icons/md";
 import Img from "@/app/_components/_global/Img";
-import { articles } from "@/constants/Articles";
 import { ArticleType } from "@/app/_components/_website/_blog/ArticleCard";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useBlogPost, blogToLegacyArticle } from "@/src/modules/blog";
 import Link from "next/link";
 
 const COMMENT_MAX_LENGTH = 500;
@@ -133,8 +133,8 @@ Full detailed review and hands-on content will be available soon as we continue 
 };
 
 // Sample comments per article (will be replaced with API data)
-const getSampleComments = (articleId: number): CommentEntry[] => {
-  const commentsMap: Record<number, CommentEntry[]> = {
+const getSampleComments = (articleId: number | string): CommentEntry[] => {
+  const commentsMap: Record<string | number, CommentEntry[]> = {
     1: [
       {
         id: "c1",
@@ -255,13 +255,19 @@ function ArticleNotFound() {
 }
 
 export default function ArticleComponent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const params = useParams();
   const shouldReduceMotion = useReducedMotion();
 
-  const articleId = searchParams.get("articleId");
+  const slug =
+    typeof params?.articleTitle === "string" ? params.articleTitle : "";
+
+  const {
+    data: blogArticle,
+    isLoading,
+    error: articleError,
+  } = useBlogPost(slug || undefined);
+
   const [article, setArticle] = useState<ArticleType | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [content, setContent] = useState<{
     features: ArticleFeature[];
     body: string;
@@ -280,30 +286,31 @@ export default function ArticleComponent() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Load article
+  // Load article from blog module
   useEffect(() => {
-    if (!articleId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!blogArticle) return;
 
-    // Simulate API fetch delay (replace with real API call)
-    const timer = setTimeout(() => {
-      const foundArticle = articles.find(
-        (a) => a.id === Number(articleId),
+    const legacy = blogToLegacyArticle(blogArticle);
+    setArticle(legacy);
+
+    const bodyContent = getPlaceholderContent(legacy);
+    setContent(bodyContent);
+
+    setComments(getSampleComments(legacy.id));
+    setLikes(Math.floor(Math.random() * 200) + 50);
+
+    // Use article content from API when available
+    if (blogArticle.content) {
+      setContent((prev) =>
+        prev
+          ? {
+              ...prev,
+              body: blogArticle.content,
+            }
+          : prev,
       );
-      if (foundArticle) {
-        setArticle(foundArticle);
-        const bodyContent = getPlaceholderContent(foundArticle);
-        setContent(bodyContent);
-        setComments(getSampleComments(foundArticle.id));
-        setLikes(Math.floor(Math.random() * 200) + 50);
-      }
-      setIsLoading(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [articleId]);
+    }
+  }, [blogArticle]);
 
   // Like handler
   const handleLike = useCallback(() => {
@@ -403,6 +410,11 @@ export default function ArticleComponent() {
   // Loading state
   if (isLoading) {
     return <ArticleSkeleton />;
+  }
+
+  // Error state
+  if (articleError && !article) {
+    return <ArticleNotFound />;
   }
 
   // Not found state

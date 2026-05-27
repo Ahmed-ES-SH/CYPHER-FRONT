@@ -1,43 +1,26 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { FiSearch } from "react-icons/fi";
-import { articles } from "@/constants/Articles";
 import MiniArticleCard from "./MiniArticleCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { useBlogPosts } from "@/src/modules/blog";
+import { blogToLegacyArticleSummary } from "@/src/modules/blog";
 
 export default function InputSearchArticles() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredArticles, setFilteredArticles] = useState<typeof articles>([]);
-  const [loading, setLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
 
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      const query = searchQuery.trim().toLowerCase();
+  const query = searchQuery.trim();
+  const hasSearched = query.length > 0;
 
-      if (query === "") {
-        setFilteredArticles([]);
-        setHasSearched(false);
-        return;
-      }
+  // Only fetch when there's an active search query to avoid unnecessary mount-time fetches
+  const { data: postsResult, isLoading } = hasSearched
+    ? useBlogPosts({ search: query, limit: 20 })
+    : { data: undefined, isLoading: false };
 
-      setLoading(true);
-      setHasSearched(true);
-
-      // تأخير عرض النتائج 1 ثانية
-      setTimeout(() => {
-        const results = articles.filter(
-          (article) =>
-            article.title.toLowerCase().includes(query) ||
-            article.description.toLowerCase().includes(query)
-        );
-        setFilteredArticles(results);
-        setLoading(false);
-      }, 1000);
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchQuery]);
+  const filteredArticles = useMemo(
+    () => (postsResult?.data ?? []).map(blogToLegacyArticleSummary),
+    [postsResult],
+  );
 
   return (
     <div className="w-full max-w-3xl mx-auto">
@@ -58,7 +41,7 @@ export default function InputSearchArticles() {
       </div>
 
       {/* Loading Spinner */}
-      {loading && (
+      {isLoading && (
         <div className="flex justify-center items-center py-10">
           <motion.div
             className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full"
@@ -70,7 +53,7 @@ export default function InputSearchArticles() {
 
       {/* Results */}
       <AnimatePresence>
-        {!loading && hasSearched && filteredArticles.length > 0 && (
+        {!isLoading && hasSearched && filteredArticles.length > 0 && (
           <motion.div
             className="flex flex-col h-[50vh] hidden-scrollbar overflow-y-auto gap-4"
             initial={{ opacity: 0 }}
@@ -90,7 +73,7 @@ export default function InputSearchArticles() {
           </motion.div>
         )}
 
-        {!loading && hasSearched && filteredArticles.length === 0 && (
+        {!isLoading && hasSearched && filteredArticles.length === 0 && (
           <motion.div
             className="text-center text-gray-500 py-10 w-full"
             initial={{ opacity: 0 }}

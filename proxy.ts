@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const AUTH_COOKIE = "sanad_auth_token";
 
-const PROTECTED_ROUTES = ["/dashboard", "/admin", "/checkout", "/cart"];
+const PROTECTED_ROUTES = ["/dashboard",  "/checkout", "/cart"];
 const AUTH_ROUTES = [
   "/signin",
   "/signup",

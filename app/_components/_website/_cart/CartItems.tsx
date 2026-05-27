@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartStore } from "@/app/store/CartStore";
+import { useGuestCart } from "@/src/modules/cart";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiCheck, FiMinus, FiPlus, FiX, FiShoppingBag, FiClock } from "react-icons/fi";
 import Img from "../../_global/Img";
@@ -8,11 +8,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 
-const MAX_QUANTITY = 10;
-
 export default function CartItems() {
-  const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart, clearCart } =
-    useCartStore();
+  const { items, updateQuantity, removeItem, clearItems } = useGuestCart();
 
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
@@ -28,11 +25,11 @@ export default function CartItems() {
   };
 
   const handleClearCart = () => {
-    clearCart();
+    clearItems();
     toast.success("Cart cleared");
   };
 
-  if (cartItems.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="min-w-0 flex-1">
         <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -78,15 +75,15 @@ export default function CartItems() {
         {/* Cart Items List */}
         <AnimatePresence>
           <div className="max-h-[50vh] overflow-y-auto">
-            {cartItems.map((item, index) => {
-              const itemSubtotal = item.price * item.quantity;
+            {items.map((item, index) => {
+              const itemSubtotal = item.unitPrice.amount * item.quantity;
               const isLowStock = item.stock <= 5;
-              const isAtMax = item.quantity >= MAX_QUANTITY;
+              const isAtMax = item.quantity >= item.maximumQuantity;
               const isAtStock = item.quantity >= item.stock;
 
               return (
                 <motion.div
-                  key={item.id}
+                  key={item.productId}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: 20 }}
@@ -96,13 +93,13 @@ export default function CartItems() {
                   {/* Product Info */}
                   <div className="col-span-5 flex items-center gap-4 min-w-0">
                     <Img
-                      src={item.images[0]}
-                      alt={item.title}
+                      src={item.productImage}
+                      alt={item.productName}
                       className="h-14 w-14 shrink-0 object-contain"
                     />
                     <div className="min-w-0 flex-1">
                       <h3 className="truncate text-sm font-medium text-[var(--text-primary)]">
-                        {item.title}
+                        {item.productName}
                       </h3>
                       {isLowStock && !isAtStock && (
                         <p className="mt-0.5 text-xs text-[var(--primary-yellow)]">
@@ -115,52 +112,53 @@ export default function CartItems() {
                         </p>
                       )}
                       <p className="mt-0.5 text-sm text-[var(--text-muted)] sm:hidden">
-                        ${item.price.toFixed(2)}
+                        ${item.unitPrice.amount.toFixed(2)}
                       </p>
                     </div>
                   </div>
 
                   {/* Price */}
                   <div className="col-span-2 flex items-center justify-center text-sm text-[var(--text-muted)] max-sm:col-span-3">
-                    ${item.price.toFixed(2)}
+                    ${item.unitPrice.amount.toFixed(2)}
                   </div>
 
                   {/* Quantity Controls */}
                   <div className="col-span-3 flex items-center justify-center">
                     <div className="flex items-center rounded-md border border-[var(--border-subtle)]">
                       <button
-                        onClick={() => decreaseQuantity(item.id)}
+                        onClick={() => {
+                          if (item.quantity > 1) {
+                            updateQuantity(item.productId, item.quantity - 1);
+                          }
+                        }}
                         className="flex h-8 w-8 items-center justify-center text-[var(--text-muted)] transition-colors hover:bg-[var(--surface)]"
-                        aria-label={`Decrease quantity of ${item.title}`}
+                        aria-label={`Decrease quantity of ${item.productName}`}
                       >
                         <FiMinus className="h-3.5 w-3.5" />
                       </button>
                       <input
                         type="number"
                         min={1}
-                        max={Math.min(item.stock, MAX_QUANTITY)}
+                        max={Math.min(item.stock, item.maximumQuantity)}
                         value={item.quantity}
                         onChange={(e) => {
                           const val = parseInt(e.target.value, 10);
-                          if (!isNaN(val) && val >= 1 && val <= Math.min(item.stock, MAX_QUANTITY)) {
-                            const diff = val - item.quantity;
-                            if (diff > 0) {
-                              for (let i = 0; i < diff; i++) increaseQuantity(item);
-                            } else {
-                              for (let i = 0; i < Math.abs(diff); i++) decreaseQuantity(item.id);
-                            }
+                          if (!isNaN(val) && val >= 1) {
+                            updateQuantity(item.productId, val);
                           }
                         }}
                         className="w-10 border-x border-[var(--border-subtle)] bg-transparent py-1 text-center text-sm font-medium text-[var(--text-primary)] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        aria-label={`Quantity of ${item.title}`}
+                        aria-label={`Quantity of ${item.productName}`}
                       />
                       <button
                         onClick={() => {
-                          if (!isAtMax && !isAtStock) increaseQuantity(item);
+                          if (!isAtMax && !isAtStock) {
+                            updateQuantity(item.productId, item.quantity + 1);
+                          }
                         }}
                         disabled={isAtMax || isAtStock}
                         className="flex h-8 w-8 items-center justify-center text-[var(--text-muted)] transition-colors hover:bg-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-30"
-                        aria-label={`Increase quantity of ${item.title}`}
+                        aria-label={`Increase quantity of ${item.productName}`}
                       >
                         <FiPlus className="h-3.5 w-3.5" />
                       </button>
@@ -173,9 +171,12 @@ export default function CartItems() {
                       ${itemSubtotal.toFixed(2)}
                     </span>
                     <button
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => {
+                        removeItem(item.productId);
+                        toast.info("Removed from cart");
+                      }}
                       className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--text-muted)] transition-colors hover:bg-red-50 hover:text-red-500"
-                      aria-label={`Remove ${item.title} from cart`}
+                      aria-label={`Remove ${item.productName} from cart`}
                     >
                       <FiX className="h-4 w-4" />
                     </button>
@@ -184,9 +185,12 @@ export default function CartItems() {
                   {/* Remove button for mobile */}
                   <div className="col-span-3 flex items-center justify-end sm:hidden">
                     <button
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => {
+                        removeItem(item.productId);
+                        toast.info("Removed from cart");
+                      }}
                       className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--text-muted)] transition-colors hover:bg-red-50 hover:text-red-500"
-                      aria-label={`Remove ${item.title} from cart`}
+                      aria-label={`Remove ${item.productName} from cart`}
                     >
                       <FiX className="h-4 w-4" />
                     </button>

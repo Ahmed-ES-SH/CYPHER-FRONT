@@ -6,7 +6,7 @@ import { VscLoading } from "react-icons/vsc";
 import { useRouter } from "next/navigation";
 import { FaTimes } from "react-icons/fa";
 import { PiWarningOctagon } from "react-icons/pi";
-import { apiInstance } from "@/app/helpers/axios";
+import { verifyEmailApi } from "@/src/modules/auth";
 
 interface props {
   onClose: () => void;
@@ -70,20 +70,22 @@ export default function VerifyCode({ onClose }: props) {
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (code.length < 6) {
+      toast.error("Please enter all 6 digits");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const response = await apiInstance.post("/");
-      if (response.status === 200) {
-        toast.success("User signed up and verified!");
-        setValues(Array(6).fill(""));
-        router.push("/signin");
-      } else {
-        toast.error("Verification incomplete");
-      }
-    } catch (err) {
+      const response = await verifyEmailApi(code);
+
+      toast.success(response.message || "Email verified successfully!");
+      setValues(Array(6).fill(""));
+      router.push("/signin");
+    } catch (err: any) {
       console.error("Verification error:", err);
-      toast.error("Verification error");
+      toast.error(err?.message || "Verification failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -106,7 +108,7 @@ export default function VerifyCode({ onClose }: props) {
           <div className="bg-white shadow-xl p-6 rounded-3xl space-y-8 border border-gray-200 relative w-[95%] lg:w-[80%] xl:w-1/2">
             <FaTimes
               onClick={() => setSureMessage(true)}
-              className="size-6 text-red-400 hover:text-red-600 hover:Scale-110 cursor-pointer ml-auto duration-300"
+              className="size-6 text-red-400 hover:text-red-600 hover:scale-110 cursor-pointer ml-auto duration-300"
             />
             <h1 className="text-center text-2xl font-light pb-1 border-b border-primary-blue w-fit mx-auto">
               Verify Email
@@ -117,7 +119,7 @@ export default function VerifyCode({ onClose }: props) {
             </p>
             <form
               onSubmit={handleVerify}
-              className="h-fit flex flex-col items-center justify-center space-y-8  "
+              className="h-fit flex flex-col items-center justify-center space-y-8"
             >
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -135,7 +137,7 @@ export default function VerifyCode({ onClose }: props) {
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
-                    className="lg:w-14 lg:h-14 w-10 h-10 text-center text-lg rounded-xl border border-gray-300  bg-neutral-100  text-black  focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    className="lg:w-14 lg:h-14 w-10 h-10 text-center text-lg rounded-xl border border-gray-300 bg-neutral-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
                     value={val}
                     onChange={(e) => handleChange(e, idx)}
                     onKeyDown={(e) => handleKeyDown(e, idx)}
@@ -183,7 +185,7 @@ export default function VerifyCode({ onClose }: props) {
                 onClick={handleCancel}
                 className="bg-primary-blue text-white px-8 py-3 w-full rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg"
               >
-                ok
+                Ok
               </button>
               <button
                 onClick={() => setSureMessage(false)}

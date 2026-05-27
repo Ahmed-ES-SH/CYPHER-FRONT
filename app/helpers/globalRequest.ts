@@ -44,6 +44,7 @@ interface GlobalRequestOptions<TBody = any, TResult = any> {
   returnRaw?: boolean;
   next?: RequestInit["next"];
   cache?: RequestCache;
+  baseURL?: string;
 }
 
 interface GlobalResponse<T = any> {
@@ -68,12 +69,20 @@ export async function globalRequest<TBody = any, TResult = any>({
   returnRaw = false,
   next,
   cache = "no-store",
+  baseURL,
 }: GlobalRequestOptions<TBody, TResult>): Promise<GlobalResponse<TResult>> {
   const requestId = crypto.randomUUID?.() ?? Date.now().toString(36);
   const logCtx = { requestId, method, endpoint, hasBody: !!body };
 
   try {
-    const url = process.env.BACKE_END_URL + endpoint;
+    const resolvedBaseURL =
+      baseURL ?? process.env.NEXT_PUBLIC_BACKEND_URL;
+    if (!resolvedBaseURL) {
+      throw new Error(
+        "globalRequest: API base URL is not configured. Set NEXT_PUBLIC_BACKEND_URL or pass baseURL.",
+      );
+    }
+    const url = resolvedBaseURL + endpoint;
 
     debugLog("ENTRY", logCtx);
     debugLog("URL", { requestId, url });

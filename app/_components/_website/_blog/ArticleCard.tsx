@@ -6,7 +6,7 @@ import Link from "next/link";
 import { formatTitle } from "@/app/helpers/helpers";
 
 export interface ArticleType {
-  id: number;
+  id: number | string;
   title: string;
   date: string;
   category: string;

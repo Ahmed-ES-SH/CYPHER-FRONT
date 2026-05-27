@@ -96,9 +96,30 @@ export function useLogout() {
 ====================== */
 
 export function useResetPassword() {
+  const resetPasswordLoading = useAuthStore((s) => s.isLoading.resetPassword);
+
+  const sendMutation = useMutation({
+    mutationFn: sendResetPasswordApi,
+    onMutate: () => useAuthStore.getState().setLoading("resetPassword", true),
+    onSettled: () => useAuthStore.getState().setLoading("resetPassword", false),
+  });
+
+  const verifyMutation = useMutation({
+    mutationFn: verifyResetTokenApi,
+    onMutate: () => useAuthStore.getState().setLoading("resetPassword", true),
+    onSettled: () => useAuthStore.getState().setLoading("resetPassword", false),
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: resetPasswordApi,
+    onMutate: () => useAuthStore.getState().setLoading("resetPassword", true),
+    onSettled: () => useAuthStore.getState().setLoading("resetPassword", false),
+  });
+
   return {
-    send: useMutation({ mutationFn: sendResetPasswordApi }),
-    verify: useMutation({ mutationFn: verifyResetTokenApi }),
-    reset: useMutation({ mutationFn: resetPasswordApi }),
+    send: sendMutation,
+    verify: verifyMutation,
+    reset: resetMutation,
+    isLoading: resetPasswordLoading,
   };
 }

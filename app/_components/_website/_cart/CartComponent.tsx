@@ -1,30 +1,29 @@
 "use client";
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { FiCheck, FiTruck, FiMapPin } from "react-icons/fi";
-import { useCartStore } from "@/app/store/CartStore";
-import Img from "../../_global/Img";
+import { useGuestCart } from "@/src/modules/cart";
 import { toast } from "sonner";
 import CartItems from "./CartItems";
 
 type ShippingMethod = "free_shipping" | "local_pickup";
 
 export default function CartComponent() {
-  const { cartItems } = useCartStore();
+  const { items } = useGuestCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<ShippingMethod>("free_shipping");
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.unitPrice.amount * item.quantity,
     0,
   );
   const shippingCost = shippingMethod === "free_shipping" ? 0 : 0;
   const total = subtotal + shippingCost;
 
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) {
+    if (items.length === 0) {
       toast.error("Your cart is empty");
       return;
     }
@@ -32,9 +31,9 @@ export default function CartComponent() {
     setIsCheckingOut(true);
 
     try {
-      const lineItems = cartItems.map((item) => ({
-        name: item.title,
-        price: item.price,
+      const lineItems = items.map((item) => ({
+        name: item.productName,
+        price: item.unitPrice.amount,
         quantity: item.quantity,
       }));
 
@@ -163,7 +162,7 @@ export default function CartComponent() {
 
               <button
                 onClick={handleCheckout}
-                disabled={isCheckingOut || cartItems.length === 0}
+                disabled={isCheckingOut || items.length === 0}
                 className="flex w-full items-center justify-center gap-2 rounded-md bg-[var(--primary-blue)] py-3.5 text-base font-semibold text-white transition-colors hover:bg-[var(--dark-btn)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isCheckingOut ? (

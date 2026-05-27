@@ -1,8 +1,10 @@
 "use client";
 
 import { CgShoppingCart } from "react-icons/cg";
-import { useCartStore } from "@/app/store/CartStore";
+import { useGuestCart } from "@/src/modules/cart";
+import { productToGuestCartItem, isProductInCart } from "@/src/modules/cart/adapters/cart-helpers";
 import { ProductType } from "@/app/types/productType";
+import { toast } from "sonner";
 
 interface props {
   product: ProductType;
@@ -10,18 +12,20 @@ interface props {
 }
 
 export default function ProductAction({ product, isHovered }: props) {
-  const { addToCart, cartItems } = useCartStore();
-  const isInCart =
-    !!product && cartItems.some((item) => item.id === product.id);
+  const { items, addItem } = useGuestCart();
+  const inCart = isProductInCart(items, product);
   return (
     <button
-      onClick={() => addToCart(product)}
+      onClick={() => {
+        addItem(productToGuestCartItem(product));
+        toast.success("Added to cart!");
+      }}
       disabled={product.stock === 0}
       className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-all duration-200 my-3 text-[13px]
     ${
       product.stock === 0
         ? "bg-surface text-text-muted cursor-not-allowed"
-        : isInCart
+        : inCart
           ? "bg-primary-blue/10 text-primary-blue border border-primary-blue/20"
           : isHovered
             ? "bg-primary-blue text-white hover:bg-dark-btn"
@@ -32,7 +36,7 @@ export default function ProductAction({ product, isHovered }: props) {
       <CgShoppingCart size={15} />
       {product.stock === 0
         ? "Out of Stock"
-        : isInCart
+        : inCart
           ? "In Cart"
           : "Add to Cart"}
     </button>
