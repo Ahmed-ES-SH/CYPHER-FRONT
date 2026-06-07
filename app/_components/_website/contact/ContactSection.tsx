@@ -9,17 +9,23 @@ import {
   FiUser,
   FiMessageSquare,
 } from "react-icons/fi";
+import { toast } from "sonner";
 import Img from "../../_global/Img";
+import {
+  sanitizeContactDraft,
+  useSubmitContact,
+  validateContactDraft,
+} from "@/src/modules/contact";
 
 export default function ContactSection() {
+  const { mutateAsync: submitContact, isPending } = useSubmitContact();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
   });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const offices = [
     {
@@ -49,7 +55,7 @@ export default function ContactSection() {
   ];
 
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -60,20 +66,31 @@ export default function ContactSection() {
 
   const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setFormErrors({});
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const draft = {
+      fullName: formData.name,
+      email: formData.email,
+      subject: formData.subject,
+      message: formData.message,
+    };
 
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+    const errors = validateContactDraft(draft);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
 
-    setIsSubmitting(false);
+    try {
+      const sanitized = sanitizeContactDraft(draft);
+      await submitContact(sanitized);
+      toast.success(
+        "Inquiry submitted successfully! We'll get back to you within 24 hours.",
+      );
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch {
+      toast.error("Failed to submit inquiry. Please try again later.");
+    }
   };
 
   const containerVariants = {
@@ -99,7 +116,7 @@ export default function ContactSection() {
 
   return (
     <div className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         <motion.div
           className="grid lg:grid-cols-2 gap-12 items-start"
           variants={containerVariants}
@@ -140,7 +157,7 @@ export default function ContactSection() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-start gap-3">
                         <FiMapPin
-                          className="text-primary-blue mt-1 flex-shrink-0"
+                          className="text-primary-blue mt-1 shrink-0"
                           size={14}
                         />
                         <p className="text-icon-color text-sm leading-relaxed">
@@ -151,7 +168,7 @@ export default function ContactSection() {
                       <div className="space-y-2">
                         <div className="flex items-center gap-3">
                           <FiPhone
-                            className="text-primary-blue flex-shrink-0"
+                            className="text-primary-blue shrink-0"
                             size={14}
                           />
                           <a
@@ -164,7 +181,7 @@ export default function ContactSection() {
 
                         <div className="flex items-center gap-3">
                           <FiMail
-                            className="text-primary-blue flex-shrink-0"
+                            className="text-primary-blue shrink-0"
                             size={14}
                           />
                           <a
@@ -188,7 +205,10 @@ export default function ContactSection() {
             >
               <div className="space-y-4 text-dark-btn/80 leading-relaxed italic font-light">
                 <p className="text-lg">
-                  "Our mission is to bridge the gap between innovation and the end-user. Whether it's a software glitch or a hardware inquiry, our engineers are here to provide the clarity you deserve."
+                  "Our mission is to bridge the gap between innovation and the
+                  end-user. Whether it's a software glitch or a hardware
+                  inquiry, our engineers are here to provide the clarity you
+                  deserve."
                 </p>
                 <p className="text-sm font-bold text-primary-blue uppercase tracking-widest not-italic">
                   — The CYPHER Technical Team
@@ -232,7 +252,8 @@ export default function ContactSection() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  Expect a response from our technical specialists within 24 business hours.
+                  Expect a response from our technical specialists within 24
+                  business hours.
                 </motion.p>
               </div>
 
@@ -259,11 +280,15 @@ export default function ContactSection() {
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
-                        required
                         className="w-full outline-none pl-10 pr-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm"
                         placeholder="e.g. Alan Turing"
                       />
                     </div>
+                    {formErrors.fullName && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {formErrors.fullName}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -280,11 +305,15 @@ export default function ContactSection() {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        required
                         className="w-full outline-none pl-10 pr-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm"
                         placeholder="name@email.com"
                       />
                     </div>
+                    {formErrors.email && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {formErrors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -297,10 +326,14 @@ export default function ContactSection() {
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    required
                     className="w-full outline-none px-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm"
                     placeholder="What can we help you with?"
                   />
+                  {formErrors.subject && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {formErrors.subject}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -320,17 +353,22 @@ export default function ContactSection() {
                       className="w-full outline-none pl-10 pr-4 py-4 border border-gray-100 rounded-md focus:border-primary-blue transition-all bg-gray-50 text-dark-btn text-sm resize-none"
                       placeholder="Please provide as much detail as possible..."
                     />
+                    {formErrors.message && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {formErrors.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <motion.button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isPending}
                   className="w-full bg-dark-btn hover:bg-primary-blue text-white font-bold py-5 px-8 rounded-full shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-70"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {isSubmitting ? (
+                  {isPending ? (
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{
@@ -342,7 +380,9 @@ export default function ContactSection() {
                     />
                   ) : (
                     <>
-                      <span className="uppercase tracking-widest text-sm">Deploy Inquiry</span>
+                      <span className="uppercase tracking-widest text-sm">
+                        Deploy Inquiry
+                      </span>
                       <FiSend size={18} className="text-primary-yellow" />
                     </>
                   )}

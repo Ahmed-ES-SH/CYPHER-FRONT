@@ -1,4 +1,3 @@
-import React from "react";
 import HeroSlider from "./HeroSlider";
 import HeroList from "./HeroList";
 import AnimateBackground from "../../_global/AnimateBackground";

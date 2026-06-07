@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useRef, useEffect, useCallback, useState, type ReactNode } from "react";
-import { getPusherClient, isPusherConfigured } from "../notifications.client";
+import { getPusherClient, getRawPusherInstance, isPusherConfigured } from "../notifications.client";
 import { getPusherConfigFromEnv } from "../notifications.config";
 import { PusherEvent } from "../notifications.types";
 import type { PusherEventHandler } from "../notifications.client";
@@ -104,15 +104,24 @@ export function NotificationsProvider({ children, userId, enabled = true }: Noti
 
     unsubscribeFnsRef.current = unsubs;
 
-    /* Check connection state periodically */
-    const interval = setInterval(() => {
-      const c = getPusherClient();
-      setIsConnected(c?.isConnected ?? false);
-    }, 5000);
+    /* Subscribe to connection state changes */
+    const pusherInstance = getRawPusherInstance() as { connection: { bind: (event: string, handler: () => void) => void; unbind: (event: string, handler: () => void) => void } } | null;
+    if (pusherInstance) {
+      const handleConnected = () => setIsConnected(true);
+      const handleDisconnected = () => setIsConnected(false);
+      pusherInstance.connection.bind("connected", handleConnected);
+      pusherInstance.connection.bind("disconnected", handleDisconnected);
+
+      return () => {
+        unsubs.forEach((fn) => fn());
+        pusherInstance.connection.unbind("connected", handleConnected);
+        pusherInstance.connection.unbind("disconnected", handleDisconnected);
+        handlersRef.current.clear();
+      };
+    }
 
     return () => {
       unsubs.forEach((fn) => fn());
-      clearInterval(interval);
       handlersRef.current.clear();
     };
   }, [userId, enabled, isDuplicate]);

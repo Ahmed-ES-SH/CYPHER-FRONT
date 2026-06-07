@@ -2,6 +2,7 @@
 
 import { useGuestCart } from "@/src/modules/cart";
 import { productToGuestCartItem, isProductInCart } from "@/src/modules/cart/adapters/cart-helpers";
+import { productTypeAdapter } from "@/src/modules/cart/adapters/product-type.adapter";
 import { ProductType } from "@/app/types/productType";
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
@@ -18,7 +19,7 @@ export default function SearchResultItem({
 }) {
   const { items, addItem } = useGuestCart();
 
-  const inCart = isProductInCart(items, product);
+  const inCart = isProductInCart(items, product, productTypeAdapter);
 
   return (
     <Link
@@ -63,16 +64,18 @@ export default function SearchResultItem({
 
             <motion.button
               onClick={() => {
-                addItem(productToGuestCartItem(product));
+                if (inCart) return;
+                addItem(productToGuestCartItem(product, productTypeAdapter));
                 toast.success("Added to cart!");
               }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className={`p-2 ${
                 inCart
-                  ? "bg-green-100 hover:bg-green-200"
+                  ? "bg-green-100 hover:bg-green-200 cursor-default"
                   : "bg-blue-100 hover:bg-blue-200"
               } rounded-full transition-colors duration-200`}
+              aria-label={`Add ${product.title} to cart`}
             >
               {inCart ? (
                 <IoCheckmarkOutline className="w-4 h-4 text-green-600" />

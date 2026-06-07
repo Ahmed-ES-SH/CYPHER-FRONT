@@ -11,6 +11,7 @@ import type {
   DeleteCategoryResult,
   ApiError,
 } from "./categories.types";
+import { CategoryApiError } from "./categories.types";
 
 /* =========================================================
    Transport Interface + Adapter
@@ -30,7 +31,7 @@ async function transportRequest<TResult = any>(
 ): Promise<TResult> {
   const res = await globalRequest({ endpoint, method, body });
   if (!res.success) {
-    throw { message: res.message, status: res.statusCode ?? 500 } satisfies ApiError;
+    throw new CategoryApiError(res.message, res.statusCode ?? 500, res.errors);
   }
   return res.data as TResult;
 }
@@ -86,6 +87,8 @@ export function parseValidationErrors(
 
 export const CATEGORY_ENDPOINTS = {
   PUBLIC_LIST: "/api/categories",
+  ALL_PUBLIC_LIST: "/api/categories/list",
+
   PUBLIC_DETAIL: (slug: string) => `/api/categories/${slug}`,
   ADMIN_LIST: "/api/admin/categories",
   ADMIN_DETAIL: (id: string) => `/api/admin/categories/${id}`,
@@ -120,24 +123,44 @@ export const categoryKeys = {
    ========================================================= */
 
 export function toCategory(raw: any): Category {
+  if (!raw || typeof raw !== "object") {
+    return {
+      id: "",
+      name: "Unknown Category",
+      slug: "",
+      description: null,
+      color: null,
+      icon: null,
+      order: 0,
+      createdAt: "",
+      updatedAt: "",
+    };
+  }
   return {
-    id: raw.id,
-    name: raw.name,
-    slug: raw.slug,
+    id: raw.id ?? "",
+    name: raw.name ?? "",
+    slug: raw.slug ?? "",
     description: raw.description ?? null,
     color: raw.color ?? null,
     icon: raw.icon ?? null,
-    order: raw.order,
+    order: typeof raw.order === "number" ? raw.order : 0,
     createdAt: raw.createdAt ?? "",
     updatedAt: raw.updatedAt ?? "",
   };
 }
 
 export function toCategoryDetails(raw: any): CategoryDetails {
+  if (!raw || typeof raw !== "object") {
+    return {
+      ...toCategory(null),
+      parentId: null,
+      children: [],
+    };
+  }
   return {
     ...toCategory(raw),
     parentId: raw.parentId ?? null,
-    children: (raw.children ?? []).map(toCategory),
+    children: Array.isArray(raw.children) ? raw.children.map(toCategory) : [],
   };
 }
 
@@ -235,6 +258,7 @@ export async function reorderCategoriesApi(
    ========================================================= */
 
 export function normalizeSlug(input: string): string {
+  if (typeof input !== "string") return "";
   return input
     .toLowerCase()
     .trim()

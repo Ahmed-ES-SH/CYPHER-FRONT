@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { FiX, FiLoader } from "react-icons/fi";
+import { toast } from "sonner";
 import { useUpdateUser } from "../../hooks/useUser.hook";
 import type { User } from "../../types/user.types";
 import { UserRole, UserStatus } from "../../types/user.types";
@@ -22,14 +23,19 @@ export default function EditUserModal({ user, onClose }: EditUserModalProps) {
   const { mutateAsync: updateUser, isPending } = useUpdateUser(user.id);
 
   const handleSave = async () => {
-    await updateUser({
-      name: name || undefined,
-      email,
-      avatar: avatar || undefined,
-      role,
-      status,
-    });
-    onClose();
+    try {
+      await updateUser({
+        name: name || undefined,
+        email,
+        avatar: avatar || undefined,
+        role,
+        status,
+      });
+      toast.success("User updated successfully");
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update user. Please try again.");
+    }
   };
 
   const handleKeyDown = useCallback(

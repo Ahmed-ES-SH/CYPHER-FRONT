@@ -9,7 +9,7 @@ export default function NavbarWrapper({
 }) {
   const pathname = usePathname();
 
-  if (pathname == "/reset-password" || pathname == "/auth/callback" || pathname.includes("/admin"))
+  if (pathname == "/reset-password" || pathname == "/auth/callback" || pathname.includes("/dashboard"))
     return null;
   return <div>{children}</div>;
 }

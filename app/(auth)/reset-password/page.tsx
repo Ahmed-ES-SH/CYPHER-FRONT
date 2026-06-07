@@ -37,10 +37,11 @@ export default function RestPasswordPage() {
         setTokenValid(true);
         setVerifyError(null);
       } catch (error) {
-        console.error("Verification error:", error);
         setTokenValid(false);
         setVerifyError(
-          "Network error. Please check your connection and try again.",
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred. Please try again.",
         );
       } finally {
         setIsVerifying(false);
@@ -48,7 +49,8 @@ export default function RestPasswordPage() {
     };
 
     verifyToken();
-  }, [token, email, verify]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, email]);
 
   // Orchestrate rendering based on state
   if (isVerifying) {

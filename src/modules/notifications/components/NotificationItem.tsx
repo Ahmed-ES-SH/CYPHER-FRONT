@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import {
   HiOutlineShoppingBag,
   HiOutlineCreditCard,
@@ -68,6 +69,10 @@ export function NotificationItem({ notification, onMarkRead, onDelete }: Notific
   const bgColor = typeBgColors[notification.type] ?? "bg-slate-50/50";
   const iconColor = typeIconColors[notification.type] ?? "text-slate-500";
   const dotColor = priorityDotColors[notification.priority] ?? "bg-slate-400";
+  const relativeTime = useMemo(
+    () => formatRelativeTime(notification.createdAt),
+    [notification.createdAt],
+  );
 
   return (
     <motion.div
@@ -104,7 +109,7 @@ export function NotificationItem({ notification, onMarkRead, onDelete }: Notific
             {notification.title}
           </p>
           <span className="shrink-0 text-xs text-text-muted whitespace-nowrap">
-            {formatRelativeTime(notification.createdAt)}
+            {relativeTime}
           </span>
         </div>
 

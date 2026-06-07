@@ -1,14 +1,13 @@
 import { create } from "zustand";
-import type { AuthState, AuthLoading } from "./auth.types";
+import type { AuthState } from "./auth.types";
 
-const initialState: Omit<AuthState, "setUser" | "setLoading" | "setInitialized" | "reset"> = {
+const initialState: Omit<AuthState, "setUser" | "setLoading" | "setInitialized" | "reset" | "clearUser"> = {
   user: null,
   isAuthenticated: false,
   isLoading: {
     session: false,
     login: false,
     logout: false,
-    resetPassword: false,
   },
   isInitialized: false,
 };
@@ -30,4 +29,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   setInitialized: () => set({ isInitialized: true }),
 
   reset: () => set({ ...initialState }),
+
+  clearUser: () =>
+    set((state) => ({
+      user: null,
+      isAuthenticated: false,
+      isLoading: {
+        session: false,
+        login: false,
+        logout: false,
+      },
+      isInitialized: state.isInitialized,
+    })),
 }));
+

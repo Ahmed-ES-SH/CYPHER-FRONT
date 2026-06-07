@@ -15,9 +15,10 @@ import ProductAction from "./_productCard/ProductAction";
 
 interface props {
   product: ProductType;
+  viewMode?: "grid" | "list";
 }
 
-export default function ProductCard({ product }: props) {
+export default function ProductCard({ product, viewMode = "grid" }: props) {
   const { addToWishlist, wishlistItems, removeFromWishlist } =
     useWishlistStore();
 
@@ -61,7 +62,9 @@ export default function ProductCard({ product }: props) {
 
   return (
     <div
-      className="relative bg-surface-elevated rounded-md cursor-pointer overflow-hidden transition-all duration-200 hover:shadow-lg group w-full h-fit border border-border-subtle"
+      className={`relative bg-surface-elevated rounded-md cursor-pointer overflow-hidden transition-all duration-200 hover:shadow-lg group w-full h-fit border border-border-subtle ${
+        viewMode === "list" ? "flex flex-row" : ""
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
     >
@@ -83,7 +86,13 @@ export default function ProductCard({ product }: props) {
       )}
 
       {/* Product image */}
-      <div className="relative overflow-hidden bg-surface aspect-square">
+      <div
+        className={`relative overflow-hidden bg-surface border-gray-200 ${
+          viewMode === "list"
+            ? "w-48 shrink-0 border-r aspect-square self-start"
+            : "border-b aspect-square"
+        }`}
+      >
         <Img
           src={
             product.images?.[0] ||
@@ -96,9 +105,7 @@ export default function ProductCard({ product }: props) {
         />
 
         {/* Side icons - always visible on mobile, hover-reveal on desktop */}
-        <div
-          className="absolute right-3 top-16 transform -translate-y-1/2 flex flex-col items-center gap-2"
-        >
+        <div className="absolute right-3 top-16 transform -translate-y-1/2 flex flex-col items-center gap-2">
           {/* Heart icon */}
           <button
             onClick={(e) => {
@@ -108,7 +115,9 @@ export default function ProductCard({ product }: props) {
                 ? removeFromWishlist(product.id)
                 : addToWishlist(product);
             }}
-            aria-label={isInWishList ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={
+              isInWishList ? "Remove from wishlist" : "Add to wishlist"
+            }
             className={`z-10 p-2 rounded-full shadow-md transition-colors duration-200 xl:opacity-0 xl:translate-x-8 xl:group-hover:opacity-100 xl:group-hover:translate-x-0 opacity-100 translate-x-0 ${
               isInWishList
                 ? "bg-primary-yellow hover:bg-yellow-400 text-dark-btn"
@@ -134,7 +143,7 @@ export default function ProductCard({ product }: props) {
       </div>
 
       {/* Card content */}
-      <div className="p-4">
+      <div className="p-4 flex-1">
         {/* Brand */}
         {product.brand && (
           <div className="text-[11px] text-text-muted uppercase tracking-wider mb-1 font-medium">
@@ -147,7 +156,9 @@ export default function ProductCard({ product }: props) {
           href={`/products/${formatTitle(product.title)}?productId=${
             product.id
           }`}
-          className="text-text-primary font-medium text-[14px] mb-2 line-clamp-2 hover:text-primary-blue transition-colors duration-200 min-h-[40px] block leading-tight"
+          className={`text-text-primary font-medium text-[14px] mb-2 hover:text-primary-blue transition-colors duration-200 block leading-tight ${
+            viewMode === "list" ? "" : "line-clamp-2 min-h-[40px]"
+          }`}
         >
           {product.title}
         </Link>

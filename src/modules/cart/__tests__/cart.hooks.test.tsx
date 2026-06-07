@@ -10,7 +10,9 @@ import {
   useGuestCart,
 } from "../cart.hooks";
 import { useCartStore } from "../cart.store";
-import * as api from "../cart.api";
+import * as service from "../cart.service";
+import * as invalidation from "../cart-invalidation";
+import { toCart } from "../cart-mappers";
 import type { Cart, CartDto, CartItemDto } from "../cart.types";
 
 /* =========================================================
@@ -54,14 +56,12 @@ const mockCartDto: CartDto = {
   updatedAt: "2026-01-01T00:00:00.000Z",
 };
 
-const mockCart: Cart = api.toCart(mockCartDto);
+const mockCart: Cart = toCart(mockCartDto);
 
 beforeEach(() => {
   vi.restoreAllMocks();
-  // Reset the cart store between tests
   useCartStore.setState({
     guestItems: [],
-    loading: { add: {}, update: {}, remove: {}, checkout: false, sync: false },
     isHydrated: false,
   });
 });
@@ -90,7 +90,6 @@ describe("useCartSummary", () => {
       wrapper: createWrapper(),
     });
 
-    // With enabled=false, useCart won't fetch, so guest summary is returned
     expect(result.current.summary.itemCount).toBe(3);
     expect(result.current.summary.subtotal.amount).toBe(3000);
   });
@@ -310,7 +309,6 @@ describe("useGuestCart", () => {
       });
     });
 
-    // Should merge to 2 + 3 = 5
     expect(result.current.items).toHaveLength(1);
     expect(result.current.items[0].quantity).toBe(5);
   });
@@ -348,7 +346,6 @@ describe("useGuestCart", () => {
       });
     });
 
-    // 8 + 5 = 13, but stock is 10, so clamped to 10
     expect(result.current.items).toHaveLength(1);
     expect(result.current.items[0].quantity).toBe(10);
   });
@@ -360,8 +357,8 @@ describe("useGuestCart", () => {
 
 describe("useCartActions.addItem", () => {
   it("calls addItemApi with the dto and completes mutation", async () => {
-    const spy = vi.spyOn(api, "addItemApi").mockResolvedValue(mockCart);
-    const invalidateSpy = vi.spyOn(api, "invalidateCart");
+    const spy = vi.spyOn(service, "addItemApi").mockResolvedValue(mockCart);
+    const invalidateSpy = vi.spyOn(invalidation, "invalidateCartDetail");
 
     const { result } = renderHook(() => useCartActions(), {
       wrapper: createWrapper(),
@@ -376,7 +373,7 @@ describe("useCartActions.addItem", () => {
   });
 
   it("surfaces addItem API error", async () => {
-    vi.spyOn(api, "addItemApi").mockRejectedValue({
+    vi.spyOn(service, "addItemApi").mockRejectedValue({
       message: "Product out of stock",
       status: 400,
     });
@@ -399,7 +396,7 @@ describe("useCartActions.addItem", () => {
 
 describe("useCartActions.removeItem", () => {
   it("calls removeItemApi with the item id", async () => {
-    const spy = vi.spyOn(api, "removeItemApi").mockResolvedValue(mockCart);
+    const spy = vi.spyOn(service, "removeItemApi").mockResolvedValue(mockCart);
 
     const { result } = renderHook(() => useCartActions(), {
       wrapper: createWrapper(),
@@ -420,12 +417,11 @@ describe("useCartActions.removeItem", () => {
 
 describe("useCartActions.clearCart", () => {
   it("clears guest items from store on success", async () => {
-    vi.spyOn(api, "clearCartApi").mockResolvedValue({
+    vi.spyOn(service, "clearCartApi").mockResolvedValue({
       success: true,
       message: "Cart cleared",
     });
 
-    // Add a guest item first
     act(() => {
       useCartStore.getState().addGuestItem({
         productId: "p1",
@@ -452,7 +448,6 @@ describe("useCartActions.clearCart", () => {
       expect(result.current.clearCart.isLoading).toBe(false),
     );
 
-    // Guest items should be cleared
     expect(useCartStore.getState().guestItems).toHaveLength(0);
   });
 });
@@ -463,12 +458,11 @@ describe("useCartActions.clearCart", () => {
 
 describe("useSyncGuestCart", () => {
   it("clears guest items and updates query cache on success", async () => {
-    vi.spyOn(api, "syncGuestCart").mockResolvedValue({
+    vi.spyOn(service, "syncGuestCart").mockResolvedValue({
       success: true,
       cart: mockCart,
     });
 
-    // Add a guest item before sync
     act(() => {
       useCartStore.getState().addGuestItem({
         productId: "p1",
@@ -501,16 +495,14 @@ describe("useSyncGuestCart", () => {
 
     await waitFor(() => expect(result.current.isPending).toBe(false));
 
-    // Guest items should be cleared after successful sync
     expect(useCartStore.getState().guestItems).toHaveLength(0);
 
-    // Query cache should have the server cart
-    const cachedCart = queryClient.getQueryData(api.cartKeys.detail());
+    const cachedCart = queryClient.getQueryData(["cart", "detail"]);
     expect(cachedCart).toEqual(mockCart);
   });
 
   it("does not clear guest items on sync failure", async () => {
-    vi.spyOn(api, "syncGuestCart").mockResolvedValue({
+    vi.spyOn(service, "syncGuestCart").mockResolvedValue({
       success: false,
       errors: [{ productId: "p1", reason: "Server error" }],
     });
@@ -547,7 +539,6 @@ describe("useSyncGuestCart", () => {
 
     await waitFor(() => expect(result.current.isPending).toBe(false));
 
-    // Guest items should NOT be cleared on failed sync
     expect(useCartStore.getState().guestItems).toHaveLength(1);
   });
 });
@@ -559,7 +550,7 @@ describe("useSyncGuestCart", () => {
 describe("useCartActions.updateItem", () => {
   it("calls updateItemApi with itemId and dto", async () => {
     const spy = vi
-      .spyOn(api, "updateItemApi")
+      .spyOn(service, "updateItemApi")
       .mockResolvedValue(mockCart);
 
     const { result } = renderHook(() => useCartActions(), {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { globalRequest } from "@/app/helpers/globalRequest";
 import type {
   Notification,
@@ -64,10 +63,11 @@ export function validateAdminBroadcast(dto: AdminBroadcastDto): ValidationErrorM
 
 export function normalizeNotificationError(error: unknown): NotificationApiError {
   if (error && typeof error === "object" && "message" in error) {
+    const err = error as Record<string, unknown>;
     return {
-      message: (error as any).message ?? "An unexpected error occurred",
-      status: (error as any).status ?? 500,
-      errors: (error as any).errors,
+      message: (err.message as string) ?? "An unexpected error occurred",
+      status: (err.status as number) ?? 500,
+      errors: err.errors as Record<string, string[]> | undefined,
     };
   }
   return { message: "An unexpected error occurred", status: 500 };
@@ -115,13 +115,13 @@ export function buildAdminQueryParams(params: AdminNotificationQueryParams): str
 }
 
 interface Transport {
-  get<T = any>(endpoint: string): Promise<T>;
-  post<T = any>(endpoint: string, body?: unknown): Promise<T>;
-  patch<T = any>(endpoint: string, body?: unknown): Promise<T>;
-  delete<T = any>(endpoint: string): Promise<T>;
+  get<T>(endpoint: string): Promise<T>;
+  post<T>(endpoint: string, body?: unknown): Promise<T>;
+  patch<T>(endpoint: string, body?: unknown): Promise<T>;
+  delete<T>(endpoint: string): Promise<T>;
 }
 
-async function transportRequest<TResult = any>(
+async function transportRequest<TResult>(
   endpoint: string,
   method: "GET" | "POST" | "PATCH" | "DELETE" = "GET",
   body?: unknown,
@@ -170,21 +170,21 @@ export const notificationKeys = {
   },
 };
 
-export function toNotification(raw: any): Notification {
+export function toNotification(raw: Record<string, unknown>): Notification {
   return {
-    id: raw.id,
-    userId: raw.userId ?? raw.user_id ?? "",
-    type: raw.type ?? "system",
-    title: raw.title ?? "",
-    body: raw.body ?? "",
-    data: raw.data ?? undefined,
-    link: raw.link ?? undefined,
-    image: raw.image ?? undefined,
-    priority: raw.priority ?? "normal",
-    channel: raw.channel ?? "in_app",
-    isRead: raw.isRead ?? raw.is_read ?? false,
-    readAt: raw.readAt ?? raw.read_at ?? undefined,
-    createdAt: raw.createdAt ?? raw.created_at ?? "",
+    id: raw.id as string,
+    userId: (raw.userId ?? raw.user_id ?? "") as string,
+    type: (raw.type ?? "system") as Notification["type"],
+    title: (raw.title ?? "") as string,
+    body: (raw.body ?? "") as string,
+    data: raw.data as Record<string, unknown> | undefined,
+    link: raw.link as string | undefined,
+    image: raw.image as string | undefined,
+    priority: (raw.priority ?? "normal") as Notification["priority"],
+    channel: (raw.channel ?? "in_app") as Notification["channel"],
+    isRead: (raw.isRead ?? raw.is_read ?? false) as boolean,
+    readAt: (raw.readAt ?? raw.read_at ?? undefined) as string | undefined,
+    createdAt: (raw.createdAt ?? raw.created_at ?? "") as string,
   };
 }
 
@@ -195,11 +195,11 @@ export async function getNotificationsApi(
   const t = transport ?? activeTransport;
   const qs = buildNotificationQueryParams(params);
   const endpoint = `${NOTIFICATION_ENDPOINTS.LIST}?${qs}`;
-  const raw = await t.get<any>(endpoint);
+  const raw = await t.get<Record<string, unknown>>(endpoint);
   return {
-    data: (raw.data ?? []).map(toNotification),
-    meta: raw.meta ?? { page: params.page ?? 1, limit: params.limit ?? 20, total: 0, totalPages: 0 },
-    unread: raw.unread ?? { total: 0, byType: {} },
+    data: ((raw.data ?? []) as Record<string, unknown>[]).map(toNotification),
+    meta: (raw.meta ?? { page: params.page ?? 1, limit: params.limit ?? 20, total: 0, totalPages: 0 }) as NotificationListResponse["meta"],
+    unread: (raw.unread ?? { total: 0, byType: {} }) as NotificationListResponse["unread"],
   };
 }
 
@@ -207,10 +207,10 @@ export async function getUnreadCountApi(
   transport?: Transport,
 ): Promise<UnreadCount> {
   const t = transport ?? activeTransport;
-  const raw = await t.get<any>(NOTIFICATION_ENDPOINTS.UNREAD);
+  const raw = await t.get<Record<string, unknown>>(NOTIFICATION_ENDPOINTS.UNREAD);
   return {
-    total: raw.total ?? raw.count ?? 0,
-    byType: raw.byType ?? raw.by_type ?? {},
+    total: (raw.total ?? raw.count ?? 0) as number,
+    byType: (raw.byType ?? raw.by_type ?? {}) as UnreadCount["byType"],
   };
 }
 
@@ -252,11 +252,11 @@ export async function getAdminNotificationsApi(
   const t = transport ?? activeTransport;
   const qs = buildAdminQueryParams(params);
   const endpoint = `${NOTIFICATION_ENDPOINTS.ADMIN_LIST}?${qs}`;
-  const raw = await t.get<any>(endpoint);
+  const raw = await t.get<Record<string, unknown>>(endpoint);
   return {
-    data: (raw.data ?? []).map(toNotification),
-    meta: raw.meta ?? { page: params.page ?? 1, limit: params.limit ?? 20, total: 0, totalPages: 0 },
-    unread: raw.unread ?? { total: 0, byType: {} },
+    data: ((raw.data ?? []) as Record<string, unknown>[]).map(toNotification),
+    meta: (raw.meta ?? { page: params.page ?? 1, limit: params.limit ?? 20, total: 0, totalPages: 0 }) as NotificationListResponse["meta"],
+    unread: (raw.unread ?? { total: 0, byType: {} }) as NotificationListResponse["unread"],
   };
 }
 
@@ -267,10 +267,10 @@ export async function getCursorNotificationsApi(
   const t = transport ?? activeTransport;
   const qs = buildCursorQueryParams(params);
   const endpoint = `${NOTIFICATION_ENDPOINTS.LIST}?${qs}`;
-  const raw = await t.get<any>(endpoint);
+  const raw = await t.get<Record<string, unknown>>(endpoint);
   return {
-    data: (raw.data ?? []).map(toNotification),
-    meta: raw.meta ?? { nextCursor: null, hasMore: false },
+    data: ((raw.data ?? []) as Record<string, unknown>[]).map(toNotification),
+    meta: (raw.meta ?? { nextCursor: null, hasMore: false }) as CursorPaginatedResponse<Notification>["meta"],
   };
 }
 
@@ -279,7 +279,7 @@ export async function adminSendNotificationApi(
   transport?: Transport,
 ): Promise<Notification> {
   const t = transport ?? activeTransport;
-  const raw = await t.post<any>(NOTIFICATION_ENDPOINTS.ADMIN_SEND, dto);
+  const raw = await t.post<Record<string, unknown>>(NOTIFICATION_ENDPOINTS.ADMIN_SEND, dto);
   return toNotification(raw);
 }
 
@@ -299,20 +299,4 @@ export async function adminDeleteNotificationApi(
   await t.delete(NOTIFICATION_ENDPOINTS.ADMIN_DELETE(id));
 }
 
-import type { QueryClient } from "@tanstack/react-query";
 
-export function invalidateNotificationLists(queryClient: QueryClient, params?: NotificationQueryParams) {
-  if (params) {
-    queryClient.invalidateQueries({ queryKey: notificationKeys.list(params) });
-    return;
-  }
-  queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
-}
-
-export function invalidateUnreadCount(queryClient: QueryClient) {
-  queryClient.invalidateQueries({ queryKey: notificationKeys.unread() });
-}
-
-export function invalidatePreferences(queryClient: QueryClient) {
-  queryClient.invalidateQueries({ queryKey: notificationKeys.preferences() });
-}

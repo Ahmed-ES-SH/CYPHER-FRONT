@@ -1,14 +1,10 @@
 import BlogSidebar from "@/app/_components/_website/_blog/BlogSidebar";
-import React from "react";
+import type { ReactNode } from "react";
 
-interface layoutProps {
-  children: React.ReactNode;
-}
-
-export default function BlogLayout({ children }: layoutProps) {
+export default function BlogLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <div className="c-container mt-8  flex items-start gap-4 ">
+      <div className="c-container mt-8 flex items-start gap-4">
         {children}
         <BlogSidebar />
       </div>

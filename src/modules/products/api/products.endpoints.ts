@@ -3,6 +3,7 @@ export const PRODUCTS_ENDPOINTS = {
   PUBLIC_BY_SLUG: (slug: string) => `/api/products/${slug}`,
   PUBLIC_BY_CATEGORY: (categorySlug: string) =>
     `/api/products/category/${categorySlug}`,
+  FILTER_OPTIONS: "/api/products/filter-options",
   ADMIN_LIST: "/api/admin/products",
   ADMIN_GET: (id: string) => `/api/admin/products/${id}`,
   CREATE: "/api/admin/products",

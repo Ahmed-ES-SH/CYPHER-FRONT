@@ -1,12 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import {
   authKeys,
   AUTH_ERRORS,
   AUTH_ROUTES,
   AUTH_ENDPOINTS,
   AUTH_COOKIE_NAME,
-  getAuthConfig,
-} from "../auth.api";
+} from "../constants";
 
 /* =========================================================
    authKeys
@@ -124,37 +123,41 @@ describe("AUTH_COOKIE_NAME", () => {
 });
 
 /* =========================================================
-   getAuthConfig
+   AUTH_CONFIG
    ========================================================= */
 
-describe("getAuthConfig", () => {
+describe("AUTH_CONFIG", () => {
   const originalEnv = process.env;
+
+  beforeEach(() => {
+    vi.resetModules();
+  });
 
   afterEach(() => {
     process.env = { ...originalEnv };
   });
 
-  it("returns apiUrl from env when set", () => {
+  it("returns apiUrl from env when set", async () => {
     process.env.NEXT_PUBLIC_BACKEND_URL = "https://api.example.com";
-    const config = getAuthConfig();
-    expect(config.apiUrl).toBe("https://api.example.com");
+    const { AUTH_CONFIG } = await import("../constants/auth.endpoints");
+    expect(AUTH_CONFIG.apiUrl).toBe("https://api.example.com");
   });
 
-  it("falls back to localhost when env is not set", () => {
+  it("falls back to localhost when env is not set", async () => {
     delete process.env.NEXT_PUBLIC_BACKEND_URL;
-    const config = getAuthConfig();
-    expect(config.apiUrl).toBe("http://localhost:3000");
+    const { AUTH_CONFIG } = await import("../constants/auth.endpoints");
+    expect(AUTH_CONFIG.apiUrl).toBe("http://localhost:3000");
   });
 
-  it("returns cookieName from env when set", () => {
-    process.env.NEXT_PUBLIC_AUTH_COOKIE = "my_custom_cookie";
-    const config = getAuthConfig();
-    expect(config.cookieName).toBe("my_custom_cookie");
+  it("returns cookieName from env when set", async () => {
+    process.env.NEXT_PUBLIC_AUTH_TOKEN = "my_custom_cookie";
+    const { AUTH_CONFIG } = await import("../constants/auth.endpoints");
+    expect(AUTH_CONFIG.cookieName).toBe("my_custom_cookie");
   });
 
-  it("falls back to AUTH_COOKIE_NAME when env is not set", () => {
-    delete process.env.NEXT_PUBLIC_AUTH_COOKIE;
-    const config = getAuthConfig();
-    expect(config.cookieName).toBe(AUTH_COOKIE_NAME);
+  it("falls back to AUTH_COOKIE_NAME when env is not set", async () => {
+    delete process.env.NEXT_PUBLIC_AUTH_TOKEN;
+    const { AUTH_CONFIG } = await import("../constants/auth.endpoints");
+    expect(AUTH_CONFIG.cookieName).toBe(AUTH_COOKIE_NAME);
   });
 });

@@ -2,8 +2,8 @@
 import { ORDER_ENDPOINTS } from "./orders.endpoints";
 import { getOrderTransport } from "./orders.transport";
 import { toOrder } from "../utils/normalize-order";
-import type { Order, OrderListResponse, OrderStats, OrderQueryParams } from "../contracts/order.types";
-import type { OrderApiError } from "../contracts/order-error.types";
+import type { Order, OrderListResponse, OrderStats, OrderQueryParams, OrderSortField, SortOrder, CreateOrderDto, UpdateOrderStatusDto } from "../contracts/order.types";
+import type { ValidationErrorMap } from "../contracts/order-error.types";
 
 export const ORDER_LIMITS = {
   PAGE_MIN: 1,
@@ -14,7 +14,7 @@ export const ORDER_LIMITS = {
   NOTES_MAX: 1000,
 } as const;
 
-export const ORDER_SORT_FIELDS: readonly string[] = [
+export const ORDER_SORT_FIELDS: readonly OrderSortField[] = [
   "createdAt",
   "updatedAt",
   "total",
@@ -22,16 +22,33 @@ export const ORDER_SORT_FIELDS: readonly string[] = [
   "orderNumber",
 ] as const;
 
-function normalizeSortField(field: string | undefined): string {
-  if (field && ORDER_SORT_FIELDS.includes(field)) return field;
+export function normalizeSortField(field: string | undefined): OrderSortField {
+  if (field && (ORDER_SORT_FIELDS as readonly string[]).includes(field)) {
+    return field as OrderSortField;
+  }
   return "createdAt";
 }
 
-function normalizeOrder(order: string | undefined): "ASC" | "DESC" {
+export function normalizeOrder(order: string | undefined): SortOrder {
   return order === "ASC" ? "ASC" : "DESC";
 }
 
-function buildOrderQueryParams(params: OrderQueryParams): string {
+function normalizeQueryParams(params: OrderQueryParams): Record<string, string> {
+  const query: Record<string, string> = {
+    page: String(Math.max(params.page ?? ORDER_LIMITS.DEFAULT_PAGE, ORDER_LIMITS.PAGE_MIN)),
+    limit: String(Math.min(Math.max(params.limit ?? ORDER_LIMITS.DEFAULT_LIMIT, ORDER_LIMITS.LIMIT_MIN), ORDER_LIMITS.LIMIT_MAX)),
+    sortBy: normalizeSortField(params.sortBy),
+    order: normalizeOrder(params.order),
+  };
+  if (params.status) query.status = params.status;
+  if (params.paymentStatus) query.paymentStatus = params.paymentStatus;
+  if (params.search) query.search = params.search;
+  if (params.dateFrom) query.dateFrom = params.dateFrom;
+  if (params.dateTo) query.dateTo = params.dateTo;
+  return query;
+}
+
+export function buildOrderQueryParams(params: OrderQueryParams): string {
   const searchParams = new URLSearchParams();
   searchParams.set("page", String(Math.max(params.page ?? ORDER_LIMITS.DEFAULT_PAGE, ORDER_LIMITS.PAGE_MIN)));
   searchParams.set("limit", String(Math.min(Math.max(params.limit ?? ORDER_LIMITS.DEFAULT_LIMIT, ORDER_LIMITS.LIMIT_MIN), ORDER_LIMITS.LIMIT_MAX)));
@@ -45,7 +62,72 @@ function buildOrderQueryParams(params: OrderQueryParams): string {
   return searchParams.toString();
 }
 
+export function validateCreateOrderDto(dto: CreateOrderDto): ValidationErrorMap {
+  const errors: ValidationErrorMap = {};
+
+  if (!dto.items || dto.items.length === 0) {
+    errors.items = "At least one item is required";
+  } else {
+    dto.items.forEach((item, index) => {
+      if (!item.productId) {
+        errors[`items.${index}.productId`] = "Product ID is required";
+      }
+      if (!item.quantity || item.quantity < 1) {
+        errors[`items.${index}.quantity`] = "Quantity must be at least 1";
+      }
+    });
+  }
+
+  if (!dto.shippingAddress) {
+    errors.shippingAddress = "Shipping address is required";
+  } else {
+    const addr = dto.shippingAddress;
+    if (!addr.fullName) errors["shippingAddress.fullName"] = "Full name is required";
+    if (!addr.addressLine1) errors["shippingAddress.addressLine1"] = "Address is required";
+    if (!addr.city) errors["shippingAddress.city"] = "City is required";
+    if (!addr.postalCode) errors["shippingAddress.postalCode"] = "Postal code is required";
+    if (!addr.country) errors["shippingAddress.country"] = "Country is required";
+  }
+
+  if (dto.notes && dto.notes.length > ORDER_LIMITS.NOTES_MAX) {
+    errors.notes = `Notes must be at most ${ORDER_LIMITS.NOTES_MAX} characters`;
+  }
+
+  return errors;
+}
+
+export const orderKeys = {
+  all: ["orders"] as const,
+  lists: () => [...orderKeys.all, "list"] as const,
+  list: (params?: OrderQueryParams) => {
+    const normalized = params ? normalizeQueryParams(params) : undefined;
+    return [...orderKeys.lists(), normalized].filter((v) => v !== undefined);
+  },
+  details: () => [...orderKeys.all, "detail"] as const,
+  detail: (id: string) => [...orderKeys.details(), id] as const,
+  stats: () => [...orderKeys.all, "stats"] as const,
+  userOrders: (userId: string) => [...orderKeys.all, "user", userId] as const,
+};
+
 export async function getOrderHistoryApi(
+  params: OrderQueryParams = {},
+): Promise<OrderListResponse> {
+  const transport = getOrderTransport();
+  const qs = buildOrderQueryParams(params);
+  const endpoint = `${ORDER_ENDPOINTS.USER_LIST}?${qs}`;
+  const raw = await transport.get<any>(endpoint);
+  return {
+    data: (raw.data ?? []).map(toOrder),
+    meta: raw.meta ?? {
+      page: params.page ?? ORDER_LIMITS.DEFAULT_PAGE,
+      limit: params.limit ?? ORDER_LIMITS.DEFAULT_LIMIT,
+      total: 0,
+      totalPages: 0,
+    },
+  };
+}
+
+export async function getUserOrdersApi(
   params: OrderQueryParams = {},
 ): Promise<OrderListResponse> {
   const transport = getOrderTransport();
@@ -70,7 +152,7 @@ export async function getOrderByIdApi(id: string): Promise<Order> {
 }
 
 export async function createOrderApi(
-  dto: { items: Array<{ productId: string; quantity: number }>; shippingAddress: any; notes?: string; couponCode?: string },
+  dto: CreateOrderDto,
 ): Promise<Order> {
   const transport = getOrderTransport();
   const raw = await transport.post<any>(ORDER_ENDPOINTS.CREATE, dto);
@@ -109,7 +191,7 @@ export async function getAdminOrderByIdApi(id: string): Promise<Order> {
 
 export async function updateOrderStatusApi(
   id: string,
-  dto: { status: string; reason?: string },
+  dto: UpdateOrderStatusDto,
 ): Promise<Order> {
   const transport = getOrderTransport();
   const raw = await transport.patch(ORDER_ENDPOINTS.ADMIN_UPDATE_STATUS(id), dto);
@@ -135,4 +217,24 @@ export async function getOrderStatsApi(): Promise<OrderStats> {
       currency: raw.averageOrderValue?.currency ?? raw.average_order_value?.currency ?? "usd",
     },
   };
+}
+
+export function invalidateOrderLists(queryClient: any, params?: OrderQueryParams) {
+  if (params) {
+    queryClient.invalidateQueries({ queryKey: orderKeys.list(params) });
+    return;
+  }
+  queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+}
+
+export function invalidateOrderDetail(queryClient: any, id: string) {
+  queryClient.invalidateQueries({ queryKey: orderKeys.detail(id) });
+}
+
+export function removeOrderDetail(queryClient: any, id: string) {
+  queryClient.removeQueries({ queryKey: orderKeys.detail(id) });
+}
+
+export function invalidateOrderStats(queryClient: any) {
+  queryClient.invalidateQueries({ queryKey: orderKeys.stats() });
 }

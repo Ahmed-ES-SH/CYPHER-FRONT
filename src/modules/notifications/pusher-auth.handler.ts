@@ -10,10 +10,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthCookie } from "@/app/helpers/session";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACK_END_URL ??
-  process.env.NEXT_PUBLIC_BACKEND_URL ??
-  "http://localhost:5000";
+const BACKEND_URL = process.env.BACKEND_URL;
+
+if (!BACKEND_URL) {
+  throw new Error("[pusher-auth] BACKEND_URL environment variable is not set.");
+}
 
 /**
  * POST /api/pusher/auth

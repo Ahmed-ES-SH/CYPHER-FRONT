@@ -16,7 +16,7 @@ import { join } from "path";
    ✔ transform response
 ========================================================= */
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = process.env.NODE_ENV === "development";
 const LOG_DIR = join(process.cwd(), "logs");
 const LOG_FILE = join(LOG_DIR, "global-request.log");
 
@@ -53,6 +53,7 @@ interface GlobalResponse<T = any> {
   data?: T;
   statusCode?: number;
   meta?: PaginationMeta;
+  errors?: Record<string, string[]>;
 }
 
 /* =========================================================
@@ -167,6 +168,7 @@ export async function globalRequest<TBody = any, TResult = any>({
         success: false,
         message: result?.message || result?.error || defaultErrorMessage,
         statusCode: response.status,
+        errors: result?.errors,
       };
     }
 

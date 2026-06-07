@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { QueryClient } from "@tanstack/react-query";
+import type { QueryClient, UseQueryOptions } from "@tanstack/react-query";
 import type {
   Category,
   CategoryDetails,
@@ -36,24 +36,29 @@ const CATEGORY_RETRY = 1;
    Public Hooks
    ========================================================= */
 
-export function useCategories() {
-  return useQuery<Category[]>({
+export function useCategories(options?: Partial<UseQueryOptions<Category[], Error>>) {
+  return useQuery<Category[], Error>({
     queryKey: categoryKeys.list(),
     queryFn: () => getCategoriesApi(),
     staleTime: CATEGORY_STALE_TIME,
     gcTime: CATEGORY_GC_TIME,
     retry: CATEGORY_RETRY,
+    ...options,
   });
 }
 
-export function useCategory(slug: string | undefined) {
-  return useQuery<CategoryDetails>({
+export function useCategory(
+  slug: string | undefined,
+  options?: Partial<UseQueryOptions<CategoryDetails, Error>>,
+) {
+  return useQuery<CategoryDetails, Error>({
     queryKey: categoryKeys.detail(slug ?? ""),
     queryFn: () => getCategoryApi(slug!),
     enabled: !!slug,
     staleTime: CATEGORY_STALE_TIME,
     gcTime: CATEGORY_GC_TIME,
     retry: CATEGORY_RETRY,
+    ...options,
   });
 }
 
@@ -61,24 +66,32 @@ export function useCategory(slug: string | undefined) {
    Admin Hooks
    ========================================================= */
 
-export function useAdminCategories(filters: CategoryFilters = {}) {
-  return useQuery<PaginatedCategories>({
+export function useAdminCategories(
+  filters: CategoryFilters = {},
+  options?: Partial<UseQueryOptions<PaginatedCategories, Error>>,
+) {
+  return useQuery<PaginatedCategories, Error>({
     queryKey: categoryKeys.adminList(filters),
     queryFn: () => getAdminCategoriesApi(filters),
     staleTime: CATEGORY_STALE_TIME,
     gcTime: CATEGORY_GC_TIME,
     retry: CATEGORY_RETRY,
+    ...options,
   });
 }
 
-export function useAdminCategory(id: string | undefined) {
-  return useQuery<CategoryDetails>({
+export function useAdminCategory(
+  id: string | undefined,
+  options?: Partial<UseQueryOptions<CategoryDetails, Error>>,
+) {
+  return useQuery<CategoryDetails, Error>({
     queryKey: categoryKeys.adminDetail(id ?? ""),
     queryFn: () => getAdminCategoryApi(id!),
     enabled: !!id,
     staleTime: CATEGORY_STALE_TIME,
     gcTime: CATEGORY_GC_TIME,
     retry: CATEGORY_RETRY,
+    ...options,
   });
 }
 
@@ -107,6 +120,10 @@ export function useUpdateCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: categoryKeys.adminLists() });
       queryClient.invalidateQueries({ queryKey: categoryKeys.adminDetail(id) });
+      queryClient.invalidateQueries({ queryKey: categoryKeys.details() });
+      if (_data?.slug) {
+        queryClient.invalidateQueries({ queryKey: categoryKeys.detail(_data.slug) });
+      }
     },
   });
 }
@@ -120,6 +137,7 @@ export function useDeleteCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: categoryKeys.adminLists() });
       queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: categoryKeys.adminDetails() });
+      queryClient.invalidateQueries({ queryKey: categoryKeys.details() });
     },
   });
 }
@@ -133,6 +151,7 @@ export function useReorderCategoriesMutation() {
       queryClient.invalidateQueries({ queryKey: categoryKeys.adminLists() });
       queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: categoryKeys.adminDetails() });
+      queryClient.invalidateQueries({ queryKey: categoryKeys.details() });
     },
   });
 }

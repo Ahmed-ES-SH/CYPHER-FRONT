@@ -2,15 +2,15 @@ import { create } from "zustand";
 import type { NotificationQueryParams } from "./notifications.types";
 
 export interface NotificationState {
-  unreadCount: number;
   isDropdownOpen: boolean;
   filters: NotificationQueryParams;
 
-  setUnreadCount: (count: number) => void;
-  decrementUnread: () => void;
   setDropdownOpen: (open: boolean) => void;
   toggleDropdown: () => void;
-  setFilter: (key: keyof NotificationQueryParams, value: any) => void;
+  setFilter: <K extends keyof NotificationQueryParams>(
+    key: K,
+    value: NotificationQueryParams[K],
+  ) => void;
   resetFilters: () => void;
   reset: () => void;
 }
@@ -23,7 +23,6 @@ const defaultFilters: NotificationQueryParams = {
 };
 
 const initialState = {
-  unreadCount: 0,
   isDropdownOpen: false,
   filters: { ...defaultFilters },
 };
@@ -31,11 +30,6 @@ const initialState = {
 export const useNotificationStore = create<NotificationState>()(
   (set) => ({
     ...initialState,
-
-    setUnreadCount: (count) => set({ unreadCount: count }),
-
-    decrementUnread: () =>
-      set((state) => ({ unreadCount: Math.max(0, state.unreadCount - 1) })),
 
     setDropdownOpen: (open) => set({ isDropdownOpen: open }),
 

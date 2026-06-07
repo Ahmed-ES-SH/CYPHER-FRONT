@@ -11,7 +11,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   
-  if (pathname.includes("/admin")) return null;
+  if (pathname.includes("/dashboard")) return null;
   
   return (
     <>

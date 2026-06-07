@@ -1,3 +1,4 @@
+import axios from "axios";
 import type { NormalizedPaymentError, PaymentApiError } from "../types/payments.types";
 import { PaymentErrorCode } from "../types/payments.types";
 import {
@@ -10,7 +11,7 @@ import {
 
 export function normalizePaymentError(error: unknown): NormalizedPaymentError {
   // Axios error with response
-  if (isAxiosError(error) && error.response) {
+  if (axios.isAxiosError(error) && error.response) {
     const status = error.response.status;
     const data = error.response.data as Record<string, unknown> | undefined;
 
@@ -23,6 +24,17 @@ export function normalizePaymentError(error: unknown): NormalizedPaymentError {
         status,
         retryable: mapped.retryable,
         validationErrors: extractValidationErrors(data?.errors),
+      };
+    }
+
+    // Unmapped 4xx client errors (e.g. 422) → INVALID_INPUT with validation details
+    if (status >= 400 && status < 500) {
+      return {
+        code: PaymentErrorCode.INVALID_INPUT,
+        message: (data?.message as string) ?? "Validation failed.",
+        status,
+        retryable: false,
+        validationErrors: extractValidationErrors(data?.errors ?? data),
       };
     }
 
@@ -58,7 +70,7 @@ export function normalizePaymentError(error: unknown): NormalizedPaymentError {
   }
 
   // Axios error without response (network error / timeout)
-  if (isAxiosError(error) && !error.response) {
+  if (axios.isAxiosError(error) && !error.response) {
     return {
       code: TRANSPORT_ERROR.code,
       message: error.message ?? TRANSPORT_ERROR.message,
@@ -103,14 +115,6 @@ function extractValidationErrors(
     }
   }
   return Object.keys(map).length > 0 ? map : undefined;
-}
-
-function isAxiosError(error: unknown): error is { response?: { status: number; data: unknown }; message: string } {
-  return (
-    error !== null &&
-    typeof error === "object" &&
-    "isAxiosError" in error
-  );
 }
 
 function isNormalizedShape(error: unknown): error is NormalizedPaymentError {

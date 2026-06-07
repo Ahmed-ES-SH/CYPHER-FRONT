@@ -6,8 +6,8 @@ import { VscLoading } from "react-icons/vsc";
 import { useRouter } from "next/navigation";
 import { FaTimes } from "react-icons/fa";
 import { PiWarningOctagon } from "react-icons/pi";
-import { verifyEmailApi } from "@/src/modules/auth";
-
+import { verifyEmailApi } from "@/src/modules/auth/auth.api";
+import { createPortal} from "react-dom"
 interface props {
   onClose: () => void;
 }
@@ -95,9 +95,9 @@ export default function VerifyCode({ onClose }: props) {
     setSureMessage(false);
     onClose();
   };
-
-  return (
-    <>
+  
+  
+  const contetn = (<>
       {!sureMessage && (
         <motion.div
           initial={{ opacity: 0, y: -300 }}
@@ -197,6 +197,13 @@ export default function VerifyCode({ onClose }: props) {
           </div>
         </motion.div>
       )}
-    </>
+    </>)
+    
+    
+    if (typeof window === "undefined") return null;
+
+  return (
+    createPortal(contetn , document.body)
   );
 }
+  

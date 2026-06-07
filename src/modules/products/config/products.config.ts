@@ -1,6 +1,9 @@
 export interface ProductsConfig {
   baseURL: string;
   onUnauthorized?: () => void;
+  staleTime?: number;
+  gcTime?: number;
+  retryCount?: number;
 }
 
 let config: ProductsConfig = {

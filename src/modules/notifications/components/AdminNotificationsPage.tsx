@@ -16,7 +16,9 @@ import { NotificationType } from "../notifications.types";
 import type { Notification, AdminNotificationQueryParams } from "../notifications.types";
 import { SendNotificationForm } from "./SendNotificationForm";
 import { BroadcastNotificationForm } from "./BroadcastNotificationForm";
+import RecipientsTable from "./RecipientsTable";
 import { SkeletonNotificationFeed } from "./SkeletonNotificationFeed";
+import ComposeNotificationForm from "./ComposeNotificationForm";
 import { toast } from "sonner";
 
 /* ─── Component ─── */
@@ -24,9 +26,10 @@ import { toast } from "sonner";
 export function AdminNotificationsPage() {
   const [page, setPage] = useState(1);
   const [typeFilter, setTypeFilter] = useState<NotificationType | "">("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [showSendForm, setShowSendForm] = useState(false);
   const [showBroadcastForm, setShowBroadcastForm] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
 
   const filters: AdminNotificationQueryParams = {
     page,
@@ -46,12 +49,6 @@ export function AdminNotificationsPage() {
       onSuccess: () => toast.success("Notification deleted"),
       onError: (err) => toast.error(err.message || "Failed to delete"),
     });
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    /* TODO: Enable search once the backend supports a `search` query parameter */
-    refetch();
   };
 
   return (
@@ -90,45 +87,84 @@ export function AdminNotificationsPage() {
 
       {/* Send / Broadcast Forms (toggle) */}
       <AnimatePresence>
-        {showSendForm && (
+        {(showSendForm || showBroadcastForm) && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <SendNotificationForm onClose={() => setShowSendForm(false)} />
-          </motion.div>
-        )}
-        {showBroadcastForm && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <BroadcastNotificationForm onClose={() => setShowBroadcastForm(false)} />
+            {/* Multi-step: 1) recipients table, 2) notification form */}
+            {step === 1 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
+                  <RecipientsTable selected={selectedRecipients} onChange={setSelectedRecipients} />
+                </div>
+                <div className="md:col-span-1 space-y-4">
+                  <div className="rounded-xl border border-border-subtle bg-surface p-4">
+                    <h3 className="text-sm font-semibold mb-2">Selected Users</h3>
+                    <div className="text-2xl font-bold">{selectedRecipients.length}</div>
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => setStep(2)}
+                        disabled={selectedRecipients.length === 0}
+                        className="inline-flex items-center gap-2 btn-shop disabled:opacity-50"
+                      >
+                        Continue
+                      </button>
+                      <button
+                        onClick={() => { setShowSendForm(false); setShowBroadcastForm(false); setStep(1); setSelectedRecipients([]); }}
+                        className="px-4 py-2 rounded-lg border border-border-subtle text-sm"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                  {/* If admin opened Send vs Broadcast, we still use the same compose form but handle recipients count */}
+                  <div className="rounded-xl border border-border-subtle bg-surface p-4">
+                    <h4 className="text-sm font-medium mb-2">Quick Actions</h4>
+                    <p className="text-xs text-text-muted mb-2">Selected recipients will determine whether this is a single-send or a broadcast.</p>
+                    <div className="flex gap-2">
+                      <button onClick={() => setStep(2)} disabled={selectedRecipients.length === 0} className="px-3 py-2 bg-primary-blue text-white rounded">Compose</button>
+                      <button onClick={() => setSelectedRecipients([])} className="px-3 py-2 border rounded">Clear</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {/* Compose form uses recipients list from step 1 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-1">
+                    <div className="rounded-xl border border-border-subtle bg-surface p-4">
+                      <h3 className="text-sm font-semibold mb-2">Recipients</h3>
+                      <div className="text-sm text-text-muted">{selectedRecipients.length} selected</div>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <ComposeNotificationForm recipients={selectedRecipients} onClose={() => { setShowSendForm(false); setShowBroadcastForm(false); setStep(1); setSelectedRecipients([]); }} />
+                    <div className="mt-3 flex gap-2">
+                      <button onClick={() => setStep(1)} className="px-3 py-2 rounded border border-border-subtle text-sm">Back</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1">
-          <div className="relative flex-1 max-w-sm">
-            <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-text-muted" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by ID..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg border border-border-subtle text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-            />
-          </div>
-          <button type="submit" className="btn-shop text-sm px-4 py-2">
-            Search
-          </button>
-        </form>
+        <div className="relative flex-1 max-w-sm" title="Search is not yet available">
+          <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-text-muted" />
+          <input
+            type="text"
+            disabled
+            placeholder="Search (coming soon)"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-border-subtle text-sm opacity-50 cursor-not-allowed"
+          />
+        </div>
 
         <div className="flex items-center gap-2">
           <HiOutlineFunnel className="size-4 text-text-muted" />

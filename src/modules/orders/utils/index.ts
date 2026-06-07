@@ -6,6 +6,8 @@ export {
   isZeroMoney,
   addMoney,
   multiplyMoney,
+  formatMoney,
+  getCurrencyDivisor,
 } from "./money";
 export {
   isTerminalStatus,
@@ -24,3 +26,4 @@ export {
   isServerError,
   isNetworkError,
 } from "./normalize-error";
+export { OrderError } from "./error";

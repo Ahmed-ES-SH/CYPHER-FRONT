@@ -8,11 +8,14 @@ export type PusherEventHandler = (data: unknown) => void;
 export interface PusherClient {
   subscribe(channel: string, event: string, handler: PusherEventHandler): () => void;
   disconnect(): void;
-  isConnected: boolean;
+  readonly isConnected: boolean;
 }
 
 let clientInstance: PusherClient | null = null;
 let activeConfig: PusherConfig | null = null;
+let rawPusherInstance: unknown = null;
+
+const channelRefs = new Map<string, { count: number }>();
 
 function loadConfig(): PusherConfig | null {
   if (activeConfig) return activeConfig;
@@ -37,6 +40,10 @@ export function isPusherConfigured(): boolean {
   return loadConfig() !== null;
 }
 
+export function getRawPusherInstance(): unknown {
+  return rawPusherInstance;
+}
+
 export function getPusherClient(): PusherClient | null {
   if (clientInstance) return clientInstance;
 
@@ -53,23 +60,41 @@ export function getPusherClient(): PusherClient | null {
       disableStats: true,
     });
 
+    rawPusherInstance = pusher;
+
     clientInstance = {
-      subscribe: (channel: string, event: string, handler: PusherEventHandler) => {
-        const ch = pusher.subscribe(channel);
+      subscribe: (channelName: string, event: string, handler: PusherEventHandler) => {
+        if (!channelRefs.has(channelName)) {
+          channelRefs.set(channelName, { count: 0 });
+        }
+        const ref = channelRefs.get(channelName)!;
+        ref.count++;
+
+        const ch = pusher.subscribe(channelName);
         ch.bind(event, handler);
+
         return () => {
           ch.unbind(event, handler);
-          pusher.unsubscribe(channel);
+          ref.count--;
+          if (ref.count <= 0) {
+            pusher.unsubscribe(channelName);
+            channelRefs.delete(channelName);
+          }
         };
       },
       disconnect: () => {
         pusher.disconnect();
         clientInstance = null;
+        rawPusherInstance = null;
+        channelRefs.clear();
       },
-      isConnected: pusher.connection.state === "connected",
+      get isConnected() {
+        return pusher.connection.state === "connected";
+      },
     };
   } catch {
     clientInstance = null;
+    rawPusherInstance = null;
   }
 
   return clientInstance;
@@ -80,5 +105,7 @@ export function resetPusherClient(): void {
     clientInstance.disconnect();
   }
   clientInstance = null;
+  rawPusherInstance = null;
   activeConfig = null;
+  channelRefs.clear();
 }

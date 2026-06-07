@@ -10,13 +10,12 @@ export {
   useAdminOrderDetail,
   useUpdateOrderStatus,
   useOrderStats,
-  useOrderPolling,
   useUserOrdersAdmin,
-} from "./orders.hooks";
+} from "./hooks/useOrders.hook";
 
 export {
   useOrderFilterStore,
-} from "./orders.store";
+} from "./store/orders.store";
 
 export type {
   Order,
@@ -32,35 +31,23 @@ export type {
   SortOrder,
   ShippingAddress,
   Money,
-  OrderApiError,
-  ValidationErrorMap,
-} from "./orders.types";
+} from "./contracts/order.types";
 
 export {
   OrderStatus,
   PaymentStatus,
-} from "./orders.types";
+} from "./contracts/order-status";
 
-export type { OrderFilterState } from "./orders.store";
+export type { OrderFilterState } from "./store/orders.store";
 
 export {
   ORDER_LIMITS,
   ORDER_SORT_FIELDS,
-  ORDER_ENDPOINTS,
-  VALID_STATUS_TRANSITIONS,
   orderKeys,
-  setOrderTransport,
-  getOrderTransport,
   validateCreateOrderDto,
-  canTransitionStatus,
-  normalizeOrderError,
-  parseValidationErrors,
   normalizeSortField,
   normalizeOrder,
   buildOrderQueryParams,
-  toOrder,
-  toOrderItem,
-  toShippingAddress,
   createOrderApi,
   getUserOrdersApi,
   getOrderByIdApi,
@@ -73,4 +60,40 @@ export {
   invalidateOrderDetail,
   removeOrderDetail,
   invalidateOrderStats,
-} from "./orders.api";
+} from "./api/orders.api";
+
+export {
+  ORDER_ENDPOINTS,
+  setOrderTransport,
+  getOrderTransport,
+} from "./api";
+
+export {
+  toOrder,
+  toOrderItem,
+  toShippingAddress,
+  toMoney,
+} from "./utils/normalize-order";
+
+export {
+  normalizeOrderError,
+  parseValidationErrors,
+} from "./utils/normalize-error";
+
+export {
+  canTransitionStatus,
+  isTerminalStatus,
+  shouldPoll,
+} from "./utils/status-guards";
+
+export {
+  formatMoney,
+  getCurrencyDivisor,
+  centsToUnits,
+  unitsToCents,
+  isZeroMoney,
+  addMoney,
+  multiplyMoney,
+} from "./utils/money";
+
+export { OrderError } from "./utils/error";

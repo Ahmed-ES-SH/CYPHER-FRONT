@@ -21,7 +21,7 @@ async function userRequest<TResult = any>(
 ): Promise<TResult> {
   const res = await globalRequest({ endpoint, method, body });
   if (!res.success) {
-    throw { message: res.message, status: res.statusCode };
+    throw { message: res.message, status: res.statusCode, errors: res.errors };
   }
   return res.data as TResult;
 }

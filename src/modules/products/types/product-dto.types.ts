@@ -24,11 +24,20 @@ export interface ProductQuery {
   limit?: number;
   search?: string;
   categorySlug?: string;
+  categoryIds?: string;
   minPrice?: number;
   maxPrice?: number;
   sortBy?: "price" | "title" | "rating" | "createdAt" | "updatedAt";
   sortOrder?: "asc" | "desc";
-  inStock?: boolean;
+  inStockOnly?: boolean;
+  brand?: string;
+  onSale?: boolean;
+  minDiscount?: number;
+  maxDiscount?: number;
+  minWeight?: number;
+  maxWeight?: number;
+  tags?: string;
+  minRating?: number;
 }
 
 export interface AdminProductQuery extends ProductQuery {

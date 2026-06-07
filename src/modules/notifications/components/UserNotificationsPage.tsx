@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineBell, HiOutlineCheckCircle } from "react-icons/hi2";
 import { InfiniteNotificationFeed } from "./InfiniteNotificationFeed";
 import { NotificationPreferencesCard as NotificationPreferences } from "./NotificationPreferences";
-import { useMarkAsRead, useMarkAllAsRead } from "../notifications.hooks";
+import { useMarkAsRead, useMarkAllAsRead, useAdminDeleteNotification } from "../notifications.hooks";
 import { toast } from "sonner";
 
 /* ─── Tabs ─── */
@@ -18,6 +18,7 @@ export function UserNotificationsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("all");
   const { mutate: markAsRead } = useMarkAsRead();
   const { mutate: markAllAsRead, isPending: isMarkingAll } = useMarkAllAsRead();
+  const { mutate: deleteNotification } = useAdminDeleteNotification();
 
   const handleMarkRead = (id: string) => {
     markAsRead(
@@ -39,12 +40,14 @@ export function UserNotificationsPage() {
   };
 
   const handleDelete = (id: string) => {
-    toast("Delete notification?", {
+    toast("Delete this notification?", {
       action: {
         label: "Delete",
         onClick: () => {
-          /* The actual delete mutation is handled within the feed */
-          toast.success("Notification deleted");
+          deleteNotification(id, {
+            onSuccess: () => toast.success("Notification deleted"),
+            onError: (err) => toast.error(err.message || "Failed to delete"),
+          });
         },
       },
     });

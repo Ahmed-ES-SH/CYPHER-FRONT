@@ -59,7 +59,7 @@ export function InfiniteNotificationFeed({
 
   /* Flatten pages */
   const notifications: Notification[] = data?.pages.flatMap((page) => page.data) ?? [];
-  const unreadCount = 0; // Cursor pages don't include unread count; handled separately
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <div className="space-y-3">
@@ -90,7 +90,7 @@ export function InfiniteNotificationFeed({
 
       {/* End of list */}
       {!hasNextPage && notifications.length > 0 && (
-        <p className="text-center text-sm text-text-muted py-6">
+        <p role="status" aria-live="polite" className="text-center text-sm text-text-muted py-6">
           You&apos;ve reached the end
         </p>
       )}

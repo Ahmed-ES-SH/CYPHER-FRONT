@@ -1,7 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
 import Img from "@/app/_components/_global/Img";
-import { getAuthConfig, AUTH_ENDPOINTS } from "@/src/modules/auth";
+import {  AUTH_ENDPOINTS } from "@/src/modules/auth";
+import { getAuthConfig } from "@/src/modules/auth/constants";
 
 export default function SocialSignup() {
   const { apiUrl } = getAuthConfig();
@@ -23,7 +24,7 @@ export default function SocialSignup() {
       >
         <div className="flex items-center justify-center gap-3  ">
           <Img src="/google.png" className="w-5 h-5 object-contain" />
-          <span className="w-[180px]">Continue with Google</span>
+          <span className="w-45">Continue with Google</span>
         </div>
       </button>
     </motion.div>

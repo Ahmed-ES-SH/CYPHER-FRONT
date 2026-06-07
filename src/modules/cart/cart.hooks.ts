@@ -1,35 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useShallow } from "zustand/react/shallow";
 import { useCartStore } from "./cart.store";
-import {
-  getCartApi,
-  addItemApi,
-  updateItemApi,
-  removeItemApi,
-  clearCartApi,
-  checkoutApi,
-  prepareAndCheckout,
-  syncGuestCart,
-  cartKeys,
-  invalidateCart,
-  invalidateCartCount,
-  selectCartSummary,
-  selectCartItemCount,
-  selectGuestCartSummary,
-  selectGuestItemCount,
-} from "./cart.api";
-import type {
-  Cart,
-  AddItemDto,
-  UpdateItemDto,
-  CheckoutRequestDto,
-  CheckoutResult,
-  ClearCartResponseDto,
-  CartApiError,
-  SyncResult,
-  CheckoutValidation,
-} from "./cart.types";
+import { cartKeys } from "./cart.keys";
+import { getCartApi, addItemApi, updateItemApi, removeItemApi, clearCartApi, prepareAndCheckout, syncGuestCart } from "./cart.service";
+import { invalidateCart, invalidateCartDetail, invalidateCartCount } from "./cart-invalidation";
+import { selectCartSummary, selectCartItemCount, selectGuestCartSummary, selectGuestItemCount } from "./cart-selectors";
+import { getActiveRedirectAdapter } from "./cart.transport";
+import type { Cart, AddItemDto, UpdateItemDto, CheckoutRequestDto, CheckoutResult, ClearCartResponseDto, CartApiError, SyncResult, CheckoutValidation } from "./cart.types";
 
 /* =========================================================
    useCart
@@ -38,7 +18,7 @@ import type {
 export function useCart(enabled = true) {
   return useQuery<Cart, CartApiError>({
     queryKey: cartKeys.detail(),
-    queryFn: getCartApi,
+    queryFn: () => getCartApi(),
     enabled,
     staleTime: 30_000,
     gcTime: 5 * 60_000,
@@ -54,18 +34,26 @@ export function useCartSummary(enabled = true) {
   const guestItems = useCartStore((s) => s.guestItems);
   const { data: serverCart, isLoading, error } = useCart(enabled);
 
-  if (isLoading || error || !serverCart) {
+  if (serverCart) {
+    return {
+      summary: selectCartSummary(serverCart),
+      isLoading: false,
+      error: null,
+    };
+  }
+
+  if (isLoading) {
     return {
       summary: selectGuestCartSummary(guestItems),
-      isLoading,
-      error: error ?? null,
+      isLoading: true,
+      error: null,
     };
   }
 
   return {
-    summary: selectCartSummary(serverCart),
-    isLoading,
-    error: null,
+    summary: selectGuestCartSummary(guestItems),
+    isLoading: false,
+    error: error ?? null,
   };
 }
 
@@ -90,12 +78,12 @@ export function useCartCount(enabled = true) {
 
 export function useCartActions() {
   const queryClient = useQueryClient();
-  const store = useCartStore();
+  const clearGuestItems = useCartStore((s) => s.clearGuestItems);
 
   const addMutation = useMutation<Cart, CartApiError, AddItemDto>({
     mutationFn: (dto) => addItemApi(dto),
     onSuccess: () => {
-      invalidateCart(queryClient);
+      invalidateCartDetail(queryClient);
     },
   });
 
@@ -106,21 +94,21 @@ export function useCartActions() {
   >({
     mutationFn: ({ itemId, dto }) => updateItemApi(itemId, dto),
     onSuccess: () => {
-      invalidateCart(queryClient);
+      invalidateCartDetail(queryClient);
     },
   });
 
   const removeMutation = useMutation<Cart, CartApiError, string>({
     mutationFn: (itemId) => removeItemApi(itemId),
     onSuccess: () => {
-      invalidateCart(queryClient);
+      invalidateCartDetail(queryClient);
     },
   });
 
   const clearMutation = useMutation<ClearCartResponseDto, CartApiError>({
     mutationFn: () => clearCartApi(),
     onSuccess: () => {
-      store.clearGuestItems();
+      clearGuestItems();
       invalidateCart(queryClient);
       invalidateCartCount(queryClient);
     },
@@ -133,22 +121,18 @@ export function useCartActions() {
   >({
     mutationFn: async (dto) => {
       const cart = queryClient.getQueryData<Cart>(cartKeys.detail());
-      return prepareAndCheckout(dto, { cart, guestItems: useCartStore.getState().guestItems });
+      const guestItems = useCartStore.getState().guestItems;
+      return prepareAndCheckout(dto, { cart, guestItems });
     },
     onSuccess: (data) => {
       if (data.result) {
         invalidateCart(queryClient);
+        if (data.result.url) {
+          getActiveRedirectAdapter().to(data.result.url);
+        }
       }
     },
   });
-
-  const checkoutReturn = {
-    mutate: checkoutMutation.mutate,
-    mutateAsync: checkoutMutation.mutateAsync,
-    isLoading: checkoutMutation.isPending,
-    error: checkoutMutation.error,
-    validation: checkoutMutation.data?.validation,
-  };
 
   return {
     addItem: {
@@ -175,7 +159,13 @@ export function useCartActions() {
       isLoading: clearMutation.isPending,
       error: clearMutation.error,
     },
-    checkout: checkoutReturn,
+    checkout: {
+      mutate: checkoutMutation.mutate,
+      mutateAsync: checkoutMutation.mutateAsync,
+      isLoading: checkoutMutation.isPending,
+      error: checkoutMutation.error,
+      validation: checkoutMutation.data?.validation,
+    },
   };
 }
 
@@ -185,14 +175,16 @@ export function useCartActions() {
 
 export function useSyncGuestCart() {
   const queryClient = useQueryClient();
-  const guestItems = useCartStore((s) => s.guestItems);
-  const clearGuestItems = useCartStore((s) => s.clearGuestItems);
 
   return useMutation<SyncResult, CartApiError, void>({
-    mutationFn: () => syncGuestCart(guestItems),
+    mutationFn: () => {
+      const guestItems = useCartStore.getState().guestItems;
+      const serverCart = queryClient.getQueryData<Cart>(cartKeys.detail());
+      return syncGuestCart(guestItems, { serverCart });
+    },
     onSuccess: (result) => {
       if (result.success && result.cart) {
-        clearGuestItems();
+        useCartStore.getState().clearGuestItems();
         queryClient.setQueryData(cartKeys.detail(), result.cart);
         invalidateCartCount(queryClient);
       }
@@ -205,12 +197,17 @@ export function useSyncGuestCart() {
    ========================================================= */
 
 export function useGuestCart() {
-  const guestItems = useCartStore((s) => s.guestItems);
-  const isHydrated = useCartStore((s) => s.isHydrated);
+  const { guestItems, isHydrated } = useCartStore(
+    useShallow((s) => ({ guestItems: s.guestItems, isHydrated: s.isHydrated })),
+  );
+
   const addGuestItem = useCartStore((s) => s.addGuestItem);
   const removeGuestItem = useCartStore((s) => s.removeGuestItem);
   const updateGuestItemQuantity = useCartStore((s) => s.updateGuestItemQuantity);
   const clearGuestItems = useCartStore((s) => s.clearGuestItems);
+
+  const summary = useMemo(() => selectGuestCartSummary(guestItems), [guestItems]);
+  const itemCount = useMemo(() => selectGuestItemCount(guestItems), [guestItems]);
 
   return {
     items: guestItems,
@@ -219,7 +216,7 @@ export function useGuestCart() {
     removeItem: removeGuestItem,
     updateQuantity: updateGuestItemQuantity,
     clearItems: clearGuestItems,
-    summary: selectGuestCartSummary(guestItems),
-    itemCount: selectGuestItemCount(guestItems),
+    summary,
+    itemCount,
   };
 }

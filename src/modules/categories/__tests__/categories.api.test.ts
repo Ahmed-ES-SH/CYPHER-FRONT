@@ -263,4 +263,28 @@ describe("toCategoryDetails", () => {
     const result = toCategoryDetails(raw);
     expect(result.children).toEqual([]);
   });
+
+  it("handles null or invalid objects gracefully", () => {
+    const result = toCategoryDetails(null);
+    expect(result.id).toBe("");
+    expect(result.name).toBe("Unknown Category");
+    expect(result.children).toEqual([]);
+  });
+});
+
+/* =========================================================
+   CategoryApiError
+   ========================================================= */
+
+import { CategoryApiError } from "../categories.types";
+
+describe("CategoryApiError", () => {
+  it("creates an Error instance with proper properties", () => {
+    const err = new CategoryApiError("Conflict", 409, { name: ["Duplicate name"] });
+    expect(err).toBeInstanceOf(Error);
+    expect(err.name).toBe("CategoryApiError");
+    expect(err.message).toBe("Conflict");
+    expect(err.status).toBe(409);
+    expect(err.errors?.name).toEqual(["Duplicate name"]);
+  });
 });

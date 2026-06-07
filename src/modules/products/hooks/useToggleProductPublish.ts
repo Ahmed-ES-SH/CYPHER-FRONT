@@ -10,9 +10,15 @@ export function useToggleProductPublish() {
 
   return useMutation<PublishToggleResult, Error, string>({
     mutationFn: (id) => toggleProductPublishApi(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: productKeys.adminLists() });
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      queryClient.invalidateQueries({
+        queryKey: productKeys.adminDetail(id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: productKeys.details(),
+      });
     },
   });
 }

@@ -4,17 +4,23 @@ import {
   normalizeSortField,
   normalizeOrder,
   buildOrderQueryParams,
+  orderKeys,
+  ORDER_LIMITS,
+} from "../api/orders.api";
+import {
   normalizeOrderError,
   parseValidationErrors,
+} from "../utils/normalize-error";
+import {
   canTransitionStatus,
+} from "../utils/status-guards";
+import {
   toOrder,
   toOrderItem,
   toShippingAddress,
-  orderKeys,
-  ORDER_LIMITS,
-} from "../orders.api";
-import { OrderStatus, PaymentStatus } from "../orders.types";
-import type { CreateOrderDto } from "../orders.types";
+} from "../utils/normalize-order";
+import { OrderStatus, PaymentStatus } from "../contracts/order-status";
+import type { CreateOrderDto } from "../contracts/order.types";
 
 describe("validateCreateOrderDto", () => {
   const valid: CreateOrderDto = {

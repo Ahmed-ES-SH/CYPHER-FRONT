@@ -12,6 +12,9 @@ export {
   useGuestCart,
 } from "./cart.hooks";
 
+export { useUnifiedCart } from "./unified-cart.hooks";
+export type { UnifiedCartItem, UnifiedCart } from "./unified-cart.hooks";
+
 /* ---------- Types ---------- */
 export type {
   Cart,
@@ -27,23 +30,25 @@ export type {
   Money,
   CartApiError,
   CartValidationErrorMap,
-  CartStore,
-  CartStoreState,
-  CartStoreActions,
-  CartUiLoading,
-  CartItemLoadingKey,
   SyncCartDto,
   SyncResult,
   CheckoutValidation,
 } from "./cart.types";
 
+export type {
+  CartStore,
+  CartStoreState,
+  CartStoreActions,
+} from "./cart.store";
+
 /* ---------- Constants ---------- */
-export {
-  CART_RULES,
-  CART_STORAGE_KEY,
-} from "./cart.types";
-export { cartKeys, CART_ENDPOINTS } from "./cart.api";
-export type { QuantityValidationResult } from "./cart.api";
+export { CART_RULES, CART_STORAGE_KEY } from "./cart.types";
+
+/* ---------- Query Keys ---------- */
+export { cartKeys } from "./cart.keys";
+
+/* ---------- Endpoints ---------- */
+export { CART_ENDPOINTS } from "./cart.endpoints";
 
 /* ---------- API Functions ---------- */
 export {
@@ -54,16 +59,18 @@ export {
   clearCartApi,
   checkoutApi,
   syncGuestCartApi,
-} from "./cart.api";
+} from "./cart.service";
 
 /* ---------- Services ---------- */
 export {
   canAddToCart,
   mergeGuestItemsWithCart,
+} from "./cart-utils";
+export {
   syncGuestCart,
   prepareAndCheckout,
   validateCheckoutPrerequisites,
-} from "./cart.api";
+} from "./cart.service";
 
 /* ---------- Selectors ---------- */
 export {
@@ -77,40 +84,24 @@ export {
   selectIsCartEmpty,
   selectIsGuestCartEmpty,
   selectItemStockWarning,
-} from "./cart.api";
+} from "./cart-selectors";
 
 /* ---------- Mappers ---------- */
-export {
-  toCart,
-  toCartItem,
-  toGuestCartItem,
-} from "./cart.api";
+export { toCart, toCartItem, toGuestCartItem } from "./cart-mappers";
 
 /* ---------- Money Utilities ---------- */
-export {
-  createMoney,
-  addMoney,
-  multiplyMoney,
-} from "./cart.api";
+export { createMoney, addMoney, multiplyMoney } from "./cart-utils";
 
 /* ---------- Quantity Validation ---------- */
-export {
-  validateQuantity,
-} from "./cart.api";
+export { validateQuantity } from "./cart-utils";
+export type { QuantityValidationResult } from "./cart-utils";
 
 /* ---------- Error Utilities ---------- */
-export {
-  parseCartApiError,
-  parseCartFieldErrors,
-} from "./cart.api";
+export { parseCartApiError, parseCartFieldErrors } from "./cart.transport";
 
 /* ---------- Transport ---------- */
-export {
-  setCartTransport,
-  getActiveCartTransport,
-  defaultTransport,
-} from "./cart.api";
-export type { Transport } from "./cart.api";
+export { setCartTransport, getActiveCartTransport, defaultTransport } from "./cart.transport";
+export type { Transport } from "./cart.transport";
 
 /* ---------- Adapters ---------- */
 export {
@@ -120,19 +111,26 @@ export {
   getActiveStorageAdapter,
   setRedirectAdapter,
   getActiveRedirectAdapter,
-} from "./cart.api";
+} from "./cart.transport";
 export type {
   AuthAdapter,
   StorageAdapter,
   RedirectAdapter,
-} from "./cart.api";
+} from "./cart.transport";
+
+export {
+  createGuestCartItemFromProduct,
+  isProductInCart,
+  findCartItem,
+} from "./adapters/cart-helpers";
+export type { ProductAdapter } from "./adapters/cart-helpers";
 
 /* ---------- Query Key Helpers ---------- */
 export {
   invalidateCart,
   invalidateCartDetail,
   invalidateCartCount,
-} from "./cart.api";
+} from "./cart-invalidation";
 
 /* ---------- Store ---------- */
-export { useCartStore } from "./cart.store";
+export { useCartStore, initCartCrossTabSync } from "./cart.store";

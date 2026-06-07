@@ -6,8 +6,8 @@ import { AiOutlineUser } from "react-icons/ai";
 import { UserButton } from "./UserButton";
 
 export default function SignInBtn() {
-  const { isAuthenticated } = useAuth();
-
+  const { isAuthenticated  ,user} = useAuth();
+console.log(user);
   return (
     <>
       {isAuthenticated ? (

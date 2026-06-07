@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiCheckCircle, FiDownload, FiHome, FiMail } from "react-icons/fi";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVariables } from "@/app/context/VariablesContext";
+import { useCartStore, invalidateCart } from "@/src/modules/cart";
 
 export default function PaymentSuccess() {
   const { width, height } = useVariables();
@@ -64,9 +65,13 @@ export default function PaymentSuccess() {
     setConfettiParticles(particles);
   }, [height, width]);
 
+  // Clear cart after successful payment
   useEffect(() => {
-    if (paymentStatus == "success") {
-      localStorage.removeItem("cart-storage");
+    if (paymentStatus === "success") {
+      // Clear guest cart (local storage)
+      useCartStore.getState().clearGuestItems();
+      // Invalidate server cart query so it re-fetches on next visit
+      invalidateCart();
     }
   }, [paymentStatus]);
 

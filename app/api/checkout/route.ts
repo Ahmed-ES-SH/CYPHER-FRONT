@@ -1,51 +1,79 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 
-// Initialize Stripe client with secret key from environment variables
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export async function POST(request: Request) {
   try {
-    // Parse JSON body from request
-    const { productName, amount, currency, quantity } = await request.json();
+    const body = await request.json();
+    const {
+      lineItems,
+      shippingMethod,
+      currency = "usd",
+      successUrl,
+      cancelUrl,
+    } = body;
 
-    // Validate required fields
-    if (!productName || !amount || !currency || !quantity) {
+    // Support both new format (lineItems array) and legacy format (single product fields)
+    let items: { name: string; price: number; quantity: number }[];
+
+    if (Array.isArray(lineItems) && lineItems.length > 0) {
+      items = lineItems;
+    } else if (body.productName && body.amount != null) {
+      // Legacy format — wrap in array
+      items = [
+        {
+          name: body.productName,
+          price: body.amount,
+          quantity: body.quantity || 1,
+        },
+      ];
+    } else {
       return NextResponse.json(
-        { error: "Incomplete payment data" },
-        { status: 400 }
+        {
+          error:
+            "Incomplete payment data. Provide lineItems or productName/amount/quantity.",
+        },
+        { status: 400 },
       );
     }
 
-    // Create Stripe checkout session with dynamic data
+    // Build Stripe line items from the array
+    const stripeLineItems = items.map((item) => ({
+      price_data: {
+        currency,
+        product_data: { name: item.name },
+        unit_amount: item.price, // Already in minor units (cents)
+      },
+      quantity: item.quantity,
+    }));
+
+    // Compute total for display on cancel page
+    const totalAmount = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      line_items: [
-        {
-          price_data: {
-            currency,
-            product_data: {
-              name: productName,
-            },
-            unit_amount: amount * 100, // Convert to cents
-          },
-          quantity,
-        },
-      ],
-      success_url: `https://machie-store.vercel.app/paymentsuccess?payment_status=success&product=${encodeURIComponent(
-        productName
-      )}&amount=${amount}&productLength=${quantity}`,
-      cancel_url: `https://machie-store.vercel.app/paymentfaild?payment_status=success&amount=${amount}&productLength=${quantity}`,
+      line_items: stripeLineItems,
+      success_url:
+        successUrl ??
+        `${SITE_URL}/paymentsuccess?payment_status=success&session_id={CHECKOUT_SESSION_ID}&amount=${totalAmount}&productLength=${totalItems}`,
+      cancel_url:
+        cancelUrl ??
+        `${SITE_URL}/paymentfaild?amount=${totalAmount}&productLength=${totalItems}`,
     });
 
-    // Return the session ID to the client
     return NextResponse.json({ sessionId: session.id });
   } catch (err) {
     console.error("Stripe Error:", err);
     return NextResponse.json(
       { error: "Failed to create payment session" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

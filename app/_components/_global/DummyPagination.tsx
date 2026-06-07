@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 
 interface Props {
@@ -58,7 +58,7 @@ export default function DummyPagination({ page, setPage, totalPages }: Props) {
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="p-2 rounded-md bg-blue-600 text-white disabled:bg-gray-400 flex items-center justify-center"
+              className="p-2 rounded-md bg-primary-blue text-white disabled:bg-border-subtle flex items-center justify-center"
               aria-label="Previous Page"
             >
               <BsChevronLeft size={18} />
@@ -69,7 +69,7 @@ export default function DummyPagination({ page, setPage, totalPages }: Props) {
                 return (
                   <span
                     key={idx}
-                    className="px-3 py-1 select-none text-gray-500 cursor-default"
+                    className="px-3 py-1 select-none text-text-muted cursor-default"
                   >
                     &hellip;
                   </span>
@@ -82,8 +82,8 @@ export default function DummyPagination({ page, setPage, totalPages }: Props) {
                   onClick={() => setPage(p)}
                   className={`px-3 py-1 rounded-md ${
                     p === page
-                      ? "bg-blue-600 text-white font-semibold"
-                      : "hover:bg-blue-100"
+                      ? "bg-primary-blue text-white font-semibold"
+                      : "hover:bg-primary-blue/10"
                   }`}
                   aria-current={p === page ? "page" : undefined}
                 >
@@ -95,7 +95,7 @@ export default function DummyPagination({ page, setPage, totalPages }: Props) {
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="p-2 rounded-md bg-blue-600 text-white disabled:bg-gray-400 flex items-center justify-center"
+              className="p-2 rounded-md bg-primary-blue text-white disabled:bg-border-subtle flex items-center justify-center"
               aria-label="Next Page"
             >
               <BsChevronRight size={18} />

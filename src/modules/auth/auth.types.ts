@@ -12,7 +12,6 @@ export interface AuthLoading {
   session: boolean;
   login: boolean;
   logout: boolean;
-  resetPassword: boolean;
 }
 
 export interface AuthState {
@@ -24,6 +23,7 @@ export interface AuthState {
   setLoading: (key: keyof AuthLoading, value: boolean) => void;
   setInitialized: () => void;
   reset: () => void;
+  clearUser: () => void;
 }
 
 export interface LoginRequest {
@@ -67,3 +67,16 @@ export interface AuthApiError {
   status: number;
   errors?: Record<string, string[]>;
 }
+
+export class AuthError extends Error {
+  status: number;
+  errors?: Record<string, string[]>;
+
+  constructor(message: string, status: number, errors?: Record<string, string[]>) {
+    super(message);
+    this.name = "AuthError";
+    this.status = status;
+    this.errors = errors;
+  }
+}
+

@@ -1,4 +1,4 @@
-import type { BlogArticleSummary, BlogArticle } from "../blog.types";
+import type { BlogArticleSummary, BlogArticle } from "../types/blog.types";
 import type { ArticleType } from "@/app/_components/_website/_blog/ArticleCard";
 
 /**
@@ -10,13 +10,13 @@ export function blogToLegacyArticleSummary(
   summary: BlogArticleSummary,
 ): ArticleType {
   return {
-    id: summary.id,
-    title: summary.title,
-    date: summary.publishedAt ?? summary.createdAt,
-    category: summary.category.name,
-    tags: summary.tags.map((t) => t.name),
-    image: summary.featuredImage ?? "",
-    description: summary.excerpt,
+    id: summary?.id ?? "",
+    title: summary?.title ?? "Untitled",
+    date: summary?.publishedAt ?? summary?.createdAt ?? "",
+    category: summary?.category?.name ?? "Uncategorized",
+    tags: (summary?.tags ?? []).map((t) => t?.name ?? "").filter(Boolean),
+    image: summary?.featuredImage ?? "",
+    description: summary?.excerpt ?? "",
   };
 }
 
@@ -25,13 +25,13 @@ export function blogToLegacyArticleSummary(
  */
 export function blogToLegacyArticle(article: BlogArticle): ArticleType {
   return {
-    id: article.id,
-    title: article.title,
-    date: article.publishedAt ?? article.createdAt,
-    category: article.category.name,
-    tags: article.tags.map((t) => t.name),
-    image: article.featuredImage ?? "",
-    description: article.excerpt,
+    id: article?.id ?? "",
+    title: article?.title ?? "Untitled",
+    date: article?.publishedAt ?? article?.createdAt ?? "",
+    category: article?.category?.name ?? "Uncategorized",
+    tags: (article?.tags ?? []).map((t) => t?.name ?? "").filter(Boolean),
+    image: article?.featuredImage ?? "",
+    description: article?.excerpt ?? "",
   };
 }
 

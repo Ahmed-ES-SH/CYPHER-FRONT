@@ -1,5 +1,23 @@
 export { useAuth, useSession, useLogin, useLogout, useResetPassword } from "./auth.hooks";
 
+export { handleLogin, handleLogout, initializeSession } from "./auth.service";
+
+export { setOnUnauthorized } from "./auth.api";
+
+export {
+  AUTH_ROUTES,
+  AUTH_ENDPOINTS,
+  AUTH_COOKIE_NAME,
+  AUTH_SESSION_STALE_TIME,
+  AUTH_TOKEN_MAX_AGE,
+  AUTH_ERRORS,
+  AUTH_CONFIG,
+  authKeys,
+} from "./constants";
+
+export { useAuthStore } from "./auth.store";
+
+export { AuthError } from "./auth.types";
 export type {
   AuthUser,
   AuthLoading,
@@ -15,27 +33,3 @@ export type {
   AuthApiError,
   UserRole,
 } from "./auth.types";
-
-export {
-  AUTH_ROUTES,
-  AUTH_ENDPOINTS,
-  AUTH_COOKIE_NAME,
-  AUTH_SESSION_STALE_TIME,
-  AUTH_TOKEN_MAX_AGE,
-  AUTH_ERRORS,
-  authKeys,
-  getAuthConfig,
-  setOnUnauthorized,
-  loginApi,
-  logoutApi,
-  getCurrentUserApi,
-  verifyEmailApi,
-  sendResetPasswordApi,
-  verifyResetTokenApi,
-  resetPasswordApi,
-  handleLogin,
-  handleLogout,
-  initializeSession,
-} from "./auth.api";
-
-export { useAuthStore } from "./auth.store";

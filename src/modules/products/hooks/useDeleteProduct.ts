@@ -16,6 +16,9 @@ export function useDeleteProduct() {
       queryClient.invalidateQueries({
         queryKey: productKeys.adminDetails(),
       });
+      queryClient.invalidateQueries({
+        queryKey: productKeys.details(),
+      });
     },
   });
 }

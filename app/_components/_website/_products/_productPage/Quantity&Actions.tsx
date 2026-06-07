@@ -11,6 +11,7 @@ import { MdCompare } from "react-icons/md";
 import { ProductType } from "@/app/types/productType";
 import { useGuestCart } from "@/src/modules/cart";
 import { productToGuestCartItem, findCartItem } from "@/src/modules/cart/adapters/cart-helpers";
+import { productTypeAdapter } from "@/src/modules/cart/adapters/product-type.adapter";
 import { useWishlistStore } from "@/app/store/WishlistStoreStore";
 import { toast } from "sonner";
 import { useCallback, useMemo } from "react";
@@ -38,7 +39,7 @@ export default function Quantity_Actions({
   };
 
   const cartItem = useMemo(() => {
-    return findCartItem(items, product);
+    return findCartItem(items, product, productTypeAdapter);
   }, [items, product]);
 
   const productQuantity = cartItem?.quantity ?? 1;
@@ -72,6 +73,7 @@ export default function Quantity_Actions({
             whileTap={{ scale: 0.9 }}
             onClick={() => handleQuantityChange("decrease")}
             className="p-3 hover:bg-gray-100 transition-colors"
+            aria-label={`Decrease quantity of ${product.title}`}
           >
             <FaMinus className="text-gray-600" />
           </motion.button>
@@ -83,6 +85,7 @@ export default function Quantity_Actions({
             whileTap={{ scale: 0.9 }}
             onClick={() => handleQuantityChange("increase")}
             className="p-3 hover:bg-gray-100 transition-colors"
+            aria-label={`Increase quantity of ${product.title}`}
           >
             <FaPlus className="text-gray-600" />
           </motion.button>
@@ -92,7 +95,7 @@ export default function Quantity_Actions({
         <motion.button
           disabled={isInCart}
           onClick={() => {
-            addItem(productToGuestCartItem(product));
+            addItem(productToGuestCartItem(product, productTypeAdapter));
             toast.success("Added to cart!");
           }}
           whileHover={{ scale: 1.02 }}

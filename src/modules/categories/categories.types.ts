@@ -92,4 +92,19 @@ export interface ApiError {
   errors?: Record<string, string[]>;
 }
 
+export class CategoryApiError extends Error implements ApiError {
+  status: number;
+  errors?: Record<string, string[]>;
+
+  constructor(message: string, status: number, errors?: Record<string, string[]>) {
+    super(message);
+    this.name = "CategoryApiError";
+    this.status = status;
+    this.errors = errors;
+    // Restore prototype chain
+    Object.setPrototypeOf(this, CategoryApiError.prototype);
+  }
+}
+
 export type ValidationErrorMap = Record<string, string>;
+

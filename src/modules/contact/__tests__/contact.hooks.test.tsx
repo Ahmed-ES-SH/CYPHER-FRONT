@@ -10,9 +10,9 @@ import {
   useMarkContactAsReplied,
   useDeleteContact,
   useContactAdmin,
-} from "../contact.hooks";
-import * as api from "../contact.api";
-import type { ContactMessage, ContactListResponse } from "../contact.types";
+} from "../hooks/contact.hooks";
+import * as api from "../api/contact.api";
+import type { ContactMessage, ContactListResponse } from "../types/contact.types";
 
 /* =========================================================
    Test setup
@@ -355,5 +355,22 @@ describe("useContactAdmin", () => {
     });
 
     await waitFor(() => expect(spy).toHaveBeenCalled());
+  });
+
+  it("returns mutation and selection properties", async () => {
+    vi.spyOn(api, "getContactMessagesApi").mockResolvedValue(mockListResponse);
+
+    const { result } = renderHook(() => useContactAdmin(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current).toHaveProperty("selectedContactId");
+    expect(result.current).toHaveProperty("setSelectedContactId");
+    expect(result.current).toHaveProperty("detail");
+    expect(result.current).toHaveProperty("isDetailLoading");
+    expect(result.current).toHaveProperty("markAsRead");
+    expect(result.current).toHaveProperty("markAsReplied");
+    expect(result.current).toHaveProperty("deleteMessage");
   });
 });

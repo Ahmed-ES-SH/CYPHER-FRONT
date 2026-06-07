@@ -1,4 +1,4 @@
-import { getPaymentsClient } from "./payments.client";
+import { getPaymentsConfig } from "../config/payments.config";
 import { PAYMENT_LIMITS, PAYMENT_ENDPOINTS, PAYMENT_SORT_FIELDS } from "../constants/payments.constants";
 import type {
   PaymentTransaction,
@@ -18,6 +18,49 @@ import type {
   ValidationErrorMap,
 } from "../types/payments.types";
 import { PaymentMethod, PaymentStatus } from "../types/payments.types";
+import { normalizePaymentError } from "../utils/normalizePaymentError";
+import { globalRequest } from "@/app/helpers/globalRequest";
+
+/* ─── Transport Layer ─── */
+
+async function paymentsRequest<TResult = unknown>(
+  endpoint: string,
+  method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE" = "GET",
+  body?: unknown,
+): Promise<TResult> {
+  if (typeof window !== "undefined") {
+    const config = getPaymentsConfig();
+    const url = `${config.apiUrl}${endpoint}`;
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "include",
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw normalizePaymentError({
+        isAxiosError: true,
+        response: { status: response.status, data },
+        message: data?.message ?? `HTTP ${response.status}`,
+      });
+    }
+    return data as TResult;
+  }
+
+  const res = await globalRequest<unknown, TResult>({ endpoint, method, body });
+  if (!res.success) {
+    throw normalizePaymentError({
+      isAxiosError: true,
+      response: {
+        status: res.statusCode ?? 500,
+        data: { message: res.message, errors: res.errors },
+      },
+      message: res.message,
+    });
+  }
+  return res.data as TResult;
+}
 
 /* ─── Validation ─── */
 
@@ -100,19 +143,48 @@ export function parseValidationErrors(errors?: Record<string, string[]>): Valida
 
 /* ─── Normalization / Mapping ─── */
 
-function getAmount(raw: any, key: string): number {
+interface RawPaymentTransaction {
+  id?: string | number;
+  orderId?: string;
+  order_id?: string;
+  orderNumber?: string;
+  order_number?: string;
+  method?: string;
+  payment_method?: string;
+  status?: string;
+  amount?: number | { amount: number; currency: string };
+  fee?: number | { amount: number; currency: string };
+  netAmount?: number | { amount: number; currency: string };
+  net_amount?: number | { amount: number; currency: string };
+  stripePaymentIntentId?: string;
+  stripe_payment_intent_id?: string;
+  stripeClientSecret?: string;
+  stripe_client_secret?: string;
+  description?: string;
+  errorMessage?: string;
+  error_message?: string;
+  refundedAmount?: number | { amount: number; currency: string };
+  refunded_amount?: number | { amount: number; currency: string };
+  metadata?: Record<string, string>;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
+}
+
+function getAmount(raw: Record<string, unknown>, key: string): number {
   const val = raw[key] ?? raw[snake(key)];
   if (val == null) return 0;
   if (typeof val === "number") return val;
-  if (typeof val === "object") return val.amount ?? 0;
+  if (typeof val === "object" && val !== null) return (val as { amount?: number }).amount ?? 0;
   return Number(val) || 0;
 }
 
-function getCurrency(raw: any, key: string): string {
+function getCurrency(raw: Record<string, unknown>, key: string): string {
   const val = raw[key] ?? raw[snake(key)];
   if (val == null) return "usd";
   if (typeof val === "string") return val;
-  if (typeof val === "object") return val.currency ?? "usd";
+  if (typeof val === "object" && val !== null) return (val as { currency?: string }).currency ?? "usd";
   return "usd";
 }
 
@@ -120,53 +192,55 @@ function snake(str: string): string {
   return str.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
 }
 
-export function toPaymentTransaction(raw: any): PaymentTransaction {
+export function toPaymentTransaction(raw: unknown): PaymentTransaction {
+  const data = (raw ?? {}) as RawPaymentTransaction;
   return {
-    id: String(raw.id ?? ""),
-    orderId: String(raw.orderId ?? raw.order_id ?? ""),
-    orderNumber: String(raw.orderNumber ?? raw.order_number ?? ""),
-    method: raw.method ?? raw.payment_method ?? PaymentMethod.STRIPE,
-    status: raw.status ?? raw.status ?? PaymentStatus.PENDING,
+    id: String(data.id ?? ""),
+    orderId: String(data.orderId ?? data.order_id ?? ""),
+    orderNumber: String(data.orderNumber ?? data.order_number ?? ""),
+    method: (data.method ?? data.payment_method ?? PaymentMethod.STRIPE) as PaymentMethod,
+    status: (data.status ?? PaymentStatus.PENDING) as PaymentStatus,
     amount: {
-      amount: getAmount(raw, "amount"),
-      currency: getCurrency(raw, "amount"),
+      amount: getAmount(data as Record<string, unknown>, "amount"),
+      currency: getCurrency(data as Record<string, unknown>, "amount"),
     },
     fee: {
-      amount: getAmount(raw, "fee"),
-      currency: getCurrency(raw, "fee"),
+      amount: getAmount(data as Record<string, unknown>, "fee"),
+      currency: getCurrency(data as Record<string, unknown>, "fee"),
     },
     netAmount: {
-      amount: getAmount(raw, "netAmount"),
-      currency: getCurrency(raw, "netAmount"),
+      amount: getAmount(data as Record<string, unknown>, "netAmount"),
+      currency: getCurrency(data as Record<string, unknown>, "netAmount"),
     },
-    stripePaymentIntentId: raw.stripePaymentIntentId ?? raw.stripe_payment_intent_id ?? undefined,
-    stripeClientSecret: raw.stripeClientSecret ?? raw.stripe_client_secret ?? undefined,
-    description: raw.description ?? undefined,
-    errorMessage: raw.errorMessage ?? raw.error_message ?? undefined,
-    refundedAmount: raw.refundedAmount ?? raw.refunded_amount
+    stripePaymentIntentId: data.stripePaymentIntentId ?? data.stripe_payment_intent_id ?? undefined,
+    stripeClientSecret: data.stripeClientSecret ?? data.stripe_client_secret ?? undefined,
+    description: data.description ?? undefined,
+    errorMessage: data.errorMessage ?? data.error_message ?? undefined,
+    refundedAmount: data.refundedAmount ?? data.refunded_amount
       ? {
-          amount: getAmount(raw, "refundedAmount"),
-          currency: getCurrency(raw, "refundedAmount"),
+          amount: getAmount(data as Record<string, unknown>, "refundedAmount"),
+          currency: getCurrency(data as Record<string, unknown>, "refundedAmount"),
         }
       : undefined,
-    metadata: raw.metadata ?? undefined,
-    createdAt: String(raw.createdAt ?? raw.created_at ?? ""),
-    updatedAt: String(raw.updatedAt ?? raw.updated_at ?? ""),
+    metadata: data.metadata ?? undefined,
+    createdAt: String(data.createdAt ?? data.created_at ?? ""),
+    updatedAt: String(data.updatedAt ?? data.updated_at ?? ""),
   };
 }
 
-export function toPaymentHistoryItem(raw: any): PaymentHistoryItem {
+export function toPaymentHistoryItem(raw: unknown): PaymentHistoryItem {
+  const data = (raw ?? {}) as RawPaymentTransaction;
   return {
-    id: String(raw.id ?? ""),
-    orderId: String(raw.orderId ?? raw.order_id ?? ""),
-    orderNumber: String(raw.orderNumber ?? raw.order_number ?? ""),
-    method: raw.method ?? PaymentMethod.STRIPE,
-    status: raw.status ?? PaymentStatus.PENDING,
+    id: String(data.id ?? ""),
+    orderId: String(data.orderId ?? data.order_id ?? ""),
+    orderNumber: String(data.orderNumber ?? data.order_number ?? ""),
+    method: (data.method ?? PaymentMethod.STRIPE) as PaymentMethod,
+    status: (data.status ?? PaymentStatus.PENDING) as PaymentStatus,
     amount: {
-      amount: getAmount(raw, "amount"),
-      currency: getCurrency(raw, "amount"),
+      amount: getAmount(data as Record<string, unknown>, "amount"),
+      currency: getCurrency(data as Record<string, unknown>, "amount"),
     },
-    createdAt: String(raw.createdAt ?? raw.created_at ?? ""),
+    createdAt: String(data.createdAt ?? data.created_at ?? ""),
   };
 }
 
@@ -175,35 +249,28 @@ export function toPaymentHistoryItem(raw: any): PaymentHistoryItem {
 export async function createPaymentIntentApi(
   request: PaymentIntentRequest,
 ): Promise<PaymentIntentResponse> {
-  const client = getPaymentsClient();
-  const res = await client.post(PAYMENT_ENDPOINTS.CREATE_INTENT, request);
-  return res.data as PaymentIntentResponse;
+  return paymentsRequest<PaymentIntentResponse>(PAYMENT_ENDPOINTS.CREATE_INTENT, "POST", request);
 }
 
 export async function createCheckoutSessionApi(
   request: CheckoutSessionRequest,
 ): Promise<CheckoutSessionResponse> {
-  const client = getPaymentsClient();
-  const res = await client.post(PAYMENT_ENDPOINTS.CREATE_CHECKOUT_SESSION, request);
-  return res.data as CheckoutSessionResponse;
+  return paymentsRequest<CheckoutSessionResponse>(PAYMENT_ENDPOINTS.CREATE_CHECKOUT_SESSION, "POST", request);
 }
 
 export async function confirmPaymentApi(
   request: ConfirmPaymentRequest,
 ): Promise<PaymentTransaction> {
-  const client = getPaymentsClient();
-  const res = await client.post(PAYMENT_ENDPOINTS.CONFIRM, request);
-  return toPaymentTransaction(res.data as Record<string, unknown>);
+  const data = await paymentsRequest<Record<string, unknown>>(PAYMENT_ENDPOINTS.CONFIRM, "POST", request);
+  return toPaymentTransaction(data);
 }
 
 export async function getPaymentHistoryApi(
   params: PaymentQueryParams = {},
 ): Promise<PaymentHistoryResponse> {
-  const client = getPaymentsClient();
   const qs = buildPaymentQueryParams(params);
   const endpoint = `${PAYMENT_ENDPOINTS.HISTORY}?${qs}`;
-  const res = await client.get(endpoint);
-  const data = res.data as Record<string, unknown>;
+  const data = await paymentsRequest<Record<string, unknown>>(endpoint);
   return {
     data: ((data.data ?? []) as Record<string, unknown>[]).map(toPaymentHistoryItem),
     meta: (data.meta as PaymentHistoryResponse["meta"]) ?? {
@@ -218,15 +285,12 @@ export async function getPaymentHistoryApi(
 export async function getPaymentTransactionApi(
   id: string,
 ): Promise<PaymentTransaction> {
-  const client = getPaymentsClient();
-  const res = await client.get(PAYMENT_ENDPOINTS.TRANSACTION(id));
-  return toPaymentTransaction(res.data as Record<string, unknown>);
+  const data = await paymentsRequest<Record<string, unknown>>(PAYMENT_ENDPOINTS.TRANSACTION(id));
+  return toPaymentTransaction(data);
 }
 
 export async function getPaymentMethodsApi(): Promise<PaymentMethodOption[]> {
-  const client = getPaymentsClient();
-  const res = await client.get(PAYMENT_ENDPOINTS.METHODS);
-  const data = res.data as Record<string, unknown>;
+  const data = await paymentsRequest<Record<string, unknown>>(PAYMENT_ENDPOINTS.METHODS);
   const items = (data.data ?? data ?? []) as Record<string, unknown>[];
   return items.map((item) => ({
     id: String(item.id),
@@ -239,9 +303,7 @@ export async function getPaymentMethodsApi(): Promise<PaymentMethodOption[]> {
 }
 
 export async function getPaymentConfigApi(): Promise<PaymentConfig> {
-  const client = getPaymentsClient();
-  const res = await client.get(PAYMENT_ENDPOINTS.CONFIG);
-  const raw = res.data as Record<string, unknown>;
+  const raw = await paymentsRequest<Record<string, unknown>>(PAYMENT_ENDPOINTS.CONFIG);
   return {
     publishableKey: String(raw.publishableKey ?? raw.publishable_key ?? ""),
     currency: String(raw.currency ?? "usd"),
@@ -256,11 +318,9 @@ export async function getPaymentConfigApi(): Promise<PaymentConfig> {
 export async function getAdminPaymentHistoryApi(
   params: PaymentQueryParams = {},
 ): Promise<PaymentHistoryResponse> {
-  const client = getPaymentsClient();
   const qs = buildPaymentQueryParams(params);
   const endpoint = `${PAYMENT_ENDPOINTS.ADMIN_HISTORY}?${qs}`;
-  const res = await client.get(endpoint);
-  const data = res.data as Record<string, unknown>;
+  const data = await paymentsRequest<Record<string, unknown>>(endpoint);
   return {
     data: ((data.data ?? []) as Record<string, unknown>[]).map(toPaymentHistoryItem),
     meta: (data.meta as PaymentHistoryResponse["meta"]) ?? {
@@ -275,17 +335,15 @@ export async function getAdminPaymentHistoryApi(
 export async function getAdminPaymentTransactionApi(
   id: string,
 ): Promise<PaymentTransaction> {
-  const client = getPaymentsClient();
-  const res = await client.get(PAYMENT_ENDPOINTS.ADMIN_TRANSACTION(id));
-  return toPaymentTransaction(res.data as Record<string, unknown>);
+  const data = await paymentsRequest<Record<string, unknown>>(PAYMENT_ENDPOINTS.ADMIN_TRANSACTION(id));
+  return toPaymentTransaction(data);
 }
 
 export async function refundPaymentApi(
   id: string,
 ): Promise<PaymentTransaction> {
-  const client = getPaymentsClient();
-  const res = await client.post(PAYMENT_ENDPOINTS.REFUND(id));
-  return toPaymentTransaction(res.data as Record<string, unknown>);
+  const data = await paymentsRequest<Record<string, unknown>>(PAYMENT_ENDPOINTS.REFUND(id), "POST");
+  return toPaymentTransaction(data);
 }
 
 /* ─── Cache Invalidation Helpers ─── */

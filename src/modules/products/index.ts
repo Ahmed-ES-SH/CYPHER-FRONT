@@ -21,6 +21,13 @@ export type {
   ValidationErrorItem,
 } from "./types/product-error.types";
 
+export type {
+  FilterOptions,
+  FilterCategoryOption,
+  Range,
+  NullableRange,
+} from "./types/filter-options.types";
+
 export { PRODUCTS_ENDPOINTS } from "./api/products.endpoints";
 
 export {
@@ -94,12 +101,18 @@ export {
 } from "./hooks/useProducts";
 
 export {
+  useProductsByCategory,
+} from "./hooks/useProductsByCategory";
+
+export {
   useProduct,
 } from "./hooks/useProduct";
 
 export {
   useAdminProducts,
 } from "./hooks/useAdminProducts";
+
+export { useAdminProduct } from "./hooks/useAdminProduct";
 
 export {
   useCreateProduct,
@@ -116,6 +129,10 @@ export {
 export {
   useDeleteProduct,
 } from "./hooks/useDeleteProduct";
+
+export {
+  useFilterOptions,
+} from "./hooks/useFilterOptions";
 
 export {
   validateCreateProduct,

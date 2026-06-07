@@ -125,6 +125,7 @@ export function NotificationPreferencesCard() {
               <button
                 role="switch"
                 aria-checked={isEnabled}
+                aria-label={`${channel.label} — ${isEnabled ? "enabled" : "disabled"}`}
                 onClick={() => handleToggle(channel.key)}
                 disabled={isPending}
                 className={`

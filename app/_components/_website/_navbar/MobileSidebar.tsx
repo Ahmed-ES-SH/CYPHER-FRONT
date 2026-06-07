@@ -9,14 +9,18 @@ import SideLang from "./_sidebarmobail/SideMo";
 import SlideLinks from "./_sidebarmobail/SlideLinks";
 import Img from "../../_global/Img";
 import { useVariables } from "@/app/context/VariablesContext";
-import { PiSignIn } from "react-icons/pi";
+import { PiSignIn, PiSignOut } from "react-icons/pi";
+import { FiUser } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { useAuth, useLogout, AUTH_ROUTES } from "@/src/modules/auth";
 
 // main component ///////////////////////////////////////////////////////////////////////
 
 export default function MobailSideBar() {
   const { mobailMenu, setMobailMenu, width } = useVariables();
   const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
+  const { logout, isLoading: isLoggingOut } = useLogout();
 
   const [submenue, setsubmenue] = useState("");
 
@@ -133,13 +137,59 @@ export default function MobailSideBar() {
                       </div>
                     </li>
                     <li className="w-full pt-2 border-t border-gray-300">
-                      <Link
-                        href={"/signin"}
-                        className="flex items-center justify-between w-full pt-4 gap-3 text-primary-blue hover:text-blue-600 duration-300 px-4 "
-                      >
-                        <p>Sign in</p>
-                        <PiSignIn className="size-6" />
-                      </Link>
+                      {isAuthenticated ? (
+                        <div className="flex flex-col gap-2 px-4 pt-4">
+                          <div className="flex items-center gap-3 mb-2">
+                            <Img
+                              src={user?.avatar ?? "/images/user.png"}
+                              width={36}
+                              height={36}
+                              className="size-9 rounded-full object-cover border-2 border-gray-200"
+                            />
+                            <div className="flex flex-col">
+                              <p className="text-sm font-semibold text-gray-800">
+                                {user?.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {user?.email}
+                              </p>
+                            </div>
+                          </div>
+                          <Link
+                            href={"/dashboard"}
+                            className="flex items-center justify-between w-full gap-3 text-gray-700 hover:text-primary-blue duration-300"
+                            onClick={handleCloseMenu}
+                          >
+                            <p>My Dashboard</p>
+                            <FiUser className="size-5" />
+                          </Link>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await logout();
+                                router.push(AUTH_ROUTES.LOGIN);
+                              } catch (error) {
+                                console.error("Logout failed:", error);
+                              }
+                              handleCloseMenu();
+                            }}
+                            disabled={isLoggingOut}
+                            className="flex items-center justify-between w-full gap-3 text-red-500 hover:text-red-600 duration-300 cursor-pointer"
+                          >
+                            <p>{isLoggingOut ? "Signing out..." : "Sign out"}</p>
+                            <PiSignOut className="size-5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <Link
+                          href={"/signin"}
+                          className="flex items-center justify-between w-full pt-4 gap-3 text-primary-blue hover:text-blue-600 duration-300 px-4 "
+                          onClick={handleCloseMenu}
+                        >
+                          <p>Sign in</p>
+                          <PiSignIn className="size-6" />
+                        </Link>
+                      )}
                     </li>
                     <li>
                       <p className="text-xs text-gray-500 leading-relaxed p-2 pt-6 border-t border-gray-300">

@@ -1,17 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   createMoney,
   addMoney,
   multiplyMoney,
   validateQuantity,
-  toCartItem,
-  toCart,
-  toGuestCartItem,
-  parseCartApiError,
-  parseCartFieldErrors,
   canAddToCart,
   mergeGuestItemsWithCart,
-  cartKeys,
+} from "../cart-utils";
+import { toCartItem, toCart, toGuestCartItem } from "../cart-mappers";
+import {
   selectCartSummary,
   selectCartItemCount,
   selectGuestCartSummary,
@@ -20,7 +17,17 @@ import {
   selectIsGuestCartEmpty,
   selectItemStockWarning,
   selectOutOfStockItems,
-} from "../cart.api";
+} from "../cart-selectors";
+import { parseCartApiError, parseCartFieldErrors } from "../cart.transport";
+import { cartKeys } from "../cart.keys";
+import {
+  validateCheckoutPrerequisites,
+  prepareAndCheckout,
+  syncGuestCart,
+} from "../cart.service";
+import { useCartStore, initCartCrossTabSync } from "../cart.store";
+import { CART_STORAGE_KEY } from "../cart.types";
+import type { Transport } from "../cart.transport";
 import type {
   CartDto,
   CartItemDto,
@@ -61,6 +68,19 @@ function makeCartDto(overrides: Partial<CartDto> = {}): CartDto {
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     ...overrides,
+  };
+}
+
+beforeEach(() => {
+  vi.restoreAllMocks();
+});
+
+function createMockTransport(): Transport {
+  return {
+    get: vi.fn().mockRejectedValue(new Error("Unexpected GET")),
+    post: vi.fn().mockRejectedValue(new Error("Unexpected POST")),
+    patch: vi.fn().mockRejectedValue(new Error("Unexpected PATCH")),
+    delete: vi.fn().mockRejectedValue(new Error("Unexpected DELETE")),
   };
 }
 
@@ -142,6 +162,7 @@ describe("validateQuantity", () => {
   it("rejects negative quantity", () => {
     const result = validateQuantity(-5, 10, 1, 99);
     expect(result.valid).toBe(false);
+    expect(result.clamped).toBe(1);
     expect(result.reason).toContain("positive integer");
   });
 
@@ -208,11 +229,17 @@ describe("toCart", () => {
 });
 
 describe("toGuestCartItem", () => {
-  it("creates a GuestCartItem from raw fields", () => {
+  it("creates a GuestCartItem from options object", () => {
     const price: Money = { amount: 1999, currency: "usd" };
-    const result = toGuestCartItem(
-      "prod-1", "Test", "test", "/img.jpg", price, 2, 10,
-    );
+    const result = toGuestCartItem({
+      productId: "prod-1",
+      productName: "Test",
+      productSlug: "test",
+      productImage: "/img.jpg",
+      unitPrice: price,
+      quantity: 2,
+      stock: 10,
+    });
     expect(result.productId).toBe("prod-1");
     expect(result.quantity).toBe(2);
     expect(result.stock).toBe(10);
@@ -288,11 +315,11 @@ describe("selectGuestItemCount", () => {
 
 describe("selectIsCartEmpty", () => {
   it("returns true when cart has no items", () => {
-    expect(selectIsCartEmpty({ items: [] } as Cart)).toBe(true);
+    expect(selectIsCartEmpty({ items: [] } as unknown as Cart)).toBe(true);
   });
 
   it("returns false when cart has items", () => {
-    expect(selectIsCartEmpty({ items: [{}] } as Cart)).toBe(false);
+    expect(selectIsCartEmpty({ items: [{}] } as unknown as Cart)).toBe(false);
   });
 });
 
@@ -421,6 +448,192 @@ describe("mergeGuestItemsWithCart", () => {
 
   it("returns empty array for no guest items", () => {
     expect(mergeGuestItemsWithCart([], [])).toEqual([]);
+  });
+});
+
+/* =========================================================
+   Cart Service — Business Logic
+   ========================================================= */
+
+describe("validateCheckoutPrerequisites", () => {
+  it("returns invalid when both cart and guestItems are empty", () => {
+    const result = validateCheckoutPrerequisites(undefined, []);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain("Cart is empty");
+  });
+
+  it("returns invalid when cart has out-of-stock items", () => {
+    const cart = {
+      items: [{ quantity: 5, stock: 2 }],
+    } as Cart;
+    const result = validateCheckoutPrerequisites(cart, []);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain("Some items are out of stock");
+  });
+
+  it("returns valid when cart has in-stock items", () => {
+    const cart = {
+      items: [{ quantity: 2, stock: 10 }],
+    } as Cart;
+    const result = validateCheckoutPrerequisites(cart, []);
+    expect(result.valid).toBe(true);
+  });
+
+  it("returns valid when guestItems are present but no cart", () => {
+    const result = validateCheckoutPrerequisites(undefined, [
+      { productId: "p1" } as GuestCartItem,
+    ]);
+    expect(result.valid).toBe(true);
+  });
+});
+
+describe("prepareAndCheckout", () => {
+  it("returns validation errors without calling checkoutApi when cart is empty", async () => {
+    const result = await prepareAndCheckout({}, { cart: undefined, guestItems: [] });
+    expect(result.validation?.valid).toBe(false);
+    expect(result.result).toBeUndefined();
+  });
+
+  it("calls checkoutApi and returns result when validation passes", async () => {
+    const transport = createMockTransport();
+    transport.post = vi.fn().mockResolvedValue({
+      sessionId: "s1",
+      url: "https://checkout.stripe.com/test",
+    });
+    const cart = { items: [{ quantity: 1, stock: 10 }] } as Cart;
+    const result = await prepareAndCheckout({}, { cart, transport });
+    expect(result.result?.sessionId).toBe("s1");
+  });
+});
+
+describe("syncGuestCart", () => {
+  it("fetches cart when guestItems is empty", async () => {
+    const transport = createMockTransport();
+    transport.get = vi.fn().mockResolvedValue({
+      id: "c1", userId: "u1", items: [], subtotal: 0, total: 0,
+      currency: "usd", createdAt: "", updatedAt: "",
+    });
+    const result = await syncGuestCart([], { transport });
+    expect(transport.get).toHaveBeenCalledWith("/api/cart");
+    expect(result.success).toBe(true);
+  });
+
+  it("calls syncGuestCartApi with merged items", async () => {
+    const transport = createMockTransport();
+    transport.post = vi.fn().mockResolvedValue({
+      id: "c1", userId: "u1", items: [], subtotal: 0, total: 0,
+      currency: "usd", createdAt: "", updatedAt: "",
+    });
+    const guestItems: GuestCartItem[] = [
+      {
+        productId: "p1", productName: "P1", productSlug: "p1", productImage: "",
+        unitPrice: { amount: 100, currency: "usd" },
+        quantity: 2, stock: 10, minimumQuantity: 1, maximumQuantity: 99,
+      },
+    ];
+    const result = await syncGuestCart(guestItems, { transport });
+    expect(transport.post).toHaveBeenCalledWith("/api/cart/sync", {
+      items: [{ productId: "p1", quantity: 2 }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("returns error result when API throws", async () => {
+    const transport = createMockTransport();
+    transport.post = vi.fn().mockRejectedValue({
+      message: "Sync failed",
+      status: 500,
+    });
+    const guestItems: GuestCartItem[] = [
+      {
+        productId: "p1", productName: "P1", productSlug: "p1", productImage: "",
+        unitPrice: { amount: 100, currency: "usd" },
+        quantity: 2, stock: 10, minimumQuantity: 1, maximumQuantity: 99,
+      },
+    ];
+    const result = await syncGuestCart(guestItems, { transport });
+    expect(result.success).toBe(false);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors![0].productId).toBe("p1");
+    expect(result.errors![0].reason).toBe("Sync failed");
+  });
+});
+
+/* =========================================================
+   Cross-Tab Sync
+   ========================================================= */
+
+describe("initCartCrossTabSync", () => {
+  let cleanup: (() => void) | undefined;
+
+  beforeEach(() => {
+    useCartStore.setState({ guestItems: [] });
+  });
+
+  afterEach(() => {
+    cleanup?.();
+  });
+
+  it("updates guestItems when storage event fires with valid data", () => {
+    cleanup = initCartCrossTabSync();
+    const newItems: GuestCartItem[] = [
+      {
+        productId: "p1", productName: "P1", productSlug: "p1", productImage: "",
+        unitPrice: { amount: 100, currency: "usd" },
+        quantity: 2, stock: 10, minimumQuantity: 1, maximumQuantity: 99,
+      },
+    ];
+    const storageValue = JSON.stringify({ state: { guestItems: newItems } });
+
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: CART_STORAGE_KEY,
+        newValue: storageValue,
+      }),
+    );
+
+    expect(useCartStore.getState().guestItems).toEqual(newItems);
+  });
+
+  it("ignores storage events with wrong key", () => {
+    cleanup = initCartCrossTabSync();
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: "some-other-key",
+        newValue: JSON.stringify({ state: { guestItems: [{}] } }),
+      }),
+    );
+    expect(useCartStore.getState().guestItems).toEqual([]);
+  });
+
+  it("ignores malformed JSON in storage event", () => {
+    cleanup = initCartCrossTabSync();
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: CART_STORAGE_KEY,
+        newValue: "NOT JSON",
+      }),
+    );
+    expect(useCartStore.getState().guestItems).toEqual([]);
+  });
+
+  it("ignores storage events with invalid item shape", () => {
+    cleanup = initCartCrossTabSync();
+    const badItems = [{ productId: 123 }]; // productId should be string
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: CART_STORAGE_KEY,
+        newValue: JSON.stringify({ state: { guestItems: badItems } }),
+      }),
+    );
+    expect(useCartStore.getState().guestItems).toEqual([]);
+  });
+
+  it("removes event listener on cleanup", () => {
+    cleanup = initCartCrossTabSync();
+    const removeSpy = vi.spyOn(window, "removeEventListener");
+    cleanup();
+    expect(removeSpy).toHaveBeenCalledWith("storage", expect.any(Function));
   });
 });
 

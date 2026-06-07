@@ -159,40 +159,6 @@ export const CART_RULES = {
   MIN_QUANTITY: 1,
   MAX_QUANTITY: 99,
   DEFAULT_CURRENCY: "usd",
-} as const;
+};
 
 export const CART_STORAGE_KEY = "cart-guest-items";
-
-/* =========================================================
-   Cart Store Types
-   ========================================================= */
-
-export type CartItemLoadingKey = "add" | "update" | "remove";
-
-export interface CartUiLoading {
-  add: Record<string, boolean>;
-  update: Record<string, boolean>;
-  remove: Record<string, boolean>;
-  checkout: boolean;
-  sync: boolean;
-}
-
-export interface CartStoreState {
-  guestItems: GuestCartItem[];
-  loading: CartUiLoading;
-  isHydrated: boolean;
-}
-
-export interface CartStoreActions {
-  addGuestItem: (item: GuestCartItem) => void;
-  removeGuestItem: (productId: string) => void;
-  updateGuestItemQuantity: (productId: string, quantity: number) => void;
-  clearGuestItems: () => void;
-  replaceGuestItems: (items: GuestCartItem[]) => void;
-  setLoading: (key: CartItemLoadingKey, productId: string, value: boolean) => void;
-  setCheckoutLoading: (value: boolean) => void;
-  setSyncLoading: (value: boolean) => void;
-  setHydrated: () => void;
-}
-
-export type CartStore = CartStoreState & CartStoreActions;

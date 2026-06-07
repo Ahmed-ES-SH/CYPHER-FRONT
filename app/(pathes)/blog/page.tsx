@@ -1,11 +1,16 @@
 import ArticlesComponent from "@/app/_components/_website/_blog/ArticlesComponent";
-import { Metadata } from "next";
-import React from "react";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "CYPHER – Electronics Store ECommerce - Blog",
+  title: "CYPHER – Blog | Electronics & Tech Insights",
   description:
-    "Explore the latest articles, reviews, and news about cutting-edge electronics, gadgets, and tech trends at CYPHER's blog. Stay updated with expert insights and buying guides for your next electronic purchase.",
+    "Expert reviews, buying guides, and the latest news on smartphones, laptops, accessories, and cutting-edge electronics. Stay ahead with CYPHER's tech blog.",
+  openGraph: {
+    title: "CYPHER – Blog | Electronics & Tech Insights",
+    description:
+      "Expert reviews, buying guides, and the latest news on smartphones, laptops, accessories, and cutting-edge electronics.",
+    type: "website",
+  },
 };
 
 export default function BlogPage() {

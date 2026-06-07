@@ -95,6 +95,13 @@ button {
   cursor: pointer;
 }
 
+.editor-content:empty:before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+  display: block;
+}
+
 button:disabled {
   cursor: not-allowed;
 }

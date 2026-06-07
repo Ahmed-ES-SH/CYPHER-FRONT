@@ -1,6 +1,17 @@
 import type { Product } from "../types/product.types";
 import type { ProductType } from "@/app/types/productType";
 
+function hashToNumericId(id: string): number {
+  const parsedId = Number(id);
+  if (!isNaN(parsedId)) return parsedId;
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
 /**
  * Maps the module's Product (from the real backend) to the legacy ProductType
  * that existing UI components expect. This allows gradual migration without
@@ -8,7 +19,7 @@ import type { ProductType } from "@/app/types/productType";
  */
 export function productToLegacy(product: Product): ProductType {
   return {
-    id: Number(product.id) || 0,
+    id: hashToNumericId(product.id),
     title: product.title,
     description: product.description,
     price: product.price,

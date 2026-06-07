@@ -32,29 +32,26 @@ export default function ArticleCard({ Article }: Props) {
   ];
 
   return (
-    <div className="not-last:border-b block border-gray-200 pb-12 group">
-      <h1
-        id="title"
-        className="xl:text-3xl md:text-2xl text-xl font-light pb-6 group-hover:text-primary-blue duration-300"
-      >
+    <div className="not-last:border-b block border-border-subtle pb-12 group">
+      <h2 className="xl:text-3xl md:text-2xl text-xl font-light pb-6 group-hover:text-primary-blue duration-300">
         {Article.title}
-      </h1>
+      </h2>
 
       <div className="flex items-center flex-wrap gap-4 mt-2">
         {ArticleDetails.map((item, index) => (
           <div
             key={index}
-            className="flex items-center gap-1 cursor-pointer not-last:border-r border-gray-300 pr-2"
+            className="flex items-center gap-1 not-last:border-r border-border-subtle pr-2"
           >
             <item.icon className="text-primary-blue size-4" />
-            <p className="text-[12px]">{item.text}</p>
+            <span className="text-sm text-text-secondary">{item.text}</span>
           </div>
         ))}
-        <div className="flex items-center gap-1 cursor-pointer not-last:border-r border-gray-300 pr-2">
+        <div className="flex items-center gap-1 not-last:border-r border-border-subtle pr-2">
           <LuTickets className="text-primary-blue size-4" />
           <div className="flex items-center gap-1 flex-wrap">
             {Article.tags.map((text) => (
-              <p className="text-[12px] text-primary-blue" key={text}>
+              <p className="text-sm text-primary-blue" key={text}>
                 {text}
               </p>
             ))}
@@ -65,10 +62,10 @@ export default function ArticleCard({ Article }: Props) {
       <Img
         src={Article.image}
         className="xl:w-[90%] w-full max-h-[70vh] mt-4"
-        alt="article-img"
+        alt={Article.title}
       />
 
-      <p className="mt-3 lg:w-3/4 w-full">{Article.description}</p>
+      <p className="mt-3 lg:w-3/4 w-full max-w-prose text-pretty">{Article.description}</p>
 
       <Link
         href={`/blog/${formatTitle(Article.title)}?articleId=${Article?.id}`}

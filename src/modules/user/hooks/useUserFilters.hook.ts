@@ -20,10 +20,13 @@ export function useUserFilters() {
       } else {
         params.delete(key);
       }
-      params.set("page", "1");
-      router.push(`?${params.toString()}`);
+      // Reset to page 1 when any filter other than page itself changes
+      if (key !== "page") {
+        params.set("page", "1");
+      }
+      router.replace(`?${params.toString()}`, { scroll: false });
     },
-    [router, searchParams],
+    [router, searchParams], 
   );
 
   return { page, search, role, status, updateFilter };

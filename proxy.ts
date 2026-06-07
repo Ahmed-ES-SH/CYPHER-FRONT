@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const AUTH_COOKIE = "sanad_auth_token";
+const AUTH_COOKIE = "cypher_auth_token";
 
-const PROTECTED_ROUTES = ["/dashboard",  "/checkout", "/cart"];
+const PROTECTED_ROUTES = [
+  "/checkout",
+  "/cart",
+  "/orders",
+  "/paymentsuccess",
+  "/paymentfaild",
+  "/settings",
+  "/notifications",
+  "/dashboard",
+];
 const AUTH_ROUTES = [
   "/signin",
   "/signup",
+  "/register",
   "/forget-password",
   "/reset-password",
 ];

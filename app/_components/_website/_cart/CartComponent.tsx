@@ -2,75 +2,30 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FiCheck, FiTruck, FiMapPin } from "react-icons/fi";
-import { useGuestCart } from "@/src/modules/cart";
-import { toast } from "sonner";
+import { useUnifiedCart } from "@/src/modules/cart";
 import CartItems from "./CartItems";
+import { useCheckout } from "./useCheckout";
 
 type ShippingMethod = "free_shipping" | "local_pickup";
 
 export default function CartComponent() {
-  const { items } = useGuestCart();
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const { items, clearItems } = useUnifiedCart();
   const [shippingMethod, setShippingMethod] = useState<ShippingMethod>("free_shipping");
 
+  const { isCheckingOut, checkout } = useCheckout({
+    items,
+    shippingMethod,
+    currency: "usd",
+    onBeforeRedirect: () => clearItems(),
+  });
+
   const subtotal = items.reduce(
-    (sum, item) => sum + item.unitPrice.amount * item.quantity,
+    (sum, item) => sum + (item.unitPrice.amount / 100) * item.quantity,
     0,
   );
-  const shippingCost = shippingMethod === "free_shipping" ? 0 : 0;
-  const total = subtotal + shippingCost;
+  const total = subtotal;
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  const handleCheckout = async () => {
-    if (items.length === 0) {
-      toast.error("Your cart is empty");
-      return;
-    }
-
-    setIsCheckingOut(true);
-
-    try {
-      const lineItems = items.map((item) => ({
-        name: item.productName,
-        price: item.unitPrice.amount,
-        quantity: item.quantity,
-      }));
-
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lineItems,
-          shippingMethod,
-          currency: "usd",
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create checkout session");
-      }
-
-      const data = await res.json();
-
-      if (!data.sessionId) {
-        throw new Error("No checkout session returned");
-      }
-
-      const { loadStripe } = await import("@stripe/stripe-js");
-      const stripe = await loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-      );
-
-      await stripe?.redirectToCheckout({ sessionId: data.sessionId });
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Checkout failed. Please try again."
-      );
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
 
   return (
     <div className="c-container xl:p-4 p-2 min-h-screen">
@@ -161,7 +116,7 @@ export default function CartComponent() {
               </div>
 
               <button
-                onClick={handleCheckout}
+                onClick={checkout}
                 disabled={isCheckingOut || items.length === 0}
                 className="flex w-full items-center justify-center gap-2 rounded-md bg-[var(--primary-blue)] py-3.5 text-base font-semibold text-white transition-colors hover:bg-[var(--dark-btn)] disabled:cursor-not-allowed disabled:opacity-60"
               >

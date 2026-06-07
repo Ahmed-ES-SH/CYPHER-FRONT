@@ -15,6 +15,7 @@ export function normalizeProductQuery(
     ),
     search: query.search?.trim() || undefined,
     categorySlug: query.categorySlug?.trim() || undefined,
+    categoryIds: query.categoryIds?.trim() || undefined,
     minPrice:
       query.minPrice !== undefined
         ? Math.max(0, Number(query.minPrice))
@@ -25,7 +26,30 @@ export function normalizeProductQuery(
         : undefined,
     sortBy: query.sortBy || undefined,
     sortOrder: query.sortOrder || undefined,
-    inStock: query.inStock ?? undefined,
+    inStockOnly: query.inStockOnly ?? undefined,
+    brand: query.brand?.trim() || undefined,
+    onSale: query.onSale ?? undefined,
+    minDiscount:
+      query.minDiscount !== undefined
+        ? Math.max(0, Number(query.minDiscount))
+        : undefined,
+    maxDiscount:
+      query.maxDiscount !== undefined
+        ? Math.max(0, Number(query.maxDiscount))
+        : undefined,
+    minWeight:
+      query.minWeight !== undefined
+        ? Math.max(0, Number(query.minWeight))
+        : undefined,
+    maxWeight:
+      query.maxWeight !== undefined
+        ? Math.max(0, Number(query.maxWeight))
+        : undefined,
+    tags: query.tags?.trim() || undefined,
+    minRating:
+      query.minRating !== undefined
+        ? Math.max(0, Math.min(5, Number(query.minRating)))
+        : undefined,
   };
 }
 
@@ -49,14 +73,29 @@ export function serializeProductQuery(
     params.limit = String(query.limit);
   if (query.search) params.search = query.search;
   if (query.categorySlug) params.categorySlug = query.categorySlug;
+  if (query.categoryIds) params.categoryIds = query.categoryIds;
   if (query.minPrice !== undefined)
     params.minPrice = String(query.minPrice);
   if (query.maxPrice !== undefined)
     params.maxPrice = String(query.maxPrice);
   if (query.sortBy) params.sortBy = query.sortBy;
-  if (query.sortOrder) params.sortOrder = query.sortOrder;
-  if (query.inStock !== undefined)
-    params.inStock = String(query.inStock);
+  if (query.sortOrder) params.sortOrder = query.sortOrder.toUpperCase();
+  if (query.inStockOnly !== undefined)
+    params.inStock = String(query.inStockOnly);
+  if (query.brand) params.brand = query.brand;
+  if (query.onSale !== undefined)
+    params.onSale = String(query.onSale);
+  if (query.minDiscount !== undefined)
+    params.minDiscount = String(query.minDiscount);
+  if (query.maxDiscount !== undefined)
+    params.maxDiscount = String(query.maxDiscount);
+  if (query.minWeight !== undefined)
+    params.minWeight = String(query.minWeight);
+  if (query.maxWeight !== undefined)
+    params.maxWeight = String(query.maxWeight);
+  if (query.tags) params.tags = query.tags;
+  if (query.minRating !== undefined)
+    params.minRating = String(query.minRating);
 
   if ("isPublished" in query && query.isPublished !== undefined) {
     params.isPublished = String(query.isPublished);

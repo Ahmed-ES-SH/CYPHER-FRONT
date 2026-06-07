@@ -23,12 +23,12 @@ export default function HeroList() {
           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
           className="origin-top bg-surface-elevated mt-1 shrink-0 w-[280px] h-[61vh] rounded-md shadow-lg overflow-hidden max-xl:hidden border border-border-subtle"
         >
-          <div className="divide-y divide-border-subtle">
+          <div className="flex flex-col divide-y divide-border-subtle">
             {menuData.map((item, index) => (
               <Link
                 href="/shop"
                 key={index}
-                className="flex items-center justify-between px-4 py-3 hover:bg-surface cursor-pointer transition-colors duration-150"
+                className="flex items-center justify-between px-4 py-3 flex-1 hover:bg-surface cursor-pointer transition-colors duration-150"
               >
                 <div className="flex items-center space-x-3 w-full">
                   <item.icon className="w-5 h-5 text-text-secondary" />

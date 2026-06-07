@@ -85,6 +85,12 @@ export {
   resetPaymentsClient,
 } from "./api/payments.client";
 
+/**
+ * @deprecated getPaymentsClient has been replaced by the paymentsRequest transport
+ * wrapper in payments.api.ts. All API functions now use globalRequest on the server
+ * and fetch with credentials on the client instead of a custom axios instance.
+ */
+
 /* ─── Utils ─── */
 
 export { normalizePaymentError } from "./utils/normalizePaymentError";

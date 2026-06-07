@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { globalRequest } from "@/app/helpers/globalRequest";
 import { PRODUCTS_ENDPOINTS } from "./products.endpoints";
 import { getProductsConfig } from "../config/products.config";
@@ -18,9 +17,24 @@ import type {
   MutationResult,
   PublishToggleResult,
 } from "../types/product-dto.types";
-import type { ApiError } from "../types/product-error.types";
+import type { ApiError, ValidationErrorItem } from "../types/product-error.types";
 
-async function productsRequest<TResult = any>(
+export interface RawProductsListResponse {
+  data?: RawProductPayload[];
+  products?: RawProductPayload[];
+  pagination?: Record<string, unknown>;
+}
+
+function parseValidationErrors(
+  errors?: Record<string, string[]>,
+): ValidationErrorItem[] | undefined {
+  if (!errors) return undefined;
+  return Object.entries(errors).flatMap(([field, messages]) =>
+    messages.map((message) => ({ field, message })),
+  );
+}
+
+async function productsRequest<TResult = unknown>(
   endpoint: string,
   method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE" = "GET",
   body?: unknown,
@@ -33,7 +47,11 @@ async function productsRequest<TResult = any>(
     ...(baseURL ? { baseURL } : {}),
   });
   if (!res.success) {
-    throw { message: res.message, status: res.statusCode ?? 500 } satisfies ApiError;
+    throw {
+      message: res.message,
+      status: res.statusCode ?? 500,
+      errors: parseValidationErrors(res.errors),
+    } satisfies ApiError;
   }
   return res.data as TResult;
 }
@@ -54,18 +72,18 @@ export async function getProductsApi(
   query?: ProductQuery,
 ): Promise<PaginatedResult<Product>> {
   const qs = query ? buildQueryString(serializeProductQuery(query)) : "";
-  const raw = await productsRequest<any>(
+  const raw = await productsRequest<RawProductsListResponse>(
     `${PRODUCTS_ENDPOINTS.PUBLIC_LIST}${qs}`,
   );
-  const items: unknown[] = raw.data ?? raw.products ?? [];
+  const items = raw.data ?? raw.products ?? [];
   return {
-    data: items.map((raw) => normalizeProductPayload(raw as RawProductPayload)),
-    pagination: coercePagination(raw.pagination ?? raw),
+    data: items.map((item) => normalizeProductPayload(item)),
+    pagination: coercePagination(raw.pagination ?? (raw as unknown as Record<string, unknown>)),
   };
 }
 
 export async function getProductApi(slug: string): Promise<Product> {
-  const raw = await productsRequest<any>(
+  const raw = await productsRequest<RawProductPayload>(
     PRODUCTS_ENDPOINTS.PUBLIC_BY_SLUG(slug),
   );
   return normalizeProductPayload(raw);
@@ -76,13 +94,13 @@ export async function getProductsByCategoryApi(
   query?: ProductQuery,
 ): Promise<PaginatedResult<Product>> {
   const qs = query ? buildQueryString(serializeProductQuery(query)) : "";
-  const raw = await productsRequest<any>(
+  const raw = await productsRequest<RawProductsListResponse>(
     `${PRODUCTS_ENDPOINTS.PUBLIC_BY_CATEGORY(categorySlug)}${qs}`,
   );
-  const items: unknown[] = raw.data ?? raw.products ?? [];
+  const items = raw.data ?? raw.products ?? [];
   return {
-    data: items.map((raw) => normalizeProductPayload(raw as RawProductPayload)),
-    pagination: coercePagination(raw.pagination ?? raw),
+    data: items.map((item) => normalizeProductPayload(item)),
+    pagination: coercePagination(raw.pagination ?? (raw as unknown as Record<string, unknown>)),
   };
 }
 
@@ -90,25 +108,27 @@ export async function getAdminProductsApi(
   query?: AdminProductQuery,
 ): Promise<PaginatedResult<Product>> {
   const qs = query ? buildQueryString(serializeProductQuery(query)) : "";
-  const raw = await productsRequest<any>(
+  const raw = await productsRequest<RawProductsListResponse>(
     `${PRODUCTS_ENDPOINTS.ADMIN_LIST}${qs}`,
   );
-  const items: unknown[] = raw.data ?? raw.products ?? [];
+  const items = raw.data ?? raw.products ?? [];
   return {
-    data: items.map((raw) => normalizeProductPayload(raw as RawProductPayload)),
-    pagination: coercePagination(raw.pagination ?? raw),
+    data: items.map((item) => normalizeProductPayload(item)),
+    pagination: coercePagination(raw.pagination ?? (raw as unknown as Record<string, unknown>)),
   };
 }
 
 export async function getAdminProductApi(id: string): Promise<Product> {
-  const raw = await productsRequest<any>(PRODUCTS_ENDPOINTS.ADMIN_GET(id));
+  const raw = await productsRequest<RawProductPayload>(
+    PRODUCTS_ENDPOINTS.ADMIN_GET(id),
+  );
   return normalizeProductPayload(raw);
 }
 
 export async function createProductApi(
   dto: CreateProductDto,
 ): Promise<Product> {
-  const raw = await productsRequest<any>(
+  const raw = await productsRequest<RawProductPayload>(
     PRODUCTS_ENDPOINTS.CREATE,
     "POST",
     dto,
@@ -120,7 +140,7 @@ export async function updateProductApi(
   id: string,
   dto: UpdateProductDto,
 ): Promise<Product> {
-  const raw = await productsRequest<any>(
+  const raw = await productsRequest<RawProductPayload>(
     PRODUCTS_ENDPOINTS.UPDATE(id),
     "PATCH",
     dto,

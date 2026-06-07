@@ -5,12 +5,12 @@ import type { ReactNode } from "react";
 import {
   useBlogPosts,
   useBlogPost,
-} from "../blog.hooks";
-import * as api from "../blog.api";
+} from "../hooks/blog.hooks";
+import * as api from "../api/blog.api";
 import type {
   PaginatedArticles,
   BlogArticle,
-} from "../blog.types";
+} from "../types/blog.types";
 
 /* =========================================================
    Test setup

@@ -4,7 +4,10 @@ import { useUser, useUpdateUser } from "../../hooks/useUser.hook";
 import { useAuth } from "@/src/modules/auth";
 import UserForm from "../forms/UserForm";
 import AvatarUploader from "../forms/AvatarUploader";
+import { toast } from "sonner";
 import type { UpdateUserDto } from "../../types/user.types";
+
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 
 interface ProfileSettingsPageProps {
   userId?: number;
@@ -16,24 +19,29 @@ export function ProfileSettingsPage({ userId }: ProfileSettingsPageProps) {
   const isUnavailable = !id;
 
   const { data: user, isLoading } = useUser(id);
-  const { mutateAsync, isPending } = useUpdateUser(id);
+  const { mutateAsync: updateProfileDetails, isPending: isUpdatingDetails } = useUpdateUser(id);
+  const { mutateAsync: updateAvatarImage, isPending: isUploadingAvatar } = useUpdateUser(id);
 
   const handleSubmit = async (data: UpdateUserDto) => {
     const payload: UpdateUserDto = {};
-    if (data.name) payload.name = data.name;
-    if (data.email) payload.email = data.email;
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.email !== undefined) payload.email = data.email;
     if (data.password) payload.password = data.password;
-    await mutateAsync(payload);
+    await updateProfileDetails(payload);
   };
 
   const handleAvatarUpload = async (file: File): Promise<string> => {
+    if (file.size > MAX_AVATAR_SIZE) {
+      toast.error("Avatar image must be smaller than 2MB.");
+      throw new Error("File exceeds maximum size limits");
+    }
     const base64 = await new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-    const updated = await mutateAsync({ avatar: base64 });
+    const updated = await updateAvatarImage({ avatar: base64 });
     return updated?.avatar ?? user?.avatar ?? "";
   };
 
@@ -62,6 +70,7 @@ export function ProfileSettingsPage({ userId }: ProfileSettingsPageProps) {
           <AvatarUploader
             currentAvatar={user?.avatar}
             onUpload={handleAvatarUpload}
+            isUploading={isUploadingAvatar}
           />
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -70,7 +79,7 @@ export function ProfileSettingsPage({ userId }: ProfileSettingsPageProps) {
             mode="edit"
             initialData={user}
             onSubmit={handleSubmit}
-            isLoading={isPending}
+            isLoading={isUpdatingDetails}
           />
         </div>
       </div>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { HiMegaphone, HiOutlineXMark } from "react-icons/hi2";
 import { NotificationType, NotificationPriority, NotificationChannel } from "../notifications.types";
 import type { AdminBroadcastDto } from "../notifications.types";
-import { useSendBroadcast, useAdminNotifications } from "../notifications.hooks";
+import { useSendBroadcast } from "../notifications.hooks";
+import { useUsers } from "@/src/modules/user";
 import { validateAdminBroadcast } from "../notifications.api";
 import { toast } from "sonner";
 
@@ -25,9 +26,12 @@ export function BroadcastNotificationForm({ onClose }: BroadcastNotificationForm
   const [selectedChannels, setSelectedChannels] = useState<NotificationChannel[]>([NotificationChannel.IN_APP]);
   const [link, setLink] = useState("");
   const [userIds, setUserIds] = useState("");
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const { mutate: broadcast, isPending } = useSendBroadcast();
+  const { data: usersPage } = useUsers({ page: "1", limit: "20" });
+  const users = useMemo(() => usersPage?.data ?? [], [usersPage]);
 
   const toggleChannel = (channel: NotificationChannel) => {
     setSelectedChannels((prev) =>
@@ -45,9 +49,12 @@ export function BroadcastNotificationForm({ onClose }: BroadcastNotificationForm
       priority,
       channels: selectedChannels,
       link: link.trim() || undefined,
-      userIds: userIds.trim()
-        ? userIds.split(",").map((u) => u.trim()).filter(Boolean)
-        : undefined,
+      userIds:
+        selectedUserIds.length > 0
+          ? selectedUserIds
+          : userIds.trim()
+            ? userIds.split(",").map((u) => u.trim()).filter(Boolean)
+            : undefined,
     };
 
     /* Client-side validation */
@@ -211,9 +218,31 @@ export function BroadcastNotificationForm({ onClose }: BroadcastNotificationForm
 
       {/* Target User IDs (optional) */}
       <div>
-        <label htmlFor="broadcast-user-ids" className="block text-sm font-medium text-text-primary mb-1.5">
-          Target Users <span className="text-text-muted">(optional, comma-separated UUIDs)</span>
-        </label>
+        <label className="block text-sm font-medium text-text-primary mb-1.5">Target Users <span className="text-text-muted">(optional)</span></label>
+
+        <p className="text-xs text-text-muted mb-2">Select one or more users from the list, or paste comma-separated UUIDs below.</p>
+
+        <div className="mb-2">
+          <div className="flex flex-wrap gap-2">
+            {users.map((u: any) => {
+              const id = String(u.id);
+              const selected = selectedUserIds.includes(id);
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setSelectedUserIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]))}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    selected ? "bg-primary-blue text-white shadow-sm" : "bg-surface text-text-secondary border border-border-subtle"
+                  }`}
+                >
+                  {u.name ?? u.email}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <textarea
           id="broadcast-user-ids"
           rows={2}

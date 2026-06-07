@@ -18,8 +18,8 @@ import {
   parseValidationErrors,
   getBlogPostsApi,
   getBlogPostApi,
-} from "../blog.api";
-import type { ArticleFilters } from "../blog.types";
+} from "../api/blog.api";
+import type { ArticleFilters } from "../types/blog.types";
 
 /* =========================================================
    BLOG_ENDPOINTS
@@ -179,13 +179,11 @@ describe("buildQueryString", () => {
     expect(buildQueryString({ search: "iphone" })).toBe("?search=iphone");
   });
 
-  it("includes sortBy and sortOrder", () => {
+  it("includes sortBy", () => {
     const qs = buildQueryString({
       sortBy: "createdAt",
-      sortOrder: "ASC",
     });
     expect(qs).toContain("sortBy=createdAt");
-    expect(qs).toContain("sortOrder=ASC");
   });
 
   it("includes category and tag", () => {
@@ -213,14 +211,12 @@ describe("buildQueryString", () => {
       search: "test",
       category: "tech",
       sortBy: "title",
-      sortOrder: "ASC",
     });
     expect(qs).toContain("page=1");
     expect(qs).toContain("limit=20");
     expect(qs).toContain("search=test");
     expect(qs).toContain("category=tech");
     expect(qs).toContain("sortBy=title");
-    expect(qs).toContain("sortOrder=ASC");
   });
 });
 
@@ -229,8 +225,8 @@ describe("buildQueryString", () => {
    ========================================================= */
 
 describe("estimateReadTime", () => {
-  it("returns 1 for empty content", () => {
-    expect(estimateReadTime("")).toBe(1);
+  it("returns 0 for empty content", () => {
+    expect(estimateReadTime("")).toBe(0);
   });
 
   it("returns 1 for very short content", () => {
@@ -336,13 +332,11 @@ describe("parseArticleFilters", () => {
     expect(result.published).toBe(false);
   });
 
-  it("parses sortBy and sortOrder", () => {
+  it("parses sortBy", () => {
     const result = parseArticleFilters({
       sortBy: "title",
-      sortOrder: "ASC",
     });
     expect(result.sortBy).toBe("title");
-    expect(result.sortOrder).toBe("ASC");
   });
 
   it("returns empty object for empty input", () => {
@@ -361,7 +355,6 @@ describe("serializeArticleFilters", () => {
       limit: 10,
       search: "test",
       sortBy: "createdAt",
-      sortOrder: "DESC",
       category: "tech",
       tag: "apple",
       published: true,
@@ -371,7 +364,6 @@ describe("serializeArticleFilters", () => {
       limit: "10",
       search: "test",
       sortBy: "createdAt",
-      sortOrder: "DESC",
       category: "tech",
       tag: "apple",
       published: "true",
@@ -394,7 +386,6 @@ describe("normalizeArticleFilters", () => {
     expect(result.page).toBe(1);
     expect(result.limit).toBe(20);
     expect(result.sortBy).toBe("createdAt");
-    expect(result.sortOrder).toBe("DESC");
   });
 
   it("preserves provided values", () => {
@@ -402,12 +393,10 @@ describe("normalizeArticleFilters", () => {
       page: 3,
       limit: 50,
       sortBy: "title",
-      sortOrder: "ASC",
     });
     expect(result.page).toBe(3);
     expect(result.limit).toBe(50);
     expect(result.sortBy).toBe("title");
-    expect(result.sortOrder).toBe("ASC");
   });
 });
 

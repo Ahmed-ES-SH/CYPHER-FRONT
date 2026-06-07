@@ -6,11 +6,9 @@ export {
   useMarkContactAsReplied,
   useDeleteContact,
   useContactAdmin,
-} from "./contact.hooks";
+} from "./hooks/contact.hooks";
 
-export {
-  useContactSelectionStore,
-} from "./contact.store";
+export { useContactSelectionStore } from "./store/contact.store";
 
 export type {
   CreateContactMessageDto,
@@ -21,11 +19,10 @@ export type {
   ContactSortField,
   ContactOrder,
   ContactQueryParams,
-  ContactApiError,
   ValidationErrorMap,
-} from "./contact.types";
+} from "./types/contact.types";
 
-export type { ContactSelectionState } from "./contact.store";
+export type { ContactSelectionState } from "./store/contact.store";
 
 export {
   CONTACT_LIMITS,
@@ -41,7 +38,10 @@ export {
   normalizeSortField,
   normalizeOrder,
   buildContactQueryParams,
+  normalizeContactParams,
   toContactMessage,
+  browserTransportRequest,
+  createBrowserTransport,
   submitContactMessageApi,
   getContactMessagesApi,
   getContactMessageByIdApi,
@@ -51,4 +51,6 @@ export {
   invalidateContactLists,
   invalidateContactDetail,
   removeContactDetail,
-} from "./contact.api";
+} from "./api/contact.api";
+
+export { ContactApiError } from "./types/contact.types";

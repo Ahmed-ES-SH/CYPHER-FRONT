@@ -1,4 +1,4 @@
-const AUTH_COOKIE_NAME = "cypher_auth_token";
+const AUTH_COOKIE_NAME = process.env.NEXT_PUBLIC_AUTH_TOKEN ?? "cypher_auth_token";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 

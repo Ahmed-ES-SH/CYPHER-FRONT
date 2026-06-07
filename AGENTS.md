@@ -287,6 +287,66 @@ Do not place feature business logic globally.
 - Avoid duplicated logic.
 - Keep architecture simple and scalable.
 
+
+## How to Implement the Screen Designs in the Project
+
+Each screen includes:
+
+- 2 PNG design files showing the complete UI and responsive behavior.
+- 1 HTML reference file built with Tailwind CSS.
+
+### Implementation Guidelines
+
+1. **Use the design files as the primary source of truth**
+   - Match layout, spacing, typography, colors, states, and responsiveness as closely as possible.
+   - Use the HTML file only as a structural reference, not as a final production implementation.
+
+2. **Follow a component-based architecture**
+   - Break large pages into reusable components.
+   - Examples:
+     - FormSection
+     - PageHeader
+     - InputField
+     - SelectField
+     - TagInput
+     - ImageUploader
+     - ActionBar
+     - RichTextEditor
+   - Avoid placing the entire page inside a single large component or file.
+
+3. **Keep UI and business logic separated**
+   - UI components should only be responsible for rendering and user interactions.
+   - API calls, data fetching, validation logic, state management, and business rules should be placed in dedicated services, hooks, stores, controllers, or composables based on the project architecture.
+   - Components should receive data through props and emit events instead of containing application logic whenever possible.
+
+4. **Write clean and maintainable code**
+   - Use meaningful component, variable, and function names.
+   - Remove duplicated code by extracting reusable components.
+   - Keep files focused on a single responsibility.
+   - Follow the existing project structure and coding conventions.
+
+5. **Preserve responsiveness**
+   - Ensure the final implementation behaves correctly across desktop, tablet, and mobile breakpoints.
+   - Maintain the responsive layouts shown in the provided designs.
+
+6. **Use Tailwind CSS consistently**
+   - Reuse existing design tokens, utility classes, and shared styles whenever possible.
+   - Avoid unnecessary custom CSS when Tailwind utilities can achieve the same result.
+
+7. **Support all UI states**
+   - Implement loading, empty, success, error, disabled, hover, focus, and validation states where applicable.
+   - Ensure forms provide clear feedback to users.
+
+8. **Prioritize reusability and scalability**
+   - Build components that can be reused across multiple pages.
+   - Design the implementation so future fields, sections, and screens can be added with minimal refactoring.
+
+### Expected Result
+
+The final implementation should accurately reflect the provided designs while following clean architecture principles, component-based development, separation of concerns, responsive design best practices, and maintainable production-quality code standards. 
+
+
+
 ## Conventions and assumptions for agents
 
 - App Router is in use: prefer editing route folders under `app/` over legacy `pages/`.
@@ -343,3 +403,11 @@ If unsure about dataflows, payments, or secrets, add a comment in the PR and tag
 
 --
 This `AGENTS.md` is intentionally concise. For deeper work, request permission to run build/lint locally and include test instructions.
+
+## Design Context
+
+This project uses the [impeccable design skill](.agents/skills/impeccable/). Key references:
+- **PRODUCT.md** — register, users, brand personality, design principles
+- **DESIGN.md** — visual system: colors, typography, components, elevation
+- **Product register**: design serves the product (app UI) — see `reference/product.md`
+- **Live mode**: configured at `.impeccable/live/config.json` for in-browser design iteration

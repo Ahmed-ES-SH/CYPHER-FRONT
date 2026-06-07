@@ -11,6 +11,7 @@ import {
 } from "../auth.hooks";
 import { useAuthStore } from "../auth.store";
 import * as api from "../auth.api";
+import * as service from "../auth.service";
 import type {
   AuthUser,
   LoginRequest,
@@ -97,7 +98,7 @@ describe("useLogin", () => {
   };
 
   it("calls handleLogin and succeeds", async () => {
-    const spy = vi.spyOn(api, "handleLogin").mockResolvedValue(mockUser);
+    const spy = vi.spyOn(service, "handleLogin").mockResolvedValue(mockUser);
 
     const { result } = renderHook(() => useLogin(), {
       wrapper: createWrapper(),
@@ -110,7 +111,7 @@ describe("useLogin", () => {
   });
 
   it("surfaces error when login fails", async () => {
-    vi.spyOn(api, "handleLogin").mockRejectedValue(
+    vi.spyOn(service, "handleLogin").mockRejectedValue(
       new Error("Invalid credentials"),
     );
 
@@ -118,7 +119,7 @@ describe("useLogin", () => {
       wrapper: createWrapper(),
     });
 
-    result.current.login(loginDto);
+    result.current.login(loginDto).catch(() => {});
 
     await waitFor(() => expect(result.current.error).toBeDefined());
     expect(result.current.isSuccess).toBe(false);
@@ -131,7 +132,7 @@ describe("useLogin", () => {
 
 describe("useLogout", () => {
   it("calls handleLogout on success", async () => {
-    const spy = vi.spyOn(api, "handleLogout").mockResolvedValue(undefined);
+    const spy = vi.spyOn(service, "handleLogout").mockResolvedValue(undefined);
 
     const { result } = renderHook(() => useLogout(), {
       wrapper: createWrapper(),
@@ -143,7 +144,7 @@ describe("useLogout", () => {
   });
 
   it("surfaces error when logout fails", async () => {
-    vi.spyOn(api, "handleLogout").mockRejectedValue(
+    vi.spyOn(service, "handleLogout").mockRejectedValue(
       new Error("Logout failed"),
     );
 
@@ -151,7 +152,7 @@ describe("useLogout", () => {
       wrapper: createWrapper(),
     });
 
-    result.current.logout();
+    result.current.logout().catch(() => {});
 
     await waitFor(() => expect(result.current.error).toBeDefined());
     expect(result.current.error?.message).toBe("Logout failed");
@@ -298,18 +299,22 @@ describe("useResetPassword", () => {
    ========================================================= */
 
 describe("useSession", () => {
-  it("calls initializeSession on mount", () => {
-    const spy = vi.spyOn(api, "initializeSession").mockResolvedValue(undefined);
+  it("initializes auth state on mount", async () => {
+    vi.spyOn(service, "initializeSession").mockImplementation(async () => {
+      useAuthStore.getState().setUser(mockUser);
+      useAuthStore.getState().setInitialized();
+    });
 
-    renderHook(() => useSession(), {
+    const { result } = renderHook(() => useSession(), {
       wrapper: createWrapper(),
     });
 
-    expect(spy).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(result.current.isReady).toBe(true));
+    expect(result.current.user).toEqual(mockUser);
   });
 
   it("returns auth state after successful session check", async () => {
-    vi.spyOn(api, "initializeSession").mockImplementation(async () => {
+    vi.spyOn(service, "initializeSession").mockImplementation(async () => {
       useAuthStore.getState().setUser(mockUser);
       useAuthStore.getState().setInitialized();
     });
@@ -324,8 +329,8 @@ describe("useSession", () => {
   });
 
   it("returns unauthenticated state when session check fails", async () => {
-    vi.spyOn(api, "initializeSession").mockImplementation(async () => {
-      useAuthStore.getState().reset();
+    vi.spyOn(service, "initializeSession").mockImplementation(async () => {
+      useAuthStore.getState().clearUser();
       useAuthStore.getState().setInitialized();
     });
 

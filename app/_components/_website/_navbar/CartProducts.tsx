@@ -1,6 +1,6 @@
 "use client";
 
-import { useGuestCart } from "@/src/modules/cart";
+import { useUnifiedCart } from "@/src/modules/cart";
 import { useRef, useState } from "react";
 import { BsMinecart } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,15 +8,22 @@ import { useRouter } from "next/navigation";
 import Img from "../../_global/Img";
 import { FaTimes } from "react-icons/fa";
 import { TbShoppingCartX } from "react-icons/tb";
-import { handleCheckout, type CheckoutPayload } from "@/app/helpers/handleCheckout";
 import { toast } from "sonner";
+import { useCheckout } from "../_cart/useCheckout";
 
 export default function CartProducts() {
-  const { items, removeItem } = useGuestCart();
+  const { items, removeItem, clearItems } = useUnifiedCart();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [showMiniCart, setShowMiniCart] = useState(false);
   const router = useRouter();
+
+  const { isCheckingOut, checkout } = useCheckout({
+    items,
+    shippingMethod: "free_shipping",
+    currency: "usd",
+    onBeforeRedirect: () => clearItems(),
+  });
 
   const handleMouseEnter = () => {
     // Clear any existing closing or opening timeouts
@@ -45,7 +52,7 @@ export default function CartProducts() {
   };
 
   const totalPrice = items.reduce((acc, item) => {
-    return acc + item.unitPrice.amount * item.quantity;
+    return acc + (item.unitPrice.amount / 100) * item.quantity;
   }, 0);
 
   return (
@@ -119,11 +126,11 @@ export default function CartProducts() {
                     <div className="flex-1">
                       <p className="text-sm font-medium ">{item.productName}</p>
                       <p className="text-xs text-gray-500">
-                        {item.quantity} × ${item.unitPrice.amount}
+                        {item.quantity} × ${(item.unitPrice.amount / 100).toFixed(2)}
                       </p>
                     </div>
                     <p className="text-sm mt-2 font-semibold text-gray-800">
-                      ${(item.unitPrice.amount * item.quantity).toFixed(2)}
+                      ${((item.unitPrice.amount / 100) * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 ))}
@@ -146,18 +153,11 @@ export default function CartProducts() {
                   View Cart
                 </button>
                 <button
-                  onClick={() => handleCheckout({
-    lineItems: items.map(item => ({
-      name: item.productName,
-      price: item.unitPrice.amount,
-      quantity: item.quantity,
-    })),
-    shippingMethod: "free_shipping",
-    currency: "usd",
-  } as CheckoutPayload)}
-                  className="flex-1 w-full py-2 text-sm font-medium bg-primary hover:bg-primary/70 text-white rounded-lg transition"
+                  onClick={checkout}
+                  disabled={isCheckingOut}
+                  className="flex-1 w-full py-2 text-sm font-medium bg-primary hover:bg-primary/70 text-white rounded-lg transition disabled:opacity-60"
                 >
-                  Checkout
+                  {isCheckingOut ? "Processing..." : "Checkout"}
                 </button>
               </div>
             </div>

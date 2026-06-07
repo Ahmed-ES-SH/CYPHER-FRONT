@@ -33,6 +33,8 @@ export type {
   ValidationErrorMap,
 } from "./categories.types";
 
+export { CategoryApiError } from "./categories.types";
+
 export type { CategoriesSelectionState } from "./categories.store";
 
 export {

@@ -27,7 +27,6 @@ describe("initial state", () => {
     expect(loading.session).toBe(false);
     expect(loading.login).toBe(false);
     expect(loading.logout).toBe(false);
-    expect(loading.resetPassword).toBe(false);
   });
 });
 
@@ -88,7 +87,6 @@ describe("setLoading", () => {
 
     expect(useAuthStore.getState().isLoading.session).toBe(false);
     expect(useAuthStore.getState().isLoading.logout).toBe(false);
-    expect(useAuthStore.getState().isLoading.resetPassword).toBe(false);
   });
 
   it("sets each loading key independently", () => {
@@ -147,3 +145,27 @@ describe("reset", () => {
     expect(useAuthStore.getState().isLoading.login).toBe(false);
   });
 });
+
+/* =========================================================
+   clearUser
+   ========================================================= */
+
+describe("clearUser", () => {
+  it("clears user and sets authenticated to false, but keeps initialized status", () => {
+    useAuthStore.getState().setUser({
+      id: 1,
+      name: "John",
+      email: "john@test.com",
+      avatar: "/avatar.png",
+      role: "user",
+    });
+    useAuthStore.getState().setInitialized();
+
+    useAuthStore.getState().clearUser();
+
+    expect(useAuthStore.getState().user).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().isInitialized).toBe(true);
+  });
+});
+

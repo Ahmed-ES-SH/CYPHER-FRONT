@@ -9,7 +9,6 @@ import {
   updateUserApi,
   deleteUserApi,
 } from "../api/user.api";
-import { verifyEmailApi } from "@/src/modules/auth";
 import { userKeys } from "../constants/user.constants";
 import type {
   User,
@@ -18,6 +17,7 @@ import type {
   CreateUserDto,
   UpdateUserDto,
 } from "../types/user.types";
+import { verifyEmailApi } from "../../auth/auth.api";
 
 export function useRegister() {
   return useMutation({
@@ -66,6 +66,7 @@ export function useUpdateUser(id: number | undefined) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: userKeys.stats() });
       if (id !== undefined) {
         queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
       }

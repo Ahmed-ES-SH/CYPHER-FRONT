@@ -1,6 +1,6 @@
 "use client";
 
-import { useGuestCart } from "@/src/modules/cart";
+import { useUnifiedCart } from "@/src/modules/cart";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiCheck, FiMinus, FiPlus, FiX, FiShoppingBag, FiClock } from "react-icons/fi";
 import Img from "../../_global/Img";
@@ -9,7 +9,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 export default function CartItems() {
-  const { items, updateQuantity, removeItem, clearItems } = useGuestCart();
+  const { items, updateQuantity, removeItem, clearItems, isLoading, error } = useUnifiedCart();
 
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
@@ -28,6 +28,42 @@ export default function CartItems() {
     clearItems();
     toast.success("Cart cleared");
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--surface)]">
+            <svg className="h-10 w-10 animate-spin text-[var(--text-muted)]" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          </div>
+          <h2 className="mb-2 text-xl font-semibold text-[var(--text-primary)]">
+            Loading your cart...
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
+            <FiX className="h-10 w-10 text-red-400" />
+          </div>
+          <h2 className="mb-2 text-xl font-semibold text-[var(--text-primary)]">
+            Failed to load cart
+          </h2>
+          <p className="mb-8 text-[var(--text-muted)]">
+            {error?.message || "Something went wrong. Please try again."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -76,7 +112,7 @@ export default function CartItems() {
         <AnimatePresence>
           <div className="max-h-[50vh] overflow-y-auto">
             {items.map((item, index) => {
-              const itemSubtotal = item.unitPrice.amount * item.quantity;
+              const itemSubtotal = (item.unitPrice.amount / 100) * item.quantity;
               const isLowStock = item.stock <= 5;
               const isAtMax = item.quantity >= item.maximumQuantity;
               const isAtStock = item.quantity >= item.stock;
@@ -112,14 +148,14 @@ export default function CartItems() {
                         </p>
                       )}
                       <p className="mt-0.5 text-sm text-[var(--text-muted)] sm:hidden">
-                        ${item.unitPrice.amount.toFixed(2)}
+                        ${(item.unitPrice.amount / 100).toFixed(2)}
                       </p>
                     </div>
                   </div>
 
                   {/* Price */}
                   <div className="col-span-2 flex items-center justify-center text-sm text-[var(--text-muted)] max-sm:col-span-3">
-                    ${item.unitPrice.amount.toFixed(2)}
+                    ${(item.unitPrice.amount / 100).toFixed(2)}
                   </div>
 
                   {/* Quantity Controls */}

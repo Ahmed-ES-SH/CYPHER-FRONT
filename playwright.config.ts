@@ -24,6 +24,13 @@ export default defineConfig({
       name: "auth",
       testMatch: "**/e2e/auth/**/*.spec.ts",
     },
+    {
+      name: "cart",
+      testMatch: "**/e2e/cart/**/*.spec.ts",
+      use: {
+        storageState: undefined,
+      },
+    },
   ],
 
   webServer: {

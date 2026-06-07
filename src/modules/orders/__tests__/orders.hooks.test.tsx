@@ -12,10 +12,10 @@ import {
   useUpdateOrderStatus,
   useOrderStats,
   useUserOrdersAdmin,
-} from "../orders.hooks";
-import * as api from "../orders.api";
-import type { Order, OrderListResponse, OrderStats } from "../orders.types";
-import { OrderStatus, PaymentStatus } from "../orders.types";
+} from "../hooks/useOrders.hook";
+import * as api from "../api/orders.api";
+import type { Order, OrderListResponse, OrderStats } from "../contracts/order.types";
+import { OrderStatus, PaymentStatus } from "../contracts/order-status";
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -303,7 +303,7 @@ describe("useOrderStats", () => {
 
 describe("useUserOrdersAdmin", () => {
   it("returns orders, meta, and loading state", async () => {
-    vi.spyOn(api, "getUserOrdersApi").mockResolvedValue(mockListResponse);
+    vi.spyOn(api, "getAdminOrdersApi").mockResolvedValue(mockListResponse);
 
     const { result } = renderHook(() => useUserOrdersAdmin(), {
       wrapper: createWrapper(),
@@ -316,7 +316,7 @@ describe("useUserOrdersAdmin", () => {
   });
 
   it("returns empty orders array when no data", async () => {
-    vi.spyOn(api, "getUserOrdersApi").mockResolvedValue({
+    vi.spyOn(api, "getAdminOrdersApi").mockResolvedValue({
       data: [],
       meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
     });

@@ -30,9 +30,15 @@ export const usePaymentFilterStore = create<PaymentFilterState>()(
     setSelectedPaymentId: (id) => set({ selectedPaymentId: id }),
 
     setFilter: (key, value) =>
-      set((state) => ({
-        filters: { ...state.filters, [key]: value },
-      })),
+      set((state) => {
+        const nextFilters = { ...state.filters };
+        if (value === undefined || value === null || value === "") {
+          delete nextFilters[key];
+        } else {
+          (nextFilters as Record<string, unknown>)[key] = value;
+        }
+        return { filters: nextFilters };
+      }),
 
     resetFilters: () => set({ filters: { ...defaultFilters } }),
 

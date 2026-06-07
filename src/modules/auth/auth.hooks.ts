@@ -2,26 +2,29 @@
 
 import { useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useShallow } from "zustand/react/shallow";
 import { useAuthStore } from "./auth.store";
+import {
+  sendResetPasswordApi,
+  verifyResetTokenApi,
+  resetPasswordApi,
+} from "./auth.api";
 import {
   handleLogin,
   handleLogout,
   initializeSession,
-  sendResetPasswordApi,
-  verifyResetTokenApi,
-  resetPasswordApi,
-  authKeys,
-} from "./auth.api";
+} from "./auth.service";
+import { authKeys } from "./constants";
 
 /* ======================
    useAuth
-====================== */
+   ====================== */
 
 export function useAuth() {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isInitialized = useAuthStore((s) => s.isInitialized);
-  const isLoading = useAuthStore((s) => s.isLoading);
+  const isLoading = useAuthStore(useShallow((s) => s.isLoading));
 
   return {
     user,
@@ -34,25 +37,24 @@ export function useAuth() {
 
 /* ======================
    useSession
-====================== */
+   ====================== */
 
 export function useSession() {
   const { isInitialized } = useAuth();
 
   useEffect(() => {
     initializeSession();
-  }, [isInitialized]);
+  }, []);
 
   return useAuth();
 }
 
 /* ======================
    useLogin
-====================== */
+   ====================== */
 
 export function useLogin() {
   const queryClient = useQueryClient();
-  const loginLoading = useAuthStore((s) => s.isLoading.login);
 
   const mutation = useMutation({
     mutationFn: handleLogin,
@@ -63,7 +65,7 @@ export function useLogin() {
 
   return {
     login: mutation.mutateAsync,
-    isLoading: loginLoading,
+    isLoading: mutation.isPending,
     error: mutation.error,
     isSuccess: mutation.isSuccess,
   };
@@ -71,11 +73,10 @@ export function useLogin() {
 
 /* ======================
    useLogout
-====================== */
+   ====================== */
 
 export function useLogout() {
   const queryClient = useQueryClient();
-  const logoutLoading = useAuthStore((s) => s.isLoading.logout);
 
   const mutation = useMutation({
     mutationFn: handleLogout,
@@ -86,40 +87,35 @@ export function useLogout() {
 
   return {
     logout: mutation.mutateAsync,
-    isLoading: logoutLoading,
+    isLoading: mutation.isPending,
     error: mutation.error,
   };
 }
 
 /* ======================
    useResetPassword
-====================== */
+   ====================== */
 
 export function useResetPassword() {
-  const resetPasswordLoading = useAuthStore((s) => s.isLoading.resetPassword);
-
   const sendMutation = useMutation({
     mutationFn: sendResetPasswordApi,
-    onMutate: () => useAuthStore.getState().setLoading("resetPassword", true),
-    onSettled: () => useAuthStore.getState().setLoading("resetPassword", false),
   });
 
   const verifyMutation = useMutation({
     mutationFn: verifyResetTokenApi,
-    onMutate: () => useAuthStore.getState().setLoading("resetPassword", true),
-    onSettled: () => useAuthStore.getState().setLoading("resetPassword", false),
   });
 
   const resetMutation = useMutation({
     mutationFn: resetPasswordApi,
-    onMutate: () => useAuthStore.getState().setLoading("resetPassword", true),
-    onSettled: () => useAuthStore.getState().setLoading("resetPassword", false),
   });
 
   return {
     send: sendMutation,
     verify: verifyMutation,
     reset: resetMutation,
-    isLoading: resetPasswordLoading,
+    isSending: sendMutation.isPending,
+    isVerifying: verifyMutation.isPending,
+    isResetting: resetMutation.isPending,
+    isLoading: sendMutation.isPending || verifyMutation.isPending || resetMutation.isPending,
   };
 }

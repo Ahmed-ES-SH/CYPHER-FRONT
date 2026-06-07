@@ -1,0 +1,34 @@
+{
+  "name": "@cypher/cart",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Logic-only portable cart module for Next.js projects",
+  "main": "index.ts",
+  "types": "index.ts",
+  "files": [
+    "*.ts",
+    "*.tsx",
+    "adapters/",
+    "__tests__/"
+  ],
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5.0.0",
+    "next": ">=14.0.0",
+    "react": ">=18.0.0",
+    "zustand": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": false
+    },
+    "react": {
+      "optional": false
+    },
+    "@tanstack/react-query": {
+      "optional": false
+    },
+    "zustand": {
+      "optional": false
+    }
+  }
+}

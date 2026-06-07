@@ -15,12 +15,20 @@ export function useUpdateProduct() {
     { id: string; dto: UpdateProductDto }
   >({
     mutationFn: ({ id, dto }) => updateProductApi(id, dto),
-    onSuccess: (_data, { id }) => {
+    onSuccess: (data, { id }) => {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
       queryClient.invalidateQueries({ queryKey: productKeys.adminLists() });
       queryClient.invalidateQueries({
         queryKey: productKeys.adminDetail(id),
       });
+      queryClient.invalidateQueries({
+        queryKey: productKeys.details(),
+      });
+      if (data?.slug) {
+        queryClient.invalidateQueries({
+          queryKey: productKeys.detail(data.slug),
+        });
+      }
     },
   });
 }

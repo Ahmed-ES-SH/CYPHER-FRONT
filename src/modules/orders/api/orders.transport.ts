@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { globalRequest } from "@/app/helpers/globalRequest";
+import { OrderError } from "../utils/error";
 
 export interface Transport {
   get<T = any>(endpoint: string): Promise<T>;
@@ -15,7 +16,10 @@ async function transportRequest<TResult = any>(
 ): Promise<TResult> {
   const res = await globalRequest({ endpoint, method, body });
   if (!res.success) {
-    throw { message: res.message, status: res.statusCode ?? 500 };
+    throw new OrderError(
+      res.message ?? "API Request Failed",
+      res.statusCode ?? 500,
+    );
   }
   return res.data as TResult;
 }

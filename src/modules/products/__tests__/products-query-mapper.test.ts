@@ -115,8 +115,8 @@ describe("serializeProductQuery", () => {
     expect(result.sortOrder).toBe("asc");
   });
 
-  it("serializes inStock", () => {
-    const result = serializeProductQuery({ inStock: true });
+  it("serializes inStockOnly", () => {
+    const result = serializeProductQuery({ inStockOnly: true });
     expect(result.inStock).toBe("true");
   });
 

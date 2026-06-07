@@ -21,7 +21,7 @@ export async function prefetchProductsByCategory(
   query?: ProductQuery,
 ) {
   return queryClient.prefetchQuery({
-    queryKey: productKeys.list({ ...query, categorySlug }),
+    queryKey: [...productKeys.lists(), "category", categorySlug, query ?? {}] as const,
     queryFn: () => getProductsByCategoryApi(categorySlug, query),
     staleTime: PRODUCTS_DEFAULTS.STALE_TIME,
   });

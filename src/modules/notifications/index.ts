@@ -55,6 +55,7 @@ export {
   configurePusher,
   isPusherConfigured,
   getPusherClient,
+  getRawPusherInstance,
   resetPusherClient,
 } from "./notifications.client";
 
@@ -122,10 +123,13 @@ export {
   adminSendNotificationApi,
   sendBroadcastApi,
   adminDeleteNotificationApi,
+} from "./notifications.api";
+
+export {
   invalidateNotificationLists,
   invalidateUnreadCount,
   invalidatePreferences,
-} from "./notifications.api";
+} from "./notifications.cache";
 
 export { pusherAuthHandler } from "./pusher-auth.handler";
 

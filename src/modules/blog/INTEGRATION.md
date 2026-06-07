@@ -25,7 +25,7 @@ src/modules/blog/
 
 | Requirement | Notes |
 |---|---|
-| React 18+ / React 19 | Tested with React 19 |
+| Nextjs |
 | `@tanstack/react-query` v5+ | Needed for all hooks |
 | `zustand` v4+ | Only needed if using `useBlogUIStore` |
 | `QueryClientProvider` | Wrap your app root with it |

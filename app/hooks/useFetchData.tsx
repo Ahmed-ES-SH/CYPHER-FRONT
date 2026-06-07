@@ -21,7 +21,9 @@ export function useFetchData<T = any>(url: string): FetchResult<T> {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get<T>(`https://dummyjson.com${url}`);
+        const response = await axios.get<T>(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}${url}`,
+        );
 
         if (!isMounted) return;
 

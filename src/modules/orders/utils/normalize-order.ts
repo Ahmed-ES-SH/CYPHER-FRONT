@@ -2,9 +2,15 @@
 import type { Order, OrderItem, ShippingAddress, Money } from "../contracts/order.types";
 
 export function toMoney(raw: any, defaultCurrency = "usd"): Money {
+  if (raw === null || raw === undefined) {
+    return { amount: 0, currency: defaultCurrency };
+  }
+  if (typeof raw === "number") {
+    return { amount: raw, currency: defaultCurrency };
+  }
   return {
-    amount: raw?.amount ?? raw ?? 0,
-    currency: raw?.currency ?? defaultCurrency,
+    amount: raw.amount ?? raw ?? 0,
+    currency: raw.currency ?? defaultCurrency,
   };
 }
 
@@ -15,9 +21,9 @@ export function toOrderItem(raw: any): OrderItem {
     productName: raw.productName ?? raw.product_name ?? "",
     productSlug: raw.productSlug ?? raw.product_slug ?? "",
     productImage: raw.productImage ?? raw.product_image ?? "",
-    unitPrice: toMoney(raw.unitPrice ?? raw.unit_price, raw.currency),
+    unitPrice: toMoney(raw.unitPrice ?? raw.unit_price ?? raw.price, raw.currency),
     quantity: raw.quantity ?? 1,
-    subtotal: toMoney(raw.subtotal ?? raw.subtotal, raw.currency),
+    subtotal: toMoney(raw.subtotal, raw.currency),
   };
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { paymentKeys } from "../constants/payments.keys";
 import type { PaymentRealtimeEvent, RealtimeEventCallback } from "../types/payments.types";
@@ -16,12 +16,16 @@ export interface PaymentRealtimeAdapter {
   isAvailable(): boolean;
 }
 
-/* ─── Optional Adapter Holder ─── */
+/* ─── Reactive Adapter Holder ─── */
+
+type Listener = (adapter: PaymentRealtimeAdapter | null) => void;
 
 let activeAdapter: PaymentRealtimeAdapter | null = null;
+let listeners: Set<Listener> = new Set();
 
 export function setPaymentRealtimeAdapter(adapter: PaymentRealtimeAdapter): void {
   activeAdapter = adapter;
+  listeners.forEach((fn) => { try { fn(adapter); } catch { /* noop */ } });
 }
 
 export function getPaymentRealtimeAdapter(): PaymentRealtimeAdapter | null {
@@ -30,6 +34,12 @@ export function getPaymentRealtimeAdapter(): PaymentRealtimeAdapter | null {
 
 export function clearPaymentRealtimeAdapter(): void {
   activeAdapter = null;
+  listeners.forEach((fn) => { try { fn(null); } catch { /* noop */ } });
+}
+
+function onAdapterChange(fn: Listener): () => void {
+  listeners.add(fn);
+  return () => { listeners.delete(fn); };
 }
 
 /* ─── Hook ─── */
@@ -41,10 +51,15 @@ export function usePaymentRealtime(
   const queryClient = useQueryClient();
   const callbackRef = useRef<RealtimeEventCallback | undefined>(onEvent);
   callbackRef.current = onEvent;
+  const [adapter, setAdapter] = useState<PaymentRealtimeAdapter | null>(() => activeAdapter);
+
+  useEffect(() => {
+    const unsub = onAdapterChange(setAdapter);
+    return unsub;
+  }, []);
 
   const handleEvent = useCallback(
     (event: PaymentRealtimeEvent) => {
-      // Invalidate relevant queries so the UI re-renders
       queryClient.invalidateQueries({
         queryKey: paymentKeys.detail(event.paymentId, userId),
       });
@@ -53,8 +68,9 @@ export function usePaymentRealtime(
           queryKey: paymentKeys.checkoutSession(event.orderId, userId),
         });
       }
-
-      // Call host-supplied callback
+      queryClient.invalidateQueries({
+        queryKey: paymentKeys.lists(userId),
+      });
       callbackRef.current?.(event);
     },
     [queryClient, userId],
@@ -62,15 +78,15 @@ export function usePaymentRealtime(
 
   useEffect(() => {
     if (!userId) return;
-    if (!activeAdapter || !activeAdapter.isAvailable()) return;
+    if (!adapter || !adapter.isAvailable()) return;
 
-    const unsubscribe = activeAdapter.subscribe(userId, handleEvent);
+    const unsubscribe = adapter.subscribe(userId, handleEvent);
     return () => {
       unsubscribe();
     };
-  }, [userId, handleEvent]);
+  }, [userId, handleEvent, adapter]);
 
   return {
-    isAvailable: activeAdapter?.isAvailable() ?? false,
+    isAvailable: adapter?.isAvailable() ?? false,
   };
 }

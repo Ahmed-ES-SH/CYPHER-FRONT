@@ -7,24 +7,29 @@ import { FaTimes } from "react-icons/fa";
 import Img from "../../_global/Img";
 import { LuHeartCrack } from "react-icons/lu";
 import { useGuestCart } from "@/src/modules/cart";
-import { productToGuestCartItem } from "@/src/modules/cart/adapters/cart-helpers";
+import { productToGuestCartItem, isProductInCart } from "@/src/modules/cart/adapters/cart-helpers";
+import { productTypeAdapter } from "@/src/modules/cart/adapters/product-type.adapter";
 import { ProductType } from "@/app/types/productType";
 import { toast } from "sonner";
 
 export default function WishListProducts() {
   const { wishlistItems, removeFromWishlist, clearWishlist } =
     useWishlistStore();
-  const { addItem } = useGuestCart();
+  const { items, addItem } = useGuestCart();
 
   const [showWishList, setShowWishList] = useState(false);
 
   const WrapperAddToCart = (product: ProductType) => {
     const isInWishList = wishlistItems.some((item) => item.id === product.id);
-    if (isInWishList) {
+    if (!isInWishList) return;
+    if (isProductInCart(items, product, productTypeAdapter)) {
       removeFromWishlist(product.id);
-      addItem(productToGuestCartItem(product));
-      toast.success("Added to cart!");
+      toast.info("Already in cart");
+      return;
     }
+    removeFromWishlist(product.id);
+    addItem(productToGuestCartItem(product, productTypeAdapter));
+    toast.success("Added to cart!");
   };
   return (
     <>

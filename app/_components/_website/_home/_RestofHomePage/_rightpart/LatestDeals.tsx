@@ -10,7 +10,7 @@ export default function LatestDeals() {
   return (
     <div className="py-3 my-4 px-2 rounded-md">
       <MainHead title={"Latest Deals"} />
-      <div className="latest flex max-lg:flex-col items-center gap-3 w-full justify-between">
+      <div className="latest flex max-lg:flex-col items-stretch gap-3 w-full justify-between">
         {LatestDealsContent.map((deal, index) => {
           const soldPercent = deal.available && deal.Solid
             ? Math.round((deal.Solid / (deal.available + deal.Solid)) * 100)
@@ -22,7 +22,7 @@ export default function LatestDeals() {
               className="flex-1 group cursor-pointer max-lg:w-full border border-border-subtle rounded-md p-3 flex items-center gap-3 hover:shadow-md transition-shadow duration-200 bg-surface-elevated"
             >
               <Img
-                className={`rounded-md ${index === 0 ? "w-[120px]" : "w-[150px]"}`}
+                className="rounded-md w-[130px]"
                 src={deal.img || "/images/placeholder.webp"}
                 alt={deal.title}
               />

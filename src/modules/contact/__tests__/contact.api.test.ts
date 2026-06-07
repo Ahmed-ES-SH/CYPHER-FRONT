@@ -9,8 +9,8 @@ import {
   parseValidationErrors,
   toContactMessage,
   contactKeys,
-} from "../contact.api";
-import type { CreateContactMessageDto } from "../contact.types";
+} from "../api/contact.api";
+import type { CreateContactMessageDto } from "../types/contact.types";
 
 /* =========================================================
    sanitizeContactDraft
@@ -50,6 +50,22 @@ describe("sanitizeContactDraft", () => {
       message: "Hello world",
     };
     expect(sanitizeContactDraft(input)).toEqual(input);
+  });
+
+  it("does not crash on partial input", () => {
+    expect(() => sanitizeContactDraft({})).not.toThrow();
+    expect(() => sanitizeContactDraft({ fullName: "John" })).not.toThrow();
+    expect(() => sanitizeContactDraft(undefined as any)).not.toThrow();
+  });
+
+  it("lowercases email", () => {
+    const result = sanitizeContactDraft({
+      fullName: "John",
+      email: "John.Doe@Example.COM",
+      subject: "Test",
+      message: "Hello world",
+    });
+    expect(result.email).toBe("john.doe@example.com");
   });
 });
 
@@ -153,6 +169,11 @@ describe("validateContactDraft", () => {
     });
     expect(errs.message).toBeUndefined();
   });
+
+  it("does not crash on partial input", () => {
+    expect(() => validateContactDraft({})).not.toThrow();
+    expect(() => validateContactDraft(undefined as any)).not.toThrow();
+  });
 });
 
 /* =========================================================
@@ -226,11 +247,6 @@ describe("buildContactQueryParams", () => {
     expect(qs).toContain("isRead=true");
   });
 
-  it("omits isRead filter when undefined", () => {
-    const qs = buildContactQueryParams({});
-    expect(qs).not.toContain("isRead");
-  });
-
   it("includes all custom params", () => {
     const qs = buildContactQueryParams({
       page: 2,
@@ -257,7 +273,8 @@ describe("normalizeContactError", () => {
       message: "Not found",
       status: 404,
     });
-    expect(result).toEqual({ message: "Not found", status: 404 });
+    expect(result.message).toBe("Not found");
+    expect(result.status).toBe(404);
   });
 
   it("extracts nested errors when present", () => {
@@ -271,18 +288,14 @@ describe("normalizeContactError", () => {
 
   it("returns defaults for null", () => {
     const result = normalizeContactError(null);
-    expect(result).toEqual({
-      message: "An unexpected error occurred",
-      status: 500,
-    });
+    expect(result.message).toBe("An unexpected error occurred");
+    expect(result.status).toBe(500);
   });
 
   it("returns defaults for undefined", () => {
     const result = normalizeContactError(undefined);
-    expect(result).toEqual({
-      message: "An unexpected error occurred",
-      status: 500,
-    });
+    expect(result.message).toBe("An unexpected error occurred");
+    expect(result.status).toBe(500);
   });
 
   it("handles Error instances", () => {

@@ -34,10 +34,12 @@ import {
   sendBroadcastApi,
   adminDeleteNotificationApi,
   notificationKeys,
+} from "./notifications.api";
+import {
   invalidateNotificationLists,
   invalidateUnreadCount,
   invalidatePreferences,
-} from "./notifications.api";
+} from "./notifications.cache";
 import {
   NOTIFICATION_STALE_TIME,
   NOTIFICATION_GC_TIME,
@@ -45,6 +47,7 @@ import {
   POLL_INTERVAL,
 } from "./notifications.config";
 import { getPusherClient, isPusherConfigured } from "./notifications.client";
+import { useEventBus } from "./context/NotificationsProvider";
 
 export function useNotifications(params: NotificationQueryParams = {}) {
   return useQuery<NotificationListResponse>({
@@ -86,6 +89,8 @@ export function useUnreadCount() {
   }, [queryClient]);
 
   useEffect(() => {
+    if (isPusherConfigured()) return;
+
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.unread() });
     }, POLL_INTERVAL);
@@ -101,8 +106,40 @@ export function useMarkAsRead() {
 
   return useMutation<MarkAsReadResponse, Error, MarkAsReadDto>({
     mutationFn: (dto) => markAsReadApi(dto),
-    onSuccess: () => {
-      invalidateNotificationLists(queryClient);
+
+    onMutate: async (dto) => {
+      await queryClient.cancelQueries({ queryKey: notificationKeys.lists() });
+
+      const previous = queryClient.getQueriesData<NotificationListResponse>({
+        queryKey: notificationKeys.lists(),
+      }) as [string[], NotificationListResponse | undefined][];
+
+      if (dto.ids) {
+        queryClient.setQueriesData<NotificationListResponse>(
+          { queryKey: notificationKeys.lists() },
+          (old) => {
+            if (!old) return old;
+            return {
+              ...old,
+              data: old.data.map((n) =>
+                dto.ids!.includes(n.id) ? { ...n, isRead: true, readAt: new Date().toISOString() } : n,
+              ),
+            };
+          },
+        );
+      }
+
+      return { previous };
+    },
+
+    onError: (_err, _dto, context) => {
+      const ctx = context as { previous: [string[], NotificationListResponse | undefined][] } | undefined;
+      if (ctx?.previous) {
+        ctx.previous.forEach(([key, data]) => queryClient.setQueryData(key, data));
+      }
+    },
+
+    onSettled: () => {
       invalidateUnreadCount(queryClient);
     },
   });
@@ -206,6 +243,7 @@ export function useAdminDeleteNotification() {
 
 export function useRealtimeNotifications(enabled = false) {
   const queryClient = useQueryClient();
+  const { subscribe } = useEventBus();
 
   const handleNewNotification = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
@@ -213,19 +251,9 @@ export function useRealtimeNotifications(enabled = false) {
   }, [queryClient]);
 
   useEffect(() => {
-    if (!enabled || !isPusherConfigured()) return;
-
-    const client = getPusherClient();
-    if (!client) return;
-
-    const pusherConfig = getPusherConfigFromEnv();
-    const unsubscribe = client.subscribe(
-      pusherConfig.channel,
-      PusherEvent.NEW_NOTIFICATION,
-      handleNewNotification,
-    );
-    return unsubscribe;
-  }, [enabled, handleNewNotification]);
+    if (!enabled) return;
+    return subscribe(PusherEvent.NEW_NOTIFICATION, handleNewNotification);
+  }, [enabled, subscribe, handleNewNotification]);
 }
 
 export function useNotificationManager(params: NotificationQueryParams = {}) {

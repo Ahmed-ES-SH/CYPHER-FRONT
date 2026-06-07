@@ -2,6 +2,8 @@ import type { Money } from "../contracts/order.types";
 
 const DEFAULT_DECIMALS = 2;
 
+const ZERO_DECIMAL_CURRENCIES = ["jpy", "krw", "vnd", "clp", "byr", "xof"];
+
 export function centsToUnits(cents: number, decimals = DEFAULT_DECIMALS): number {
   return Math.round(cents) / Math.pow(10, decimals);
 }
@@ -27,4 +29,22 @@ export function addMoney(a: Money, b: Money): Money {
 
 export function multiplyMoney(money: Money, multiplier: number): Money {
   return { amount: money.amount * multiplier, currency: money.currency };
+}
+
+export function getCurrencyDivisor(currency: string): number {
+  return ZERO_DECIMAL_CURRENCIES.includes(currency.toLowerCase()) ? 1 : 100;
+}
+
+export function formatMoney(money: Money, locale = "en-US"): string {
+  const divisor = getCurrencyDivisor(money.currency);
+  const units = money.amount / divisor;
+
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: money.currency.toUpperCase(),
+    }).format(units);
+  } catch {
+    return `${money.currency.toUpperCase()} ${units.toFixed(2)}`;
+  }
 }

@@ -1,7 +1,4 @@
-export default async function FetchDummyData(
-  api: string,
-  paginationState: boolean,
-) {
+export default async function FetchData(api: string, paginationState: boolean) {
   try {
     const options = {
       method: "GET",
@@ -10,7 +7,10 @@ export default async function FetchDummyData(
       },
     };
 
-    const response = await fetch(`https://dummyjson.com${api}`, options);
+    const response = await fetch(
+      `{process.env.NEXT_PUBLIC_BACKEND_URL}${api}`,
+      options,
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

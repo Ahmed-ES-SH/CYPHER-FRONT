@@ -11,11 +11,11 @@ export {
   prefetchBlogPost,
   prefetchAdminBlogPosts,
   prefetchAdminBlogPost,
-} from "./blog.hooks";
+} from "./hooks/blog.hooks";
 
 export {
   useBlogUIStore,
-} from "./blog.store";
+} from "./store/blog.store";
 
 export type {
   BlogArticle,
@@ -35,13 +35,15 @@ export type {
   DeleteArticleResult,
   ApiError,
   ValidationErrorMap,
-} from "./blog.types";
+} from "./types/blog.types";
 
-export type { BlogUIState } from "./blog.store";export {
+export type { BlogUIState } from "./store/blog.store";
+
+export {
   configureBlog,
   getBlogConfig,
   resetBlogConfig,
-} from "./blog.config";
+} from "./config/blog.config";
 
 export {
   defaultTransport,
@@ -77,8 +79,8 @@ export {
   invalidateAdminBlogDetail,
   removeBlogDetail,
   removeAdminBlogDetail,
-} from "./blog.api";
+} from "./api/blog.api";
 
-export type { Transport } from "./blog.api";
+export type { Transport } from "./api/blog.api";
 
 export { blogToLegacyArticle, blogToLegacyArticleSummary } from "./adapters/blogToLegacy";

@@ -6,12 +6,14 @@ import { FiUploadCloud, FiX, FiImage } from "react-icons/fi";
 interface AvatarUploaderProps {
   currentAvatar?: string;
   onUpload: (file: File) => Promise<string>;
+  isUploading?: boolean;
 }
 
-export default function AvatarUploader({ currentAvatar, onUpload }: AvatarUploaderProps) {
+export default function AvatarUploader({ currentAvatar, onUpload, isUploading: isUploadingProp }: AvatarUploaderProps) {
   const [preview, setPreview] = useState<string | null>(currentAvatar || null);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const uploading = isUploadingProp || isUploading;
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -69,8 +71,11 @@ export default function AvatarUploader({ currentAvatar, onUpload }: AvatarUpload
           />
           <button
             type="button"
-            onClick={handleRemovePreview}
-            className="absolute -top-1 -right-1 rounded-full bg-red-500 p-1 text-white shadow hover:bg-red-600 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemovePreview();
+            }}
+            className="absolute -top-1 -right-1 z-20 rounded-full bg-red-500 p-1 text-white shadow hover:bg-red-600 transition-colors"
           >
             <FiX className="size-3" />
           </button>
@@ -78,7 +83,7 @@ export default function AvatarUploader({ currentAvatar, onUpload }: AvatarUpload
       ) : (
         <div className="flex flex-col items-center gap-2">
           <div className="rounded-full bg-gray-100 p-4">
-            {isUploading ? (
+            {uploading ? (
               <div className="size-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
             ) : (
               <FiUploadCloud className="size-8 text-gray-400" />
@@ -96,7 +101,7 @@ export default function AvatarUploader({ currentAvatar, onUpload }: AvatarUpload
         accept="image/*"
         onChange={handleInputChange}
         className="absolute inset-0 cursor-pointer opacity-0"
-        disabled={isUploading}
+        disabled={uploading}
       />
     </div>
   );

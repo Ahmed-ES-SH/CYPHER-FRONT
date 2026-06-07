@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { HiPaperAirplane, HiOutlineXMark } from "react-icons/hi2";
 import { NotificationType, NotificationPriority, NotificationChannel } from "../notifications.types";
 import type { CreateNotificationDto } from "../notifications.types";
 import { useAdminSendNotification } from "../notifications.hooks";
 import { toast } from "sonner";
+import { useUsers } from "@/src/modules/user";
 
 /* ─── Props ─── */
 
@@ -18,6 +19,7 @@ interface SendNotificationFormProps {
 
 export function SendNotificationForm({ onClose }: SendNotificationFormProps) {
   const [userId, setUserId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<string | undefined>(undefined);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [type, setType] = useState<NotificationType>(NotificationType.SYSTEM);
@@ -27,11 +29,14 @@ export function SendNotificationForm({ onClose }: SendNotificationFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { mutate: sendNotification, isPending } = useAdminSendNotification();
+  const { data: usersPage } = useUsers({ page: "1", limit: "10" });
+
+  const users = useMemo(() => usersPage?.data ?? [], [usersPage]);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!userId.trim()) newErrors.userId = "User ID is required";
+    if (!selectedUserId && !userId.trim()) newErrors.userId = "User ID is required";
     if (!title.trim()) newErrors.title = "Title is required";
     else if (title.length > 200) newErrors.title = "Title must be at most 200 characters";
     if (!body.trim()) newErrors.body = "Body is required";
@@ -46,7 +51,7 @@ export function SendNotificationForm({ onClose }: SendNotificationFormProps) {
     if (!validate()) return;
 
     const dto: CreateNotificationDto = {
-      userId: userId.trim(),
+      userId: (selectedUserId ?? userId).trim(),
       type,
       title: title.trim(),
       body: body.trim(),
@@ -58,7 +63,8 @@ export function SendNotificationForm({ onClose }: SendNotificationFormProps) {
     sendNotification(dto, {
       onSuccess: () => {
         toast.success("Notification sent successfully");
-        setUserId("");
+          setUserId("");
+          setSelectedUserId(undefined);
         setTitle("");
         setBody("");
         setLink("");
@@ -89,15 +95,32 @@ export function SendNotificationForm({ onClose }: SendNotificationFormProps) {
 
       {/* User ID */}
       <div>
-        <label htmlFor="send-user-id" className="block text-sm font-medium text-text-primary mb-1.5">
-          User ID <span className="text-red-500">*</span>
-        </label>
+        <label className="block text-sm font-medium text-text-primary mb-1.5">Target User <span className="text-red-500">*</span></label>
+
+        {/* Dropdown selector (first-page users) */}
+        <div className="mb-2">
+          <select
+            aria-label="Select user"
+            value={selectedUserId ?? ""}
+            onChange={(e) => setSelectedUserId(e.target.value || undefined)}
+            className="w-full rounded-lg border border-border-subtle px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-colors bg-white"
+          >
+            <option value="">Select a user (or leave empty to paste UUID)</option>
+            {users.map((u: any) => (
+              <option key={u.id} value={String(u.id)}>
+                {u.name ?? u.email}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Manual UUID fallback (kept for edge-cases) */}
         <input
           id="send-user-id"
           type="text"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          placeholder="Enter target user UUID"
+          placeholder="Or paste target user UUID"
           className="w-full rounded-lg border border-border-subtle px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
         />
         {errors.userId && <p className="mt-1 text-xs text-red-500">{errors.userId}</p>}
