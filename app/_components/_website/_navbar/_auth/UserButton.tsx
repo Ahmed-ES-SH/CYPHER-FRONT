@@ -67,12 +67,19 @@ export function UserButton() {
         aria-haspopup="true"
       >
         <div className="relative">
-          <Img
-            src={user?.avatar ?? "/images/user.png"}
-            width={40}
-            height={40}
-            className="size-10 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-all shadow-sm"
-          />
+          {user?.avatar ? (
+            <img
+              src={user.avatar}
+              alt="User avatar"
+              width={40}
+              height={40}
+              className="size-10 rounded-full object-cover border-2 border-transparent group-hover:border-primary transition-all shadow-sm"
+            />
+          ) : (
+            <div className="size-10 flex items-center justify-center bg-primary text-white rounded-full  border-2 border-transparent group-hover:border-primary transition-all shadow-sm">
+              {user?.name?.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="absolute bottom-0 right-0 size-3 bg-green-500 border-2 border-white rounded-full"></div>
         </div>
         <div className="hidden sm:flex flex-col items-start mr-1">

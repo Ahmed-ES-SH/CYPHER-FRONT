@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useCheckout } from "../_cart/useCheckout";
 
 export default function CartProducts() {
-  const { items, removeItem, clearItems } = useUnifiedCart();
+  const { items, removeItem, itemCount } = useUnifiedCart();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [showMiniCart, setShowMiniCart] = useState(false);
@@ -22,7 +22,6 @@ export default function CartProducts() {
     items,
     shippingMethod: "free_shipping",
     currency: "usd",
-    onBeforeRedirect: () => clearItems(),
   });
 
   const handleMouseEnter = () => {
@@ -66,9 +65,9 @@ export default function CartProducts() {
       <div className="flex items-center group gap-4 cursor-pointer max-md:mr-2">
         <div className="relative">
           <BsMinecart className="lg:size-7 size-6 text-icon-color group-hover:text-primary duration-300" />
-          {items.length > 0 && (
+          {itemCount > 0 && (
             <div className="w-4 h-4 absolute -top-1 -right-2 bg-primary animate-bounce text-white flex items-center justify-center text-[10px] font-bold rounded-full">
-              {items.length}
+              {itemCount}
             </div>
           )}
         </div>
@@ -91,7 +90,7 @@ export default function CartProducts() {
             animate={{ opacity: 1, y: 0, scale: 1.02 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="absolute right-0  mt-4 w-[340px] bg-white shadow-2xl rounded-xl p-4 space-y-3 z-99999"
+            className="absolute right-0  mt-4 w-85 bg-white shadow-2xl rounded-xl p-4 space-y-3 z-99999"
           >
             <h4 className="text-lg font-semibold text-gray-800">Cart Items</h4>
 
@@ -110,7 +109,8 @@ export default function CartProducts() {
                     className="flex items-center gap-3 relative not-last:border-b border-gray-200 pb-2"
                   >
                     <div
-                      onClick={() => {
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
                         removeItem(item.productId);
                         toast.info("Removed from cart");
                       }}
@@ -126,11 +126,15 @@ export default function CartProducts() {
                     <div className="flex-1">
                       <p className="text-sm font-medium ">{item.productName}</p>
                       <p className="text-xs text-gray-500">
-                        {item.quantity} × ${(item.unitPrice.amount / 100).toFixed(2)}
+                        {item.quantity} × $
+                        {(item.unitPrice.amount / 100).toFixed(2)}
                       </p>
                     </div>
                     <p className="text-sm mt-2 font-semibold text-gray-800">
-                      ${((item.unitPrice.amount / 100) * item.quantity).toFixed(2)}
+                      $
+                      {((item.unitPrice.amount / 100) * item.quantity).toFixed(
+                        2,
+                      )}
                     </p>
                   </div>
                 ))}

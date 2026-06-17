@@ -1,4 +1,5 @@
 import type { CartApiError } from "./cart.types";
+import { useCartAuthStore } from "./cart-auth.store";
 
 /* =========================================================
    Transport Interface
@@ -30,6 +31,8 @@ let activeAuthAdapter: AuthAdapter = defaultAuthAdapter;
 
 export function setAuthAdapter(adapter: AuthAdapter) {
   activeAuthAdapter = adapter;
+  // Sync reactive Zustand store so React components re-render
+  useCartAuthStore.getState().setCartAuth(adapter.isAuthenticated, adapter.userId);
 }
 
 export function getActiveAuthAdapter(): AuthAdapter {

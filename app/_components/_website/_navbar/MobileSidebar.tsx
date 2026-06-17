@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, spring } from "framer-motion";
 import Link from "next/link";
 import { FaCaretRight, FaTimes } from "react-icons/fa";
@@ -61,6 +61,16 @@ export default function MobailSideBar() {
 
   return (
     <AnimatePresence>
+      {/* overlay */}
+      {mobailMenu && (
+        <motion.div
+          onClick={handleCloseMenu}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 z-999999"
+        />
+      )}
       {mobailMenu && (
         <motion.div
           initial="hidden"
@@ -68,14 +78,10 @@ export default function MobailSideBar() {
           exit="exit"
           variants={sidebarVariants}
           transition={transitionSettings}
-          className="side-bar w-[320px] h-screen  bg-white fixed top-0 left-0  shadow-lg overflow-y-auto overflow-x-hidden  z-[999]"
+          className="side-bar w-[320px] h-screen  bg-white fixed top-0 left-0  shadow-lg overflow-y-auto overflow-x-hidden  z-999999"
         >
-          <div className="head w-full h-[60px] bg-[#031624] p-3  flex items-center justify-between">
-            <Img
-              className="w-[150px] h-[35px]"
-              src="/dark-logo.png"
-              alt="logo"
-            />
+          <div className="head w-full h-15 bg-[#031624] p-3  flex items-center justify-between">
+            <Img className="w-12" src="/logo-without.png" alt="logo" />
             <FaTimes
               onClick={handleCloseMenu}
               className="text-white cursor-pointer"
@@ -116,7 +122,7 @@ export default function MobailSideBar() {
                   </ul>
                 </div>
                 <div className="pt-3">
-                  <ul className="flex flex-col items-start gap-6 h-[20px] w-full ">
+                  <ul className="flex flex-col items-start gap-6 h-5 w-full ">
                     <li className="text-[14px]  p-2"> Order Tracking </li>
                     <li
                       onClick={() => setsubmenue("lang")}
@@ -139,30 +145,6 @@ export default function MobailSideBar() {
                     <li className="w-full pt-2 border-t border-gray-300">
                       {isAuthenticated ? (
                         <div className="flex flex-col gap-2 px-4 pt-4">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Img
-                              src={user?.avatar ?? "/images/user.png"}
-                              width={36}
-                              height={36}
-                              className="size-9 rounded-full object-cover border-2 border-gray-200"
-                            />
-                            <div className="flex flex-col">
-                              <p className="text-sm font-semibold text-gray-800">
-                                {user?.name}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {user?.email}
-                              </p>
-                            </div>
-                          </div>
-                          <Link
-                            href={"/dashboard"}
-                            className="flex items-center justify-between w-full gap-3 text-gray-700 hover:text-primary-blue duration-300"
-                            onClick={handleCloseMenu}
-                          >
-                            <p>My Dashboard</p>
-                            <FiUser className="size-5" />
-                          </Link>
                           <button
                             onClick={async () => {
                               try {
@@ -176,7 +158,9 @@ export default function MobailSideBar() {
                             disabled={isLoggingOut}
                             className="flex items-center justify-between w-full gap-3 text-red-500 hover:text-red-600 duration-300 cursor-pointer"
                           >
-                            <p>{isLoggingOut ? "Signing out..." : "Sign out"}</p>
+                            <p>
+                              {isLoggingOut ? "Signing out..." : "Sign out"}
+                            </p>
                             <PiSignOut className="size-5" />
                           </button>
                         </div>

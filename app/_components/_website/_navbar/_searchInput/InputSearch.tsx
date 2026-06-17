@@ -61,7 +61,7 @@ export default function InputSearch() {
   return (
     <div className="relative w-full max-xl:hidden" ref={inputRef}>
       {/* Input and Button */}
-      <div className="flex items-center px-2 h-[50px]">
+      <div className="flex items-center px-2 h-12.5">
         <div className="border border-gray-300 w-full flex h-full rounded-l-lg">
           <Categories data={categories} />
           <div className="flex items-center gap-4 p-2 w-full relative">
@@ -72,7 +72,7 @@ export default function InputSearch() {
               placeholder="Search your favorite product..."
               type="text"
               name="search"
-              className="w-full border-none outline-none pr-8"
+              className="w-full ring-0 border-none outline-none pr-8 focus:outline-none focus:ring-0"
             />
 
             {query && (

@@ -3,6 +3,7 @@ import Img from "../../_global/Img";
 import Link from "next/link";
 import Barsbtn from "./Barsbtn";
 import InputSearch from "./_searchInput/InputSearch";
+import SearchOverlay from "./_searchInput/SearchOverlay";
 import CartProducts from "./CartProducts";
 import WishListProducts from "./WishListProducts";
 import SignInBtn from "./_auth/Signinbtn";
@@ -22,8 +23,12 @@ export default async function MiddleBart() {
             loading="eager"
           />
         </Link>
-        {/* InputSearch */}
-        <InputSearch />
+        {/* InputSearch - visible on xl+ */}
+        <div className="max-xl:hidden w-full">
+          <InputSearch />
+        </div>
+        {/* SearchOverlay icon - visible below xl */}
+        <SearchOverlay />
         {/* //////////// */}
         <div id="icons" className="flex items-center gap-4">
           {/* Signin Link */}

@@ -19,8 +19,6 @@ export interface UseCheckoutOptions {
   items: UnifiedCartItem[];
   shippingMethod?: string;
   currency?: string;
-  /** Called before redirect (e.g. clear cart) */
-  onBeforeRedirect?: () => void;
 }
 
 export interface UseCheckoutReturn {
@@ -33,7 +31,7 @@ export interface UseCheckoutReturn {
 }
 
 export function useCheckout(options: UseCheckoutOptions): UseCheckoutReturn {
-  const { items, shippingMethod = "free_shipping", currency = "usd", onBeforeRedirect } = options;
+  const { items, shippingMethod = "free_shipping", currency = "usd" } = options;
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,9 +80,6 @@ export function useCheckout(options: UseCheckoutOptions): UseCheckoutReturn {
         throw new Error("No checkout session returned");
       }
 
-      // Call before redirect hook (e.g., clear cart)
-      onBeforeRedirect?.();
-
       // Redirect to Stripe Checkout
       const stripe = await loadStripe(
         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
@@ -104,7 +99,7 @@ export function useCheckout(options: UseCheckoutOptions): UseCheckoutReturn {
     } finally {
       setIsCheckingOut(false);
     }
-  }, [items, shippingMethod, currency, onBeforeRedirect]);
+  }, [items, shippingMethod, currency]);
 
   return { isCheckingOut, error, checkout };
 }

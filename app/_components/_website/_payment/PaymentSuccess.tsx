@@ -3,8 +3,9 @@ import { useState, useEffect, JSX } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiCheckCircle, FiDownload, FiHome, FiMail } from "react-icons/fi";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useVariables } from "@/app/context/VariablesContext";
-import { useCartStore, invalidateCart } from "@/src/modules/cart";
+import { useCartStore, cartKeys } from "@/src/modules/cart";
 
 export default function PaymentSuccess() {
   const { width, height } = useVariables();
@@ -13,6 +14,7 @@ export default function PaymentSuccess() {
   const paymentStatus = searchParams.get("payment_status");
   const productLength = searchParams.get("productLength");
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [confettiVisible, setConfettiVisible] = useState(true);
 
   useEffect(() => {
@@ -65,15 +67,15 @@ export default function PaymentSuccess() {
     setConfettiParticles(particles);
   }, [height, width]);
 
-  // Clear cart after successful payment
+  // Clear cart after successful payment (fallback for when webhook hasn't fired yet)
   useEffect(() => {
     if (paymentStatus === "success") {
       // Clear guest cart (local storage)
       useCartStore.getState().clearGuestItems();
-      // Invalidate server cart query so it re-fetches on next visit
-      invalidateCart();
+      // Invalidate server cart queries so they re-fetch as empty
+      queryClient.invalidateQueries({ queryKey: cartKeys.all });
     }
-  }, [paymentStatus]);
+  }, [paymentStatus, queryClient]);
 
   const onDownloadReceipt = () => {
     console.log("onDownloadReceipt", "download done");

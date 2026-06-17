@@ -9,14 +9,13 @@ import { useCheckout } from "./useCheckout";
 type ShippingMethod = "free_shipping" | "local_pickup";
 
 export default function CartComponent() {
-  const { items, clearItems } = useUnifiedCart();
+  const { items } = useUnifiedCart();
   const [shippingMethod, setShippingMethod] = useState<ShippingMethod>("free_shipping");
 
   const { isCheckingOut, checkout } = useCheckout({
     items,
     shippingMethod,
     currency: "usd",
-    onBeforeRedirect: () => clearItems(),
   });
 
   const subtotal = items.reduce(

@@ -21,7 +21,7 @@ export default function HeroList() {
           animate={{ opacity: 1, height: "61vh" }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-          className="origin-top bg-surface-elevated mt-1 shrink-0 w-[280px] h-[61vh] rounded-md shadow-lg overflow-hidden max-xl:hidden border border-border-subtle"
+          className="origin-top bg-surface-elevated mt-1 shrink-0 w-[280px] max-h-[61vh] overflow-y-auto rounded-md shadow-lg overflow-hidden max-xl:hidden border border-border-subtle"
         >
           <div className="flex flex-col divide-y divide-border-subtle">
             {menuData.map((item, index) => (

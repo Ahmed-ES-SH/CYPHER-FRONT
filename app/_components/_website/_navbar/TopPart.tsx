@@ -1,5 +1,4 @@
 import { linksLeft } from "@/constants/Links";
-import React from "react";
 import MiniDrop from "./MiniDrop";
 
 export default function TopPart() {
@@ -23,10 +22,10 @@ export default function TopPart() {
             <li className="text-[14px] cursor-pointer max-md:text-[10px] whitespace-nowrap">
               Order Tracking
             </li>
-            <li className="langs">
+            <li className="langs z-9999999">
               <MiniDrop options={langs} />
             </li>
-            <li className="flex flex-col   self-center  cursor-pointer mo ">
+            <li className="flex flex-col   self-center  cursor-pointer mo">
               <MiniDrop options={Currencies} />
             </li>
           </ul>

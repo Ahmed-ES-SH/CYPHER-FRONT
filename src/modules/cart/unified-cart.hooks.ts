@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
-import { getActiveAuthAdapter } from "./cart.transport";
+import { toast } from "sonner";
+import { useCartAuthStore } from "./cart-auth.store";
 import { useCart, useCartActions, useGuestCart } from "./cart.hooks";
 import { selectCartSummary } from "./cart-selectors";
 import type { CartItem, GuestCartItem, CartSummary, AddItemDto, CartApiError } from "./cart.types";
@@ -74,7 +75,7 @@ export interface UnifiedCart {
 }
 
 export function useUnifiedCart(): UnifiedCart {
-  const { isAuthenticated } = getActiveAuthAdapter();
+  const isAuthenticated = useCartAuthStore((s) => s.isAuthenticated);
   const guestCart = useGuestCart();
   const { data: serverCart, isLoading, error } = useCart(isAuthenticated);
   const cartActions = useCartActions();
@@ -135,6 +136,9 @@ export function useUnifiedCart(): UnifiedCart {
         const cartItem = productToCartItem.get(productId);
         if (cartItem) {
           cartActions.removeItem.mutate(cartItem.id);
+        } else {
+          console.error(`[cart] Item not found for productId: ${productId}`);
+          toast.error("Failed to remove item. Please try again.");
         }
       } else {
         guestCart.removeItem(productId);

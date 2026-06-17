@@ -1,6 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import Img from "@/app/_components/_global/Img";
 import { DetailsMobail } from "@/constants/constantsDetails";
 import React, { useEffect, useRef, useState } from "react";
 import MainHead from "./MainHead";
@@ -40,13 +39,7 @@ export default function PhonesSection() {
         className="max-xl:flex-col flex items-start justify-between gap-4 py-3 w-full my-4"
       >
         <div className="phone-card max-xl:w-full xl:h-full h-[80vh] w-[30%] relative rounded-md overflow-hidden self-start bg-surface-elevated border border-border-subtle">
-          <div className="IMAGE-CARD relative h-full">
-            <Img
-              className="object-cover xl:h-[70%] h-1/2 w-full"
-              src={"/images/category-banner.jpg"}
-              alt="Samsung Galaxy phone banner"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-dark-btn/80 via-dark-btn/30 to-transparent" />
+          <div className="IMAGE-CARD relative h-full bg-linear-to-br from-dark-btn via-primary-blue to-primary/60">
             <div className="content absolute left-6 top-6 max-md:left-4 z-10">
               <p className="firstLine w-fit h-fit text-primary-yellow px-3 py-1 font-medium text-[12px] tracking-wider uppercase bg-dark-btn/50 rounded-sm">
                 Samsung
@@ -57,13 +50,18 @@ export default function PhonesSection() {
               <p className="py-2 text-[15px] text-white/80">
                 Don&apos;t miss the last opportunity.
               </p>
-              <Link href="/cellphones" className="btn-shop py-2.5 px-6 bg-primary-yellow text-dark-btn hover:bg-white duration-200 font-semibold rounded-md inline-block mt-1">
+              <Link
+                href="/cellphones"
+                className="btn-shop py-2.5 px-6 bg-primary-yellow text-dark-btn hover:bg-white duration-200 font-semibold rounded-md inline-block mt-1"
+              >
                 Shop Now
               </Link>
             </div>
           </div>
           <div className="details w-full absolute bottom-0 z-[10] bg-surface-elevated/95 backdrop-blur-sm py-3">
-            <h1 className="title px-4 py-2 font-semibold text-text-primary text-[14px]">Cell Phones</h1>
+            <h1 className="title px-4 py-2 font-semibold text-text-primary text-[14px]">
+              Cell Phones
+            </h1>
             {DetailsMobail.map((detail, index) => (
               <div
                 key={index}

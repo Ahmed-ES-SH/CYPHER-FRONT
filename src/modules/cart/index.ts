@@ -134,3 +134,6 @@ export {
 
 /* ---------- Store ---------- */
 export { useCartStore, initCartCrossTabSync } from "./cart.store";
+
+/* ---------- Auth Store ---------- */
+export { useCartAuthStore } from "./cart-auth.store";

@@ -10,7 +10,10 @@ interface props {
 export default function CardTimer({ imgsrc }: props) {
   return (
     <>
-      <h1 className="px-4 border-b border-border-subtle text-xl font-semibold text-text-primary whitespace-nowrap" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+      <h1
+        className="px-4 border-b border-border-subtle text-xl font-semibold text-text-primary whitespace-nowrap"
+        style={{ fontFamily: "var(--font-space-grotesk)" }}
+      >
         Deals of the Week
       </h1>
       <div>
