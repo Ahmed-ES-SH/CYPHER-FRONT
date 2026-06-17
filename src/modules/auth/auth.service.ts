@@ -6,9 +6,24 @@ import type { LoginRequest, AuthUser } from "./auth.types";
 let initializationPromise: Promise<void> | null = null;
 
 export async function handleLogin(dto: LoginRequest): Promise<AuthUser> {
-  const { user } = await loginApi(dto);
-  useAuthStore.getState().setUser(user);
-  return user;
+  const loginRes = await loginApi(dto);
+  const { user: partialUser } = loginRes;
+
+  console.log("[handleLogin] loginApi user (JWT payload):", JSON.stringify(partialUser, null, 2));
+
+  // Set partial user (JWT payload) immediately so the UI can react
+  useAuthStore.getState().setUser(partialUser);
+
+  // Hydrate store with the full user profile from current-user endpoint
+  try {
+    const fullUser = await getCurrentUserApi();
+    console.log("[handleLogin] full user from current-user:", JSON.stringify(fullUser, null, 2));
+    useAuthStore.getState().setUser(fullUser);
+    return fullUser;
+  } catch (err) {
+    console.warn("[handleLogin] failed to fetch full user, keeping partial:", err);
+    return partialUser;
+  }
 }
 
 export async function handleLogout(): Promise<void> {

@@ -18,6 +18,7 @@ import type {
   VerifyResetTokenRequest,
   ResetPasswordRequest,
 } from "../auth.types";
+import { UserRole, UserStatus } from "../../user/types/user.types";
 
 /* =========================================================
    Test setup helpers
@@ -28,7 +29,12 @@ const mockUser: AuthUser = {
   name: "John Doe",
   email: "john@test.com",
   avatar: "/avatar.png",
-  role: "user",
+  role: UserRole.USER,
+  status: UserStatus.ACTIVE,
+  isEmailVerified: true,
+  isPremium: false,
+  createdAt: "2025-01-01T00:00:00Z",
+  updatedAt: "2025-06-01T00:00:00Z",
 };
 
 function createWrapper() {

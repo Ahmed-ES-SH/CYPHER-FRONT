@@ -94,6 +94,7 @@ export default function SignInForm() {
         email: formData.email,
         password: formData.password,
       });
+      router.push(AUTH_ROUTES.HOME);
     } catch (err: any) {
       if (err?.status === 409) {
         setShowPopup(true);

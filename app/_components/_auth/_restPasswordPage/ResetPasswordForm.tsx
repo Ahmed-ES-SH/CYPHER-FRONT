@@ -11,7 +11,11 @@ interface ResetPasswordFormProps {
   onSuccess: () => void;
 }
 
-export default function ResetPasswordForm({ token, email, onSuccess }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({
+  token,
+  email,
+  onSuccess,
+}: ResetPasswordFormProps) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -42,7 +46,7 @@ export default function ResetPasswordForm({ token, email, onSuccess }: ResetPass
       await reset.mutateAsync({
         token: token ?? "",
         password: newPassword,
-        passwordConfirmation: confirmPassword,
+        email: email!,
       });
       onSuccess();
       setTimeout(() => {
@@ -120,7 +124,9 @@ export default function ResetPasswordForm({ token, email, onSuccess }: ResetPass
           </div>
 
           {(passwordError || resetError) && (
-            <div className={`text-sm text-red-600 bg-red-50 rounded-lg p-3 ${passwordError ? 'animate-shake' : ''}`}>
+            <div
+              className={`text-sm text-red-600 bg-red-50 rounded-lg p-3 ${passwordError ? "animate-shake" : ""}`}
+            >
               {passwordError || resetError}
             </div>
           )}

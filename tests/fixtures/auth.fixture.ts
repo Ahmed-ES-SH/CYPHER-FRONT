@@ -1,11 +1,17 @@
-import type { AuthUser, UserRole } from "../../src/modules/auth/auth.types";
+import type { AuthUser } from "../../src/modules/auth/auth.types";
+import { UserRole, UserStatus } from "../../src/modules/user/types/user.types";
 
 export const TEST_USER: AuthUser = {
   id: 1,
   name: "Test User",
   email: "test@example.com",
   avatar: "/images/user.png",
-  role: "user",
+  role: UserRole.USER,
+  status: UserStatus.ACTIVE,
+  isEmailVerified: true,
+  isPremium: false,
+  createdAt: "2025-01-01T00:00:00Z",
+  updatedAt: "2025-06-01T00:00:00Z",
 };
 
 export const TEST_ADMIN: AuthUser = {
@@ -13,7 +19,12 @@ export const TEST_ADMIN: AuthUser = {
   name: "Admin User",
   email: "admin@example.com",
   avatar: "/images/user.png",
-  role: "admin",
+  role: UserRole.ADMIN,
+  status: UserStatus.ACTIVE,
+  isEmailVerified: true,
+  isPremium: true,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2025-06-01T00:00:00Z",
 };
 
 export const API_URL = "http://localhost:3000";

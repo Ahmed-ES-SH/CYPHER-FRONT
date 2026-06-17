@@ -1,9 +1,23 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useAuthStore } from "../auth.store";
+import { UserRole, UserStatus } from "../../user/types/user.types";
 
 beforeEach(() => {
   useAuthStore.getState().reset();
 });
+
+const fullUser = {
+  id: 1,
+  name: "John Doe",
+  email: "john@test.com",
+  avatar: "/avatar.png",
+  role: UserRole.USER,
+  status: UserStatus.ACTIVE,
+  isEmailVerified: true,
+  isPremium: false,
+  createdAt: "2025-01-01T00:00:00Z",
+  updatedAt: "2025-06-01T00:00:00Z",
+};
 
 /* =========================================================
    Initial State
@@ -36,28 +50,14 @@ describe("initial state", () => {
 
 describe("setUser", () => {
   it("sets user and marks as authenticated", () => {
-    const user = {
-      id: 1,
-      name: "John Doe",
-      email: "john@test.com",
-      avatar: "/avatar.png",
-      role: "user" as const,
-    };
+    useAuthStore.getState().setUser(fullUser);
 
-    useAuthStore.getState().setUser(user);
-
-    expect(useAuthStore.getState().user).toEqual(user);
+    expect(useAuthStore.getState().user).toEqual(fullUser);
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
   });
 
   it("clears user and marks as not authenticated when null", () => {
-    useAuthStore.getState().setUser({
-      id: 1,
-      name: "John",
-      email: "john@test.com",
-      avatar: "/avatar.png",
-      role: "user",
-    });
+    useAuthStore.getState().setUser(fullUser);
 
     useAuthStore.getState().setUser(null);
 
@@ -127,13 +127,7 @@ describe("setInitialized", () => {
 
 describe("reset", () => {
   it("resets all state to initial values", () => {
-    useAuthStore.getState().setUser({
-      id: 1,
-      name: "John",
-      email: "john@test.com",
-      avatar: "/avatar.png",
-      role: "admin",
-    });
+    useAuthStore.getState().setUser({ ...fullUser, role: UserRole.ADMIN });
     useAuthStore.getState().setInitialized();
     useAuthStore.getState().setLoading("login", true);
 
@@ -152,13 +146,7 @@ describe("reset", () => {
 
 describe("clearUser", () => {
   it("clears user and sets authenticated to false, but keeps initialized status", () => {
-    useAuthStore.getState().setUser({
-      id: 1,
-      name: "John",
-      email: "john@test.com",
-      avatar: "/avatar.png",
-      role: "user",
-    });
+    useAuthStore.getState().setUser(fullUser);
     useAuthStore.getState().setInitialized();
 
     useAuthStore.getState().clearUser();

@@ -1,12 +1,8 @@
-export type UserRole = "user" | "admin";
+import type { User, UserRole } from "../user/types/user.types";
 
-export interface AuthUser {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-  role: UserRole;
-}
+export type { UserRole };
+
+export type AuthUser = User;
 
 export interface AuthLoading {
   session: boolean;
@@ -59,7 +55,7 @@ export interface VerifyTokenResponse {
 export interface ResetPasswordRequest {
   token: string;
   password: string;
-  passwordConfirmation: string;
+  email: string;
 }
 
 export interface AuthApiError {
@@ -72,11 +68,14 @@ export class AuthError extends Error {
   status: number;
   errors?: Record<string, string[]>;
 
-  constructor(message: string, status: number, errors?: Record<string, string[]>) {
+  constructor(
+    message: string,
+    status: number,
+    errors?: Record<string, string[]>,
+  ) {
     super(message);
     this.name = "AuthError";
     this.status = status;
     this.errors = errors;
   }
 }
-

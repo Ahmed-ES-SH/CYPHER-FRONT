@@ -48,7 +48,11 @@ async function authRequest<TResult = any>(
    ====================== */
 
 export async function getCurrentUserApi(): Promise<CurrentUserResponse> {
-  return authRequest<CurrentUserResponse>(AUTH_ENDPOINTS.CURRENT_USER);
+  const result = await authRequest<any>(AUTH_ENDPOINTS.CURRENT_USER);
+  console.log("[getCurrentUserApi] raw result:", JSON.stringify(result, null, 2));
+  // Backend wraps user in { data: { ... } } — unwrap if present
+  const user = result?.data ?? result;
+  return user as CurrentUserResponse;
 }
 
 export async function verifyEmailApi(token: string): Promise<MessageResponse> {
