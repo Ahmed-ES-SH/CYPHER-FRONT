@@ -17,7 +17,10 @@ import type {
   MutationResult,
   PublishToggleResult,
 } from "../types/product-dto.types";
-import type { ApiError, ValidationErrorItem } from "../types/product-error.types";
+import type {
+  ApiError,
+  ValidationErrorItem,
+} from "../types/product-error.types";
 
 export interface RawProductsListResponse {
   data?: RawProductPayload[];
@@ -78,7 +81,9 @@ export async function getProductsApi(
   const items = raw.data ?? raw.products ?? [];
   return {
     data: items.map((item) => normalizeProductPayload(item)),
-    pagination: coercePagination(raw.pagination ?? (raw as unknown as Record<string, unknown>)),
+    pagination: coercePagination(
+      raw.pagination ?? (raw as unknown as Record<string, unknown>),
+    ),
   };
 }
 
@@ -100,7 +105,9 @@ export async function getProductsByCategoryApi(
   const items = raw.data ?? raw.products ?? [];
   return {
     data: items.map((item) => normalizeProductPayload(item)),
-    pagination: coercePagination(raw.pagination ?? (raw as unknown as Record<string, unknown>)),
+    pagination: coercePagination(
+      raw.pagination ?? (raw as unknown as Record<string, unknown>),
+    ),
   };
 }
 
@@ -114,7 +121,9 @@ export async function getAdminProductsApi(
   const items = raw.data ?? raw.products ?? [];
   return {
     data: items.map((item) => normalizeProductPayload(item)),
-    pagination: coercePagination(raw.pagination ?? (raw as unknown as Record<string, unknown>)),
+    pagination: coercePagination(
+      raw.pagination ?? (raw as unknown as Record<string, unknown>),
+    ),
   };
 }
 
@@ -157,9 +166,7 @@ export async function toggleProductPublishApi(
   );
 }
 
-export async function deleteProductApi(
-  id: string,
-): Promise<MutationResult> {
+export async function deleteProductApi(id: string): Promise<MutationResult> {
   return productsRequest<MutationResult>(
     PRODUCTS_ENDPOINTS.DELETE(id),
     "DELETE",

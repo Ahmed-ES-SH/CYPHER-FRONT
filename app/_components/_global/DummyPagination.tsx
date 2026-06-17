@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 interface Props {
   page: number;
@@ -11,7 +11,7 @@ interface Props {
 
 export default function DummyPagination({ page, setPage, totalPages }: Props) {
   const getPageNumbers = () => {
-    const pages = [];
+    const pages: (number | "ellipsis")[] = [];
 
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) {
@@ -20,8 +20,8 @@ export default function DummyPagination({ page, setPage, totalPages }: Props) {
     } else {
       pages.push(1);
 
-      if (page > 4) {
-        pages.push("start-ellipsis");
+      if (page > 3) {
+        pages.push("ellipsis");
       }
 
       const startPage = Math.max(2, page - 1);
@@ -31,8 +31,8 @@ export default function DummyPagination({ page, setPage, totalPages }: Props) {
         pages.push(i);
       }
 
-      if (page < totalPages - 3) {
-        pages.push("end-ellipsis");
+      if (page < totalPages - 2) {
+        pages.push("ellipsis");
       }
 
       pages.push(totalPages);
@@ -50,59 +50,69 @@ export default function DummyPagination({ page, setPage, totalPages }: Props) {
 
   const pages = getPageNumbers();
 
+  if (totalPages <= 1) return null;
+
+  const btnBase =
+    "inline-flex items-center justify-center  border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1";
+
+  const btnSize = "min-w-[32px] h-8 sm:min-w-[36px] sm:h-9 px-2 text-sm";
+
   return (
-    <>
-      {totalPages > 1 && (
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="flex justify-center items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              disabled={page === 1}
-              className="p-2 rounded-md bg-primary-blue text-white disabled:bg-border-subtle flex items-center justify-center"
-              aria-label="Previous Page"
-            >
-              <BsChevronLeft size={18} />
-            </button>
+    <nav aria-label="Pagination" className="w-full mt-4">
+      <div className="flex items-center justify-center gap-1 sm:gap-1.5">
+        <button
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          disabled={page <= 1}
+          aria-label="Previous page"
+          className={`${btnBase} ${btnSize} border-border-subtle text-text-secondary hover:bg-surface disabled:opacity-40 disabled:pointer-events-none`}
+        >
+          <FiChevronLeft className="size-4" />
+        </button>
 
-            {pages.map((p, idx) => {
-              if (typeof p === "string") {
-                return (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 select-none text-text-muted cursor-default"
-                  >
-                    &hellip;
-                  </span>
-                );
-              }
-
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          {pages.map((p, idx) => {
+            if (p === "ellipsis") {
               return (
-                <button
-                  key={idx}
-                  onClick={() => setPage(p)}
-                  className={`px-3 py-1 rounded-md ${
-                    p === page
-                      ? "bg-primary-blue text-white font-semibold"
-                      : "hover:bg-primary-blue/10"
-                  }`}
-                  aria-current={p === page ? "page" : undefined}
+                <span
+                  key={`ellipsis-${idx}`}
+                  className={`${btnSize} flex items-center justify-center text-text-muted select-none`}
+                  aria-hidden="true"
                 >
-                  {p}
-                </button>
+                  &hellip;
+                </span>
               );
-            })}
+            }
 
-            <button
-              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              disabled={page === totalPages}
-              className="p-2 rounded-md bg-primary-blue text-white disabled:bg-border-subtle flex items-center justify-center"
-              aria-label="Next Page"
-            >
-              <BsChevronRight size={18} />
-            </button>
-          </div>
+            const isActive = p === page;
+
+            return (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                disabled={isActive}
+                aria-current={isActive ? "page" : undefined}
+                aria-label={`Page ${p}`}
+                className={`${btnBase} ${btnSize} ${
+                  isActive
+                    ? "bg-primary text-white border-primary font-semibold cursor-default"
+                    : "border-border-subtle text-text-secondary hover:bg-surface hover:text-text-primary"
+                }`}
+              >
+                {p}
+              </button>
+            );
+          })}
         </div>
-      )}
-    </>
+
+        <button
+          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+          disabled={page >= totalPages}
+          aria-label="Next page"
+          className={`${btnBase} ${btnSize} border-border-subtle text-text-secondary hover:bg-surface disabled:opacity-40 disabled:pointer-events-none`}
+        >
+          <FiChevronRight className="size-4" />
+        </button>
+      </div>
+    </nav>
   );
 }

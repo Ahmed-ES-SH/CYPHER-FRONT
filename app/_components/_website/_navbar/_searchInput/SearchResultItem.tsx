@@ -3,7 +3,7 @@
 import { useGuestCart } from "@/src/modules/cart";
 import { productToGuestCartItem, isProductInCart } from "@/src/modules/cart/adapters/cart-helpers";
 import { productTypeAdapter } from "@/src/modules/cart/adapters/product-type.adapter";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { motion } from "framer-motion";
 import { FaStar } from "react-icons/fa";
 import { IoCheckmarkOutline } from "react-icons/io5";
@@ -15,7 +15,7 @@ import { toast } from "sonner";
 export default function SearchResultItem({
   product,
 }: {
-  product: ProductType;
+  product: Product;
 }) {
   const { items, addItem } = useGuestCart();
 

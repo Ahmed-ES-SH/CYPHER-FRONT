@@ -2,7 +2,7 @@
 import { BsEye } from "react-icons/bs";
 import { BiHeart } from "react-icons/bi";
 import { useState } from "react";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { formatTitle } from "@/app/helpers/helpers";
 import { useWishlistStore } from "@/app/store/WishlistStoreStore";
 import { IoHeartDislikeOutline } from "react-icons/io5";
@@ -14,7 +14,7 @@ import AdditionalInfo from "./_productCard/AdditionalInfo";
 import ProductAction from "./_productCard/ProductAction";
 
 interface props {
-  product: ProductType;
+  product: Product;
   viewMode?: "grid" | "list";
 }
 
@@ -62,8 +62,8 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
 
   return (
     <div
-      className={`relative bg-surface-elevated rounded-md cursor-pointer overflow-hidden transition-all duration-200 hover:shadow-lg group w-full h-fit border border-border-subtle ${
-        viewMode === "list" ? "flex flex-row" : ""
+      className={`relative bg-surface-elevated rounded-md cursor-pointer overflow-hidden transition-all duration-200 hover:shadow-lg group w-full border border-border-subtle ${
+        viewMode === "list" ? "flex flex-row h-fit" : "flex flex-col h-full"
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
@@ -87,10 +87,10 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
 
       {/* Product image */}
       <div
-        className={`relative overflow-hidden bg-surface border-gray-200 ${
+        className={`relative overflow-hidden  border-gray-200 ${
           viewMode === "list"
-            ? "w-48 shrink-0 border-r aspect-square self-start"
-            : "border-b aspect-square"
+            ? "w-48 shrink-0 border-r aspect-square bg-transparent self-start"
+            : "border-b aspect-square bg-surface"
         }`}
       >
         <Img
@@ -131,8 +131,8 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
             )}
           </button>
           <Link
-            href={`/products/${formatTitle(product.title)}?productId=${
-              product.id
+            href={`/products/${formatTitle(product.title)}?slug=${
+              product.slug
             }`}
             aria-label="Quick view product"
             className={`p-2 block bg-surface-elevated rounded-full shadow-md hover:bg-surface transition-all duration-300 xl:opacity-0 xl:translate-x-8 xl:group-hover:opacity-100 xl:group-hover:translate-x-0 opacity-100 translate-x-0`}
@@ -143,7 +143,9 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
       </div>
 
       {/* Card content */}
-      <div className="p-4 flex-1">
+      <div
+        className={`p-4 ${viewMode === "list" ? "flex-1" : "flex flex-col flex-1"}`}
+      >
         {/* Brand */}
         {product.brand && (
           <div className="text-[11px] text-text-muted uppercase tracking-wider mb-1 font-medium">
@@ -153,11 +155,9 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
 
         {/* Product title */}
         <Link
-          href={`/products/${formatTitle(product.title)}?productId=${
-            product.id
-          }`}
+          href={`/products/${formatTitle(product.title)}?slug=${product.slug}`}
           className={`text-text-primary font-medium text-[14px] mb-2 hover:text-primary-blue transition-colors duration-200 block leading-tight ${
-            viewMode === "list" ? "" : "line-clamp-2 min-h-[40px]"
+            viewMode === "list" ? "" : "line-clamp-2 min-h-10"
           }`}
         >
           {product.title}
@@ -192,7 +192,9 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
         <AdditionalInfo isHovered={isHovered} />
 
         {/* Add to cart button */}
-        <ProductAction product={product} isHovered={isHovered} />
+        <div className={viewMode === "grid" ? "mt-auto" : ""}>
+          <ProductAction product={product} isHovered={isHovered} />
+        </div>
       </div>
     </div>
   );

@@ -8,12 +8,11 @@ import {
   ReactNode,
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useProducts, productToLegacy } from "@/src/modules/products";
-import type { ProductQuery } from "@/src/modules/products";
-import type { ProductType } from "@/app/types/productType";
+import { useProducts } from "@/src/modules/products";
+import type { Product, ProductQuery } from "@/src/modules/products";
 
 interface ShopContextValue {
-  products: ProductType[];
+  products: Product[];
   isLoading: boolean;
   isError: boolean;
   page: number;
@@ -97,8 +96,7 @@ export default function ShopProvider({ children }: { children: ReactNode }) {
   const sortOrder = searchParams.get("sortOrder") || "desc";
   const limit = Number(searchParams.get("limit")) || 16;
   const page = Number(searchParams.get("page")) || 1;
-  const gridView =
-    searchParams.get("gridView") === "list" ? "list" : "grid";
+  const gridView = searchParams.get("gridView") === "list" ? "list" : "grid";
 
   const subpath = pathname.split("/shop")[1] || "";
   const categorySlugFromPath = ROUTE_CATEGORY_MAP[subpath];
@@ -134,8 +132,8 @@ export default function ShopProvider({ children }: { children: ReactNode }) {
 
   const { data, isLoading, isError } = useProducts(query);
 
-  const products = useMemo<ProductType[]>(
-    () => (data?.data ?? []).map(productToLegacy),
+  const products = useMemo<Product[]>(
+    () => data?.data ?? [],
     [data],
   );
 

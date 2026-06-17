@@ -8,7 +8,7 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import { MdCompare } from "react-icons/md";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { useGuestCart } from "@/src/modules/cart";
 import { productToGuestCartItem, findCartItem } from "@/src/modules/cart/adapters/cart-helpers";
 import { productTypeAdapter } from "@/src/modules/cart/adapters/product-type.adapter";
@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { useCallback, useMemo } from "react";
 
 interface Quantity_ActionsProps {
-  product: ProductType;
+  product: Product;
   setIsWishlisted: (isWishlisted: boolean) => void;
   isWishlisted: boolean;
 }
@@ -30,7 +30,7 @@ export default function Quantity_Actions({
   const { items, addItem, updateQuantity } = useGuestCart();
   const { addToWishlist, wishlistItems } = useWishlistStore();
 
-  const handleAddToWishList = (product: ProductType) => {
+  const handleAddToWishList = (product: Product) => {
     const isInWishlist = wishlistItems.find((item) => item.id == product.id);
     if (!isInWishlist) {
       addToWishlist(product);

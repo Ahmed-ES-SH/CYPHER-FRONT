@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { useWishlistStore } from "@/app/store/WishlistStoreStore";
 import { returnSpecs } from "./_productPage/constants";
 
@@ -13,7 +13,7 @@ import ProductDetailsTabs from "./_productPage/ProductDetailsTabs";
 import ProductDetails from "./_productPage/ProductDetails";
 
 interface ProductPageProps {
-  product: ProductType;
+  product: Product;
 }
 
 export default function ProductPage({ product }: ProductPageProps) {
@@ -32,7 +32,7 @@ export default function ProductPage({ product }: ProductPageProps) {
 
   useEffect(() => {
     if (product) {
-      setSelectedImage(product.images[0]);
+      setSelectedImage(product.images?.[0] || "");
     } else {
       setError(true);
     }

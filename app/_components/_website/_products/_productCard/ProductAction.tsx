@@ -4,11 +4,11 @@ import { CgShoppingCart } from "react-icons/cg";
 import { useGuestCart } from "@/src/modules/cart";
 import { productToGuestCartItem, isProductInCart } from "@/src/modules/cart/adapters/cart-helpers";
 import { productTypeAdapter } from "@/src/modules/cart/adapters/product-type.adapter";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { toast } from "sonner";
 
 interface props {
-  product: ProductType;
+  product: Product;
   isHovered: boolean;
 }
 

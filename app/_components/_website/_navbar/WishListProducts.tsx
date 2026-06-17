@@ -9,7 +9,7 @@ import { LuHeartCrack } from "react-icons/lu";
 import { useGuestCart } from "@/src/modules/cart";
 import { productToGuestCartItem, isProductInCart } from "@/src/modules/cart/adapters/cart-helpers";
 import { productTypeAdapter } from "@/src/modules/cart/adapters/product-type.adapter";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { toast } from "sonner";
 
 export default function WishListProducts() {
@@ -19,7 +19,7 @@ export default function WishListProducts() {
 
   const [showWishList, setShowWishList] = useState(false);
 
-  const WrapperAddToCart = (product: ProductType) => {
+  const WrapperAddToCart = (product: Product) => {
     const isInWishList = wishlistItems.some((item) => item.id === product.id);
     if (!isInWishList) return;
     if (isProductInCart(items, product, productTypeAdapter)) {

@@ -8,10 +8,9 @@ import {
   useState,
   useMemo,
 } from "react";
-import type { ProductType } from "../types/productType";
+import type { Product } from "@/src/modules/products";
 import { useVariables } from "./VariablesContext";
 import { useProducts } from "@/src/modules/products";
-import { productToLegacy } from "@/src/modules/products";
 import { useCategories } from "@/src/modules/categories";
 import { getProductsByCategoryApi } from "@/src/modules/products";
 
@@ -22,13 +21,13 @@ export type categoryType = {
 };
 
 interface DataContextType {
-  products: ProductType[];
-  phones: ProductType[];
-  categoryData: ProductType[];
+  products: Product[];
+  phones: Product[];
+  categoryData: Product[];
   categories: categoryType[] | null;
   loading: boolean;
-  randomProducts: ProductType[];
-  setRandomProducts: Dispatch<SetStateAction<ProductType[]>>;
+  randomProducts: Product[];
+  setRandomProducts: Dispatch<SetStateAction<Product[]>>;
 }
 
 const DataContext = createContext<DataContextType | null>(null);
@@ -55,19 +54,18 @@ export default function DataProvider({ children }: ChildrenType) {
   // Fetch categories via the categories module
   const { data: appCategories, isLoading: categoriesLoading } = useCategories();
 
-  // Map to legacy types for backward compatibility
-  const products = useMemo<ProductType[]>(
-    () => (productsResult?.data ?? []).map(productToLegacy),
+  const products = useMemo<Product[]>(
+    () => productsResult?.data ?? [],
     [productsResult],
   );
 
-  const phones = useMemo<ProductType[]>(
-    () => (phonesResult?.data ?? []).map(productToLegacy),
+  const phones = useMemo<Product[]>(
+    () => phonesResult?.data ?? [],
     [phonesResult],
   );
 
-  const [randomProducts, setRandomProducts] = useState<ProductType[]>([]);
-  const [categoryData, setCategoryData] = useState<ProductType[]>([]);
+  const [randomProducts, setRandomProducts] = useState<Product[]>([]);
+  const [categoryData, setCategoryData] = useState<Product[]>([]);
 
   // Map categories from the categories module to the legacy format
   const categories = useMemo<categoryType[] | null>(
@@ -112,7 +110,7 @@ export default function DataProvider({ children }: ChildrenType) {
         const allProducts = results.flatMap(
           (result) => result?.data ?? [],
         );
-        const mergedProducts = allProducts.map(productToLegacy);
+        const mergedProducts = allProducts;
         setCategoryData(mergedProducts);
       } catch (error) {
         console.error("Error fetching category products:", error);

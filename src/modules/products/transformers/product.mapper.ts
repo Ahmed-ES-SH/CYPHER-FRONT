@@ -7,14 +7,17 @@ export interface RawProductPayload {
   title: string;
   slug?: string;
   description: string;
+  shortDescription?: string;
   sku: string;
   price: number;
   discountPercentage?: number;
+  discountedPrice?: number;
   stock: number;
+  reservedQuantity?: number;
   minimumOrderQuantity?: number;
   categoryId: string;
   category?: Record<string, unknown>;
-  brand?: string;
+  brand?: string | null;
   tags?: string[];
   images?: string[];
   media?: ProductMedia[];
@@ -23,23 +26,26 @@ export interface RawProductPayload {
   weight?: number;
   rating?: number;
   reviews?: unknown[];
+  barcode?: string;
+  qrCode?: string;
   isPublished?: boolean;
   availabilityStatus?: string;
+  warrantyInformation?: string;
+  shippingInformation?: string;
+  returnPolicy?: string;
   createdAt?: string;
   updatedAt?: string;
+  deletedAt?: string | null;
 }
 
 export function normalizeProductPayload(raw: RawProductPayload): Product {
   const tags = normalizeTags(raw.tags);
-  const media = normalizeMediaUrls(raw.media || raw.images);
-  const thumbnail =
-    raw.thumbnail ||
-    media.find((m) => m.isPrimary)?.url ||
-    media[0]?.url;
-  const price = Math.max(0, raw.price);
+  const images = normalizeImages(raw.images);
+  const thumbnail = raw.thumbnail || images[0];
+  const price = Math.max(0, Number(raw.price) || 0);
   const discountPercentage = Math.max(
     0,
-    Math.min(100, raw.discountPercentage ?? 0),
+    Math.min(100, Number(raw.discountPercentage) ?? 0),
   );
   const stock = Math.max(0, Math.floor(raw.stock ?? 0));
 
@@ -48,10 +54,11 @@ export function normalizeProductPayload(raw: RawProductPayload): Product {
     title: raw.title,
     slug: buildProductSlug(raw.title, raw.slug),
     description: raw.description,
+    shortDescription: raw.shortDescription,
     sku: raw.sku,
     price,
     discountPercentage,
-    discountedPrice: calculateDiscountedPrice(price, discountPercentage),
+    discountedPrice: Number(raw.discountedPrice) ?? calculateDiscountedPrice(price, discountPercentage),
     stock,
     minimumOrderQuantity: Math.max(
       1,
@@ -61,17 +68,25 @@ export function normalizeProductPayload(raw: RawProductPayload): Product {
     category: raw.category as Product["category"] | undefined,
     brand: raw.brand || undefined,
     tags,
-    media,
+    images,
     thumbnail,
     dimensions: raw.dimensions || { width: 0, height: 0, depth: 0 },
-    weight: raw.weight,
-    rating: Math.max(0, Math.min(5, raw.rating ?? 0)),
+    weight: raw.weight != null ? Number(raw.weight) : undefined,
+    rating: Math.max(0, Math.min(5, Number(raw.rating) ?? 0)),
     reviews: normalizeReviews(raw.reviews, raw.id),
     isPublished: raw.isPublished ?? true,
-    availabilityStatus: deriveAvailabilityStatus(stock),
+    availabilityStatus: raw.availabilityStatus ?? deriveAvailabilityStatus(stock),
+    warrantyInformation: raw.warrantyInformation,
+    shippingInformation: raw.shippingInformation,
+    returnPolicy: raw.returnPolicy,
     createdAt: raw.createdAt || new Date().toISOString(),
     updatedAt: raw.updatedAt || new Date().toISOString(),
   };
+}
+
+function normalizeImages(images?: string[]): string[] {
+  if (!images || !Array.isArray(images)) return [];
+  return images.filter((img): img is string => typeof img === "string" && img.length > 0);
 }
 
 export function normalizeTags(tags?: string[]): string[] {

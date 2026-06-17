@@ -64,6 +64,7 @@ CYPHER's design system, **The Innovation Frame**, exists to showcase next-genera
 This system explicitly rejects visual clutter, neon gamer tropes, and over-the-top decorative glassmorphism. It is built on high contrast, deliberate whitespace, and fine-tuned micro-interactions that foster deep user trust.
 
 Key Characteristics:
+
 - Product-first focal point using neutral canvases.
 - Technical readability with prominent spec layouts.
 - Flat-by-default structure elevating only on interaction.
@@ -74,12 +75,14 @@ Key Characteristics:
 The color palette balances professional technology confidence with bright, innovative freshness.
 
 ### Primary
+
 - **Primary Blue** (#0070dc): Trust, technology, and brand-defining action. The main CTA color.
 - **Primary Cyan** (#00b8db): Innovation, freshness, link hovers, active indicators.
 - **Primary Yellow** (#facc15): Special deals, highlights, limited-time badges, and key alerts.
 - **Dark Navy** (#041e42): Heading colors, premium depth, and secondary solid CTAs.
 
 ### Neutral
+
 - **Surface** (#f8fafc): Bright, clean default body background.
 - **Surface Elevated** (#ffffff): Cards, lists, and dialog containers.
 - **Border Subtle** (#e2e8f0): Razor-thin separation lines for layouts.
@@ -97,6 +100,7 @@ The color palette balances professional technology confidence with bright, innov
 The pairing of Space Grotesk and Inter creates a clean, technical, and highly legible reading flow. Space Grotesk brings a modern, geometric tech-oriented personality to display headings, while Inter provides neutral, high-legibility rendering for specs, pricing, and dense product copy.
 
 ### Hierarchy
+
 - **Display** (Bold 700, clamp(2rem, 5vw, 3.5rem), 1.2): Main hero titles and large announcement text.
 - **Headline** (Bold 700, 1.75rem, 1.25): Category layouts and primary section titles.
 - **Title** (Semi-bold 600, 1.25rem, 1.3): Product names, card headers, and subheaders.
@@ -110,6 +114,7 @@ The pairing of Space Grotesk and Inter creates a clean, technical, and highly le
 CYPHER uses a flat-by-default hybrid design. Surfaces are clean and rely on background color separation (`--surface` vs `--surface-elevated`) and thin border boundaries (`--border-subtle`) for layout structure. Shadows are used extremely sparingly to indicate elevated components.
 
 ### Shadow Vocabulary
+
 - **Elevated Hover** (`box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05)`): Applied to product cards and buttons on hover to indicate elevation response.
 - **Nav Shadow** (`box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02)`): Subtle elevation separation for the fixed top navigation bar.
 
@@ -118,46 +123,55 @@ CYPHER uses a flat-by-default hybrid design. Surfaces are clean and rely on back
 ## 5. Components
 
 ### Buttons
+
 - **Shape:** Slightly rounded corners (6px / `rounded-md`).
 - **Primary:** `--primary-blue` background, `--surface-elevated` text, `10px 24px` padding.
 - **Hover / Focus:** Transitions to `--dark-btn` background with a smooth 200ms ease and an elevated shadow.
 
 ### Cards / Containers
+
 - **Corner Style:** Rounded corners (6px / `rounded-md`).
 - **Background:** `--surface-elevated` (#ffffff).
 - **Shadow Strategy:** Flat at rest with a subtle `--border-subtle` stroke; elevations emerge on hover.
 - **Internal Padding:** Spacing scale (`16px` to `24px`) for appropriate breathing room.
 
 ### Inputs / Fields
+
 - **Style:** Clean white background, `--border-subtle` stroke, `rounded-md` corners.
-- **Focus:** `outline: 2px solid var(--primary-blue); outline-offset: 2px;` with clean outlines.
 
 ### Navigation
+
 - **Style:** Fixed sticky header, utilizing `--surface-elevated` background and a subtle navigation shadow.
 
 ### Signature Component: Product Card
+
 The primary item-display tile of the storefront. It combines content-first structural frames with smart interaction cues.
+
 - **Border:** `border border-border-subtle` for distinct layout bounds.
 - **Hover Reaction:** Smooth 200ms transition to a soft elevation shadow (`box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05)`) and slight product image scaling (105%).
 - **Overlays:** Top rated label overlay (Primary Blue, white text) and discount overlay (Primary Yellow, Navy text) positioned in the upper-left of the image canvas.
 - **Interactive Triggers:** Reveals action buttons and additional spec attributes dynamically on hover.
 
 ### Product Action Button
+
 A smart, context-aware add-to-cart controller embedded in each product card.
+
 - **States:**
-  - *Out of Stock:* Disabled, neutral surface background (`--surface`), muted text.
-  - *In Cart:* Light accent styling (`bg-primary-blue/10 text-primary-blue border border-primary-blue/20`) to confirm checkout readiness.
-  - *Hover Active:* Vibrant Primary Blue background (`bg-primary-blue`) transitioning to Dark Navy (`bg-dark-btn`) on hover.
-  - *Rest State:* Soft neutral background (`bg-surface`) with secondary text.
+  - _Out of Stock:_ Disabled, neutral surface background (`--surface`), muted text.
+  - _In Cart:_ Light accent styling (`bg-primary-blue/10 text-primary-blue border border-primary-blue/20`) to confirm checkout readiness.
+  - _Hover Active:_ Vibrant Primary Blue background (`bg-primary-blue`) transitioning to Dark Navy (`bg-dark-btn`) on hover.
+  - _Rest State:_ Soft neutral background (`bg-surface`) with secondary text.
 
 ## 6. Do's and Don'ts
 
 ### Do:
+
 - **Do** use strict neutral layouts to let product imagery carry the color and texture.
 - **Do** showcase clear specs and prices with prominent typographic weight.
 - **Do** utilize smooth, quick transitions (200-300ms) for interactive elements.
 
 ### Don't:
+
 - **Don't** use colored left/right side-stripes on product cards, warnings, or badges.
 - **Don't** use gradient text under any circumstances; maintain solid, legible colors.
 - **Don't** apply neon backgrounds or flashing accents.

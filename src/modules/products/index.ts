@@ -153,5 +153,4 @@ export {
   prefetchProduct,
 } from "./server/prefetchProduct";
 
-export { productToLegacy } from "./adapters/productToLegacy";
-export type { LegacyProduct } from "./adapters/productToLegacy";
+

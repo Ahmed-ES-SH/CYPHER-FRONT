@@ -3,15 +3,15 @@ import { ChangeEvent, useEffect, useState, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
 import { MdClose } from "react-icons/md";
 import { AnimatePresence, motion } from "framer-motion";
-import { ProductType } from "@/app/types/productType";
-import { getProductsApi, productToLegacy } from "@/src/modules/products";
+import { Product } from "@/src/modules/products";
+import { getProductsApi } from "@/src/modules/products";
 import SearchResultsDropdown from "./SearchResultsDropdown";
 
 export default function SearchOverlay() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [searchData, setSearchData] = useState<ProductType[]>([]);
+  const [searchData, setSearchData] = useState<Product[]>([]);
   const [showResults, setShowResults] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,7 +26,7 @@ export default function SearchOverlay() {
       if (!query.trim()) return;
       try {
         const result = await getProductsApi({ search: query, limit: 10 });
-        setSearchData(result.data.map(productToLegacy));
+        setSearchData(result.data);
         setShowResults(true);
       } catch (error) {
         console.error("Search error:", error);
@@ -83,7 +83,7 @@ export default function SearchOverlay() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[99999] flex items-start justify-center pt-24 px-4"
+            className="fixed inset-0 z-99999 flex items-start justify-center pt-24 px-4"
           >
             <div
               className="absolute inset-0 bg-black/30 backdrop-blur-md"

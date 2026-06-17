@@ -2,8 +2,8 @@ import type { RawProductPayload } from "../../src/modules/products/transformers/
 
 /**
  * Raw product payloads matching what the backend API returns.
- * These get processed by normalizeProductPayload → productToLegacy
- * in the frontend before reaching UI components.
+ * These get processed by normalizeProductPayload in the frontend
+ * before reaching UI components.
  */
 
 export const SAMPLE_PRODUCT: RawProductPayload = {

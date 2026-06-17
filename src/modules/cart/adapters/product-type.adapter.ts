@@ -1,5 +1,5 @@
 import type { ProductAdapter } from "./cart-helpers";
-import type { ProductType } from "@/app/types/productType";
+import type { Product } from "@/src/modules/products";
 import { CART_RULES } from "../cart.types";
 
 /* =========================================================
@@ -10,8 +10,8 @@ import { CART_RULES } from "../cart.types";
    GuestCartItem via the generic ProductAdapter interface.
    ========================================================= */
 
-export const productTypeAdapter: ProductAdapter<ProductType> = {
-  getId: (product) => String(product.id),
+export const productTypeAdapter: ProductAdapter<Product> = {
+  getId: (product) => product.id,
   getName: (product) => product.title,
   getSlug: (product) => product.title.toLowerCase().replace(/\s+/g, "-"),
   getImage: (product) => product.images?.[0] ?? product.thumbnail ?? "",

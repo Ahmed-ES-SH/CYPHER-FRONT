@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
 import { FaTruck, FaShoppingCart, FaShieldAlt } from "react-icons/fa";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import ProductRenderStars from "./ProductRenderStars";
 import Quantity_Actions from "./Quantity&Actions";
 import CategoriesSocial from "./Categories&social";
 import QuickSpecs from "./QuickSpecs";
 
 interface ProductDetailsProps {
-  product: ProductType;
+  product: Product;
   discountedPrice: number;
   isWishlisted: boolean;
   setIsWishlisted: (value: boolean) => void;

@@ -1,5 +1,5 @@
 "use client";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import React, { useState } from "react";
 import { BiHeart, BiStar } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
@@ -10,7 +10,7 @@ import { useWishlistStore } from "@/app/store/WishlistStoreStore";
 import { IoHeartDislikeOutline } from "react-icons/io5";
 
 interface props {
-  product: ProductType;
+  product: Product;
 }
 
 export default function MiniProductCard({ product }: props) {

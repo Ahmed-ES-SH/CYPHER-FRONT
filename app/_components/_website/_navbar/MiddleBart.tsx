@@ -27,10 +27,11 @@ export default async function MiddleBart() {
         <div className="max-xl:hidden w-full">
           <InputSearch />
         </div>
-        {/* SearchOverlay icon - visible below xl */}
-        <SearchOverlay />
+
         {/* //////////// */}
         <div id="icons" className="flex items-center gap-4">
+          {/* SearchOverlay icon - visible below xl */}
+          <SearchOverlay />
           {/* Signin Link */}
           <SignInBtn />
           {/* Heart Icon && FavoriteList */}

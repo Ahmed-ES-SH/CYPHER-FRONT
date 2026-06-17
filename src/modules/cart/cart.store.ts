@@ -66,12 +66,13 @@ export const useCartStore = create<CartStore>()(
               ),
             };
           }
+          const newQty = Math.min(item.quantity, item.maximumQuantity, item.stock || item.maximumQuantity);
           return {
             guestItems: [
               ...state.guestItems,
               {
                 ...item,
-                quantity: clampGuestQuantity(item, item.quantity),
+                quantity: Math.max(1, newQty),
               },
             ],
           };

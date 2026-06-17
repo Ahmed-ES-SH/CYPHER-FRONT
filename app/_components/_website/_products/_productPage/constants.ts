@@ -1,4 +1,4 @@
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 
 export const keyFeatures = [
   "High-performance design and premium materials",
@@ -8,12 +8,12 @@ export const keyFeatures = [
   "Ships in secure, eco-friendly packaging",
 ];
 
-export function returnSpecs(product: ProductType) {
+export function returnSpecs(product: Product) {
   return [
     { label: "Brand", value: `${product?.brand || "Premium Brand"}` },
     { label: "Model SKU", value: `${product?.sku || "CY-7892-X"}` },
-    { label: "Category", value: `${product?.category || "Electronics"}` },
-    { label: "Weight", value: `${product?.weight || "0.5"} kg` },
+    { label: "Category", value: `${product?.category?.name || "Electronics"}` },
+    { label: "Weight", value: `${product?.weight != null ? product.weight : "0.5"} kg` },
     { 
       label: "Dimensions", 
       value: product?.dimensions 

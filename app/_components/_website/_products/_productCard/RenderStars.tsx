@@ -1,8 +1,8 @@
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { BiStar } from "react-icons/bi";
 
 interface RenderStarsProps {
-  product: ProductType;
+  product: Product;
 }
 
 export default function RenderStars({ product }: RenderStarsProps) {

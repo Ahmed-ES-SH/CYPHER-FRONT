@@ -39,6 +39,7 @@ export interface Product {
   title: string;
   slug: string;
   description: string;
+  shortDescription?: string;
   sku: string;
   price: number;
   discountPercentage: number;
@@ -49,7 +50,7 @@ export interface Product {
   category?: Category;
   brand?: string;
   tags: string[];
-  media: ProductMedia[];
+  images: string[];
   thumbnail?: string;
   dimensions: ProductDimensions;
   weight?: number;
@@ -57,6 +58,9 @@ export interface Product {
   reviews: ProductReview[];
   isPublished: boolean;
   availabilityStatus: string;
+  warrantyInformation?: string;
+  shippingInformation?: string;
+  returnPolicy?: string;
   createdAt: string;
   updatedAt: string;
 }

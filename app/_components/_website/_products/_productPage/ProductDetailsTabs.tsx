@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaCheck, FaStar } from "react-icons/fa";
 import { RiProductHuntLine } from "react-icons/ri";
 import { formatDateTime } from "@/app/helpers/formatTime";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { keyFeatures } from "./constants";
 
 type spec = {
@@ -14,7 +14,7 @@ type spec = {
 };
 
 interface ProductDetailsTabsProps {
-  product: ProductType;
+  product: Product;
   specs: spec[];
 }
 
@@ -162,7 +162,7 @@ export default function ProductDetailsTabs({
             >
             {product.reviews.map((review) => (
               <div
-                key={review.data}
+                key={review.id}
                 className="bg-white rounded-lg border border-gray-200 p-6 w-full"
               >
                 <div className="flex items-center space-x-4 mb-4">
@@ -171,9 +171,8 @@ export default function ProductDetailsTabs({
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800">
-                      {review.reviewerName}
+                      {review.userName}
                     </h4>
-                    <p className="text-[11px] mb-1">{review.reviewerEmail}</p>
                     <div className="flex items-center space-x-2">
                       <div className="flex space-x-1">
                         {Array.from({ length: review.rating }).map(

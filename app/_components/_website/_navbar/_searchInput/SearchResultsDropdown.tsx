@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BiNoEntry } from "react-icons/bi";
 import SearchResultItem from "./SearchResultItem";
@@ -9,7 +9,7 @@ import SearchResultItem from "./SearchResultItem";
 interface SearchResultsDropdownProps {
   showResults: boolean;
   loading: boolean;
-  searchData: ProductType[];
+  searchData: Product[];
   query: string;
 }
 

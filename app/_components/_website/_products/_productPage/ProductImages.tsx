@@ -1,10 +1,10 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import Img from "@/app/_components/_global/Img";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 
 interface ProductImagesProps {
-  images: ProductType["images"];
+  images: Product["images"];
   selectedImage: string;
   setSelectedImage: (image: string) => void;
   discountPercentage: number;

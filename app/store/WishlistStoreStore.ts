@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { toast } from "sonner";
-import { ProductType } from "../types/productType";
+import { Product } from "@/src/modules/products";
 
 type WishlistState = {
-  wishlistItems: ProductType[];
-  addToWishlist: (product: ProductType) => void;
-  removeFromWishlist: (productId: number) => void;
-  isInWishlist: (productId: number) => boolean;
+  wishlistItems: Product[];
+  addToWishlist: (product: Product) => void;
+  removeFromWishlist: (productId: string) => void;
+  isInWishlist: (productId: string) => boolean;
   clearWishlist: () => void;
 };
 

@@ -4,19 +4,18 @@ import { ChangeEvent, useEffect, useState, useRef } from "react";
 import Categories from "../Categories";
 import { CiSearch } from "react-icons/ci";
 import { useData } from "@/app/context/DataContext";
-import { ProductType } from "@/app/types/productType";
+import { Product } from "@/src/modules/products";
 import { AnimatePresence, motion } from "framer-motion";
-import { MdClose } from "react-icons/md";
 
 import SearchResultsDropdown from "./SearchResultsDropdown";
 import { getProductsApi } from "@/src/modules/products";
-import { productToLegacy } from "@/src/modules/products";
+import { MdClose } from "react-icons/md";
 
 export default function InputSearch() {
   const { categories } = useData();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [searchData, setSearchData] = useState<ProductType[]>([]);
+  const [searchData, setSearchData] = useState<Product[]>([]);
   const inputRef = useRef<HTMLDivElement>(null);
   const [showResults, setShowResults] = useState(false);
 
@@ -30,7 +29,7 @@ export default function InputSearch() {
       if (!query.trim()) return;
       try {
         const result = await getProductsApi({ search: query, limit: 10 });
-        setSearchData(result.data.map(productToLegacy));
+        setSearchData(result.data);
         setShowResults(true);
       } catch (error) {
         console.error("Search error:", error);
