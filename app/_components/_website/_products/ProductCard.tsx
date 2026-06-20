@@ -131,8 +131,8 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
             )}
           </button>
           <Link
-            href={`/products/${formatTitle(product.title)}?slug=${
-              product.slug
+            href={`/products/${formatTitle(product.title)}?productId=${
+              product.id
             }`}
             aria-label="Quick view product"
             className={`p-2 block bg-surface-elevated rounded-full shadow-md hover:bg-surface transition-all duration-300 xl:opacity-0 xl:translate-x-8 xl:group-hover:opacity-100 xl:group-hover:translate-x-0 opacity-100 translate-x-0`}
@@ -155,7 +155,7 @@ export default function ProductCard({ product, viewMode = "grid" }: props) {
 
         {/* Product title */}
         <Link
-          href={`/products/${formatTitle(product.title)}?slug=${product.slug}`}
+          href={`/products/${formatTitle(product.title)}?productId=${product.id}`}
           className={`text-text-primary font-medium text-[14px] mb-2 hover:text-primary-blue transition-colors duration-200 block leading-tight ${
             viewMode === "list" ? "" : "line-clamp-2 min-h-10"
           }`}

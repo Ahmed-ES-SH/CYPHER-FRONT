@@ -10,6 +10,7 @@ function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const email = searchParams.get("email");
   const { mutateAsync } = useVerifyEmail();
   const [status, setStatus] = useState<"loading" | "success" | "failure">("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -27,7 +28,7 @@ function VerifyEmailContent() {
     setStatus("loading");
 
     try {
-      await mutateAsync({ token });
+      await mutateAsync({ token: token! , email: email! });
       setStatus("success");
     } catch (error: any) {
       setStatus("failure");

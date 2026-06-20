@@ -87,9 +87,9 @@ export async function getProductsApi(
   };
 }
 
-export async function getProductApi(slug: string): Promise<Product> {
+export async function getProductApi(id: string): Promise<Product> {
   const raw = await productsRequest<RawProductPayload>(
-    PRODUCTS_ENDPOINTS.PUBLIC_BY_SLUG(slug),
+    PRODUCTS_ENDPOINTS.PUBLIC_BY_ID(id),
   );
   return normalizeProductPayload(raw);
 }

@@ -31,7 +31,7 @@ export default function SignUpComponent() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">
+              <span className="px-4 bg-surface text-gray-500">
                 or Sign up with new account
               </span>
             </div>

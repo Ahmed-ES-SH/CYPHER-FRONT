@@ -12,6 +12,7 @@ import {
   FiUser,
 } from "react-icons/fi";
 import { useRegister } from "@/src/modules/user";
+import VerifyEmailPopup from "./VerifyEmailPopup";
 
 type FormFields = "email" | "password" | "name";
 
@@ -99,30 +100,7 @@ export default function SignupForm() {
   };
 
   if (pendingVerification) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center justify-center py-12 px-6 text-center"
-      >
-        <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-6">
-          <FiMail className="size-10 text-green-500" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h2>
-        <p className="text-gray-500 max-w-md mb-8">
-          We&apos;ve sent a verification link to <strong>{formData.email}</strong>.
-          Please check your inbox and click the link to activate your account.
-        </p>
-        <div className="bg-gray-50 rounded-xl p-4 w-full max-w-sm text-left space-y-3">
-          <div className="flex items-start gap-3">
-            <FiMail className="size-5 text-primary mt-0.5 shrink-0" />
-            <p className="text-sm text-gray-600">
-              Didn&apos;t receive the email? Check your spam folder or try signing up again.
-            </p>
-          </div>
-        </div>
-      </motion.div>
-    );
+    return <VerifyEmailPopup email={formData.email} />;
   }
 
   return (

@@ -12,8 +12,9 @@ export async function fetchProducts(
   return getProductsApi(query);
 }
 
-export async function fetchProduct(slug: string): Promise<Product> {
-  return getProductApi(slug);
+export async function fetchProduct(id: string): Promise<Product> {
+  const res = await getProductApi(id);
+  return res;
 }
 
 export async function fetchProductsByCategory(

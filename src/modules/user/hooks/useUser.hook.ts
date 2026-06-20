@@ -27,7 +27,7 @@ export function useRegister() {
 
 export function useVerifyEmail() {
   return useMutation({
-    mutationFn: (dto: { token: string }) => verifyEmailApi(dto.token),
+    mutationFn: ({token, email}: {token: string, email: string}) => verifyEmailApi({token , email}),
   });
 }
 

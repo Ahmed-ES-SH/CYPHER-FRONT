@@ -28,7 +28,7 @@ export default function ProductPage({ product }: ProductPageProps) {
 
   // Calculate discounted price
   const discountedPrice =
-    product && product.price * (1 - product.discountPercentage / 100);
+    product && product.price * (1 - Number(product.discountPercentage) / 100);
 
   useEffect(() => {
     if (product) {
@@ -73,7 +73,7 @@ export default function ProductPage({ product }: ProductPageProps) {
               images={product.images}
               selectedImage={selectedImage}
               setSelectedImage={setSelectedImage}
-              discountPercentage={product.discountPercentage}
+              discountPercentage={Number(product.discountPercentage)}
             />
 
             {/* Product Details */}

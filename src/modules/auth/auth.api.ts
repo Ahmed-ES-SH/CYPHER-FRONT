@@ -55,8 +55,8 @@ export async function getCurrentUserApi(): Promise<CurrentUserResponse> {
   return user as CurrentUserResponse;
 }
 
-export async function verifyEmailApi(token: string): Promise<MessageResponse> {
-  return authRequest<MessageResponse>(AUTH_ENDPOINTS.VERIFY_EMAIL(token), "GET");
+export async function verifyEmailApi({token , email}: {token: string , email: string}): Promise<MessageResponse> {
+  return authRequest<MessageResponse>(AUTH_ENDPOINTS.VERIFY_EMAIL({token , email}), "GET");
 }
 
 export async function sendResetPasswordApi(

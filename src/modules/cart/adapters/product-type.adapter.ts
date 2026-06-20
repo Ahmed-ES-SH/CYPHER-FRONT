@@ -16,7 +16,7 @@ export const productTypeAdapter: ProductAdapter<Product> = {
   getSlug: (product) => product.title.toLowerCase().replace(/\s+/g, "-"),
   getImage: (product) => product.images?.[0] ?? product.thumbnail ?? "",
   getPrice: (product) => ({
-    amount: Math.round(product.price * 100),
+    amount: Math.round(product.price * (1 - product.discountPercentage / 100) * 100),
     currency: "usd",
   }),
   getStock: (product) => product.stock,

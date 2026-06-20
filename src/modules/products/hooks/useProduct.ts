@@ -7,19 +7,19 @@ import { PRODUCTS_DEFAULTS } from "../constants/products.defaults";
 import { getProductsConfig } from "../config/products.config";
 import type { Product } from "../types/product.types";
 
-export function useProduct(slug: string | undefined) {
+export function useProduct(id: string | undefined) {
   const config = getProductsConfig();
-  const safeSlug = slug?.trim() || "";
+  const safeId = id?.trim() || "";
 
   return useQuery<Product>({
-    queryKey: productKeys.detail(safeSlug),
+    queryKey: productKeys.detail(safeId),
     queryFn: () => {
-      if (!safeSlug) {
-        throw new Error("Product slug is required.");
+      if (!safeId) {
+        throw new Error("Product id is required.");
       }
-      return getProductApi(safeSlug);
+      return getProductApi(safeId);
     },
-    enabled: safeSlug.length > 0,
+    enabled: safeId.length > 0,
     staleTime: config.staleTime ?? PRODUCTS_DEFAULTS.STALE_TIME,
     gcTime: config.gcTime ?? PRODUCTS_DEFAULTS.GC_TIME,
     retry: config.retryCount ?? PRODUCTS_DEFAULTS.RETRY,

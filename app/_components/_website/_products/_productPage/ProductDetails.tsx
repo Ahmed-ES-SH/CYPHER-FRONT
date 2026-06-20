@@ -37,7 +37,8 @@ export default function ProductDetails({
           {product.title}
         </h1>
         <p className="text-icon-color text-sm">
-          SKU: <span className="font-medium">{product?.sku || "CY-7892-X"}</span> | 
+          SKU:{" "}
+          <span className="font-medium">{product?.sku || "CY-7892-X"}</span> |
           Model: <span className="font-medium">2024 Gen-3</span>
         </p>
       </div>
@@ -53,7 +54,7 @@ export default function ProductDetails({
             ({product.reviews.length} Reviews)
           </span>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           <span className="text-green-600 text-sm font-bold uppercase tracking-wide">
@@ -77,10 +78,10 @@ export default function ProductDetails({
             </span>
           </div>
         </div>
-        
+
         <div className="bg-primary-yellow/10 border border-primary-yellow/20 px-4 py-2 rounded-full">
           <span className="text-primary-yellow font-bold text-sm">
-            SAVE {(product.discountPercentage).toFixed(0)}% TODAY
+            SAVE {Number(product.discountPercentage).toFixed(0)}% TODAY
           </span>
         </div>
       </div>
@@ -110,7 +111,9 @@ export default function ProductDetails({
           </div>
           <div>
             <p className="text-sm font-bold text-dark-btn">Warranty Included</p>
-            <p className="text-xs text-icon-color">{product.warrantyInformation || "2-Year Manufacturer Protection"}</p>
+            <p className="text-xs text-icon-color">
+              {product.warrantyInformation || "2-Year Manufacturer Protection"}
+            </p>
           </div>
         </div>
       </div>
@@ -118,7 +121,9 @@ export default function ProductDetails({
       {/* High-Urgency Subtle Notification */}
       <p className="text-sm text-icon-color flex items-center gap-2">
         <FaShoppingCart className="text-primary-yellow opacity-70" />
-        <span className="italic">5 people currently have this item in their cart.</span>
+        <span className="italic">
+          5 people currently have this item in their cart.
+        </span>
       </p>
 
       {/* Categories & Social */}

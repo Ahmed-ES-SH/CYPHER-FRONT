@@ -2,7 +2,8 @@ export const AUTH_ENDPOINTS = {
   LOGIN: "/api/auth/login",
   LOGOUT: "/api/auth/logout",
   CURRENT_USER: "/api/auth/current-user",
-  VERIFY_EMAIL: (token: string) => `/api/auth/verify-email?token=${token}` as const,
+  VERIFY_EMAIL: ({ token, email }: { token: string; email: string }) =>
+    `/api/auth/verify-email?token=${token}&email=${email}` as const,
   RESET_PASSWORD_SEND: "/api/auth/reset-password/send",
   RESET_PASSWORD_VERIFY: "/api/auth/reset-password/verify",
   RESET_PASSWORD: "/api/auth/reset-password",

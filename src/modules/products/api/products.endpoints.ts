@@ -1,6 +1,6 @@
 export const PRODUCTS_ENDPOINTS = {
   PUBLIC_LIST: "/api/products",
-  PUBLIC_BY_SLUG: (slug: string) => `/api/products/${slug}`,
+  PUBLIC_BY_ID: (id: string) => `/api/products/${id}`,
   PUBLIC_BY_CATEGORY: (categorySlug: string) =>
     `/api/products/category/${categorySlug}`,
   FILTER_OPTIONS: "/api/products/filter-options",

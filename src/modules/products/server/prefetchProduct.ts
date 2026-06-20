@@ -5,11 +5,11 @@ import { PRODUCTS_DEFAULTS } from "../constants/products.defaults";
 
 export async function prefetchProduct(
   queryClient: QueryClient,
-  slug: string,
+  id: string,
 ) {
   return queryClient.prefetchQuery({
-    queryKey: productKeys.detail(slug),
-    queryFn: () => getProductApi(slug),
+    queryKey: productKeys.detail(id),
+    queryFn: () => getProductApi(id),
     staleTime: PRODUCTS_DEFAULTS.STALE_TIME,
   });
 }
